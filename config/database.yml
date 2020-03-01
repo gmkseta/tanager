@@ -1,0 +1,18 @@
+default: &default
+  adapter: postgresql
+  encoding: utf8
+  pool: 5
+
+development:
+  <<: *default
+  host: <%= ENV.fetch("POSTGRESQL_HOST") { "localhost" } %>
+  database: <%= ENV.fetch("POSTGRESQL_DB") { "swallow_development" } %>
+  username: <%= ENV.fetch("POSTGRESQL_USER_NAME") { "postgres" } %>
+  password: <%= ENV['POSTGRESQL_PASSWORD'] %>
+
+production:
+  <<: *default
+  host: <%= ENV.fetch("POSTGRESQL_HOST") { "localhost" } %>
+  database: <%= ENV.fetch("POSTGRESQL_DB") { "swallow_production" } %>
+  username: <%= ENV.fetch("POSTGRESQL_USER_NAME") { "postgres" } %>
+  password: <%= ENV['POSTGRESQL_PASSWORD'] %>

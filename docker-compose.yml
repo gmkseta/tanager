@@ -1,0 +1,57 @@
+version: '3'
+services:
+  postgres:
+    image: postgres:11.5-alpine
+    volumes:
+      - ./tmp/db:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    expose:
+      - "5432"
+  redis:
+    build: docker/redis
+    volumes:
+      - ./tmp/redis:/var/lib/redis/data
+  rails:
+    env_file: ".env"
+    environment:
+      POSTGRESQL_HOST: $POSTGRESQL_HOST
+      RAILS_ENV: $RAILS_ENV
+      REDIS_HOST: $REDIS_HOST
+      REDIS_PORT: $REDIS_PORT
+    build: 
+      context: .
+      dockerfile: ./docker/rails/Dockerfile    
+    volumes:
+      - ./:/swallow_app
+    entrypoint: dockerize -wait tcp://${POSTGRESQL_HOST}:5432 -timeout 20s
+    command: /bin/bash -c ./docker-entrypoint.sh
+    depends_on:
+      - postgres
+      - redis
+    ports:
+      - "3000:3000"
+  nginx:
+    env_file: ".env"
+    build:
+      context: .
+      dockerfile: ./docker/nginx/Dockerfile
+    environment:
+      RAILS_HOST: $RAILS_HOST
+    ports:
+      - 80:80
+    depends_on:
+      - rails
+  sidekiq:
+    env_file: ".env"
+    environment:
+      POSTGRESQL_HOST: $POSTGRESQL_HOST
+      RAILS_ENV: $RAILS_ENV
+      REDIS_HOST: $REDIS_HOST
+      REDIS_PORT: $REDIS_PORT
+    build:
+      context: .
+      dockerfile: ./docker/sidekiq/Dockerfile
+    depends_on:
+      - rails
+      - redis
