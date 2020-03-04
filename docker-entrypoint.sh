@@ -7,12 +7,11 @@ fi
 
 bundle exec rails db:create db:migrate
 
-yarn cache clean
-rm -rf node_modules/ npm-packages-offline-cache
-yarn install --check-files
-
 if [ "$RAILS_ENV" = "production" ]; then
-  echo 'precompiling assets'  
+  echo 'precompiling assets'
+  yarn cache clean
+  rm -rf node_modules/ npm-packages-offline-cache
+  yarn install --check-files
   bundle exec rails assets:precompile
 fi
 
