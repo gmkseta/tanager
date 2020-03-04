@@ -1,0 +1,50 @@
+version: 0.2
+
+phases: 
+  install: 
+    runtime-versions:
+      docker: 18 
+  pre_build:
+    commands:
+      - echo Logging in to Amazon ECR...
+      - aws --version
+      - $(aws ecr get-login --registry-ids 760101598804 --region ap-northeast-2 --no-include-email)
+      - NGINX_REPOSITORY_URI=760101598804.dkr.ecr.ap-northeast-2.amazonaws.com/swallow_nginx_staging
+      - RAILS_REPOSITORY_URI=760101598804.dkr.ecr.ap-northeast-2.amazonaws.com/swallow_rails_staging
+      - SIDEKIQ_REPOSITORY_URI=760101598804.dkr.ecr.ap-northeast-2.amazonaws.com/swallow_sidekiq_staging
+      - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+      - IMAGE_TAG=${COMMIT_HASH:=latest}
+      - docker pull $NGINX_REPOSITORY_URI:latest || true
+      - docker pull $RAILS_REPOSITORY_URI:latest || true
+      - docker pull $SIDEKIQ_REPOSITORY_URI:latest || true
+  build:
+    commands:
+      - echo Build started on `date`
+      - echo Building the Nginx image...
+      - docker build --cache-from $NGINX_REPOSITORY_URI:latest -t $NGINX_REPOSITORY_URI:latest -f docker/nginx/Dockerfile .
+      - echo Building the Rails Docker image...
+      - docker build --cache-from $RAILS_REPOSITORY_URI:latest -t $RAILS_REPOSITORY_URI:latest -f docker/rails/Dockerfile .
+      - echo Building the Sidekiq Docker image...
+      - docker build --cache-from $SIDEKIQ_REPOSITORY_URI:latest -t $SIDEKIQ_REPOSITORY_URI:latest -f docker/sidekiq/Dockerfile .
+      - docker tag $NGINX_REPOSITORY_URI:latest $NGINX_REPOSITORY_URI:$IMAGE_TAG
+      - docker tag $RAILS_REPOSITORY_URI:latest $RAILS_REPOSITORY_URI:$IMAGE_TAG
+      - docker tag $SIDEKIQ_REPOSITORY_URI:latest $SIDEKIQ_REPOSITORY_URI:$IMAGE_TAG
+  post_build:
+    commands:
+      - echo Build completed on `date`
+      - echo Pushing the Nginx Docker images...
+      - docker push $NGINX_REPOSITORY_URI:latest
+      - docker push $NGINX_REPOSITORY_URI:$IMAGE_TAG
+      - echo Pushing the Rails Docker images...
+      - docker push $RAILS_REPOSITORY_URI:latest
+      - docker push $RAILS_REPOSITORY_URI:$IMAGE_TAG
+      - echo Pushing the Sidekiq Docker images...
+      - docker push $SIDEKIQ_REPOSITORY_URI:latest
+      - docker push $SIDEKIQ_REPOSITORY_URI:$IMAGE_TAG
+      - echo Writing image definitions file...
+      - printf '[{"name":"swallow_nginx_staging","imageUri":"%s"}]' $NGINX_REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
+      - printf '[{"name":"swallow_rails_staging","imageUri":"%s"}]' $RAILS_REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
+      - printf '[{"name":"swallow_sidekiq_staging","imageUri":"%s"}]' $SIDEKIQ_REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
+artifacts:
+  files: 
+    - imagedefinitions.json

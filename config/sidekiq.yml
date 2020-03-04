@@ -1,12 +1,3 @@
 :concurrency: 30
 :queues:
-  - [access_logs, 5]
-  - [request_card_payments, 5]
-  - [send_short_messages, 2]
-  - [check_short_messages, 2]
-  - [send_ata_messages, 2]
-  - [send_cta_messages, 2]
-  - [send_kakao_group_messages, 2]
-  - [invite_excel, 2]
-  - [access_logging, 2]
   - default

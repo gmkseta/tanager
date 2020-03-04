@@ -7,7 +7,7 @@ RUN apt-get update -qq && apt-get install -y build-essential libpq-dev nodejs li
 ENV TZ Asia/Seoul
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-ENV RAILS_ROOT /goose_app
+ENV RAILS_ROOT /swallow_app
 
 RUN mkdir -p $RAILS_ROOT
 WORKDIR $RAILS_ROOT

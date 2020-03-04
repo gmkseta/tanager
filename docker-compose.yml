@@ -12,6 +12,10 @@ services:
     build: docker/redis
     volumes:
       - ./tmp/redis:/var/lib/redis/data
+    ports:
+      - "6379:6379"
+    expose:
+      - "6379"
   rails:
     env_file: ".env"
     environment:
