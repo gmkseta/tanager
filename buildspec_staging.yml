@@ -9,9 +9,9 @@ phases:
       - echo Logging in to Amazon ECR...
       - aws --version
       - $(aws ecr get-login --registry-ids 760101598804 --region ap-northeast-2 --no-include-email)
-      - NGINX_REPOSITORY_URI=760101598804.dkr.ecr.ap-northeast-2.amazonaws.com/swallow_nginx_staging
-      - RAILS_REPOSITORY_URI=760101598804.dkr.ecr.ap-northeast-2.amazonaws.com/swallow_rails_staging
-      - SIDEKIQ_REPOSITORY_URI=760101598804.dkr.ecr.ap-northeast-2.amazonaws.com/swallow_sidekiq_staging
+      - NGINX_REPOSITORY_URI=760101598804.dkr.ecr.ap-northeast-2.amazonaws.com/swallow_staging_nginx
+      - RAILS_REPOSITORY_URI=760101598804.dkr.ecr.ap-northeast-2.amazonaws.com/swallow_staging_rails
+      - SIDEKIQ_REPOSITORY_URI=760101598804.dkr.ecr.ap-northeast-2.amazonaws.com/swallow_staging_sidekiq
       - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
       - IMAGE_TAG=${COMMIT_HASH:=latest}
       - docker pull $NGINX_REPOSITORY_URI:latest || true
