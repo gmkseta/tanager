@@ -8,10 +8,11 @@ fi
 bundle exec rails db:create db:migrate
 
 if [ "$RAILS_ENV" = "production" ]; then
+  echo 'cleaning cache'
+  rm -rf node_modules yarn-offline-cache && yarn cache clean
+  echo 'updating checksums'
+  yarn --update-checksums
   echo 'precompiling assets'
-  yarn cache clean
-  rm -rf node_modules/ npm-packages-offline-cache
-  yarn install --check-files
   bundle exec rails assets:precompile
 fi
 

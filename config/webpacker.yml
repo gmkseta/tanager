@@ -36,6 +36,7 @@ default: &default
   extensions:
     - .mjs
     - .js
+    - .jsx
     - .sass
     - .scss
     - .css
@@ -50,7 +51,7 @@ default: &default
 
 development:
   <<: *default
-  compile: false
+  compile: true
 
   # Verifies that correct packages and versions are installed by inspecting package.json, yarn.lock, and node_modules
   check_yarn_integrity: false
