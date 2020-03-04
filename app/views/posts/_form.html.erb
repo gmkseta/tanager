@@ -1,0 +1,51 @@
+<%= form_for @post,
+   url: (@post.persisted? ? post_path(@post) : posts_path),
+   html: { data: {behavior: "comment-form"} } do |f| %>
+
+  <% if @post.errors.any? %>
+    <div id="error_explanation">
+      <h2 class="h4">글 등록 중 <%= pluralize(@post.errors.count, "문제") %>가 발견되었습니다</h2>
+
+      <ul>
+      <% @post.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="form-group">
+    <%= f.label "제목" %>
+    <%= f.text_field :title, placeholder: "제목을 입력하세요.", class: "form-control" %>
+  </div>
+
+
+<div class="form-group">
+  <%= f.label "카테고리 선택" %>
+  <%= f.collection_select :category_ids , Category.sorted, :id, :name, {placeholder: "카테고리를 선택하세요"}, {autofocus: true, class: "form-control category-multiple", multiple: true, :onChange=>"categorySelectHandler()"}%>
+  </div>
+
+  <% if local_assigns.fetch(:posts, true) %>
+  <% @post.comments.build if @post.comments.blank? %>
+  <%= f.fields_for :comments do |p| %>
+    <div class="form-group">
+      <%= p.label :body, "내용" %>
+      <%= p.text_area :body, placeholder: "내용을 입력하세요.", rows: 10, class: "form-control editable", data: { behavior: "comment-body" } %>
+    </div>
+  <% end %>
+  <% end %>
+
+  <div class="form-group text-right">
+    <% if f.object.new_record? %>
+      <%= f.button "등록하기", class: "btn btn-primary", data: {disable_with: "<i class='fa fa-spinner fa-spin'></i> #{t('saving')}"} %>
+    <% else %>
+      <%= f.button "수정하기", class: "btn btn-primary", data: {disable_with: "<i class='fa fa-spinner fa-spin'></i> #{t('saving')}"} %>
+    <% end %>
+  </div>
+
+<% end %>
+
+<script></script>
+<script>
+  $('.category-multiple').select2();
+</script>

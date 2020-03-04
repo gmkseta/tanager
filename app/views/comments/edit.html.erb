@@ -1,0 +1,26 @@
+<p><small><%= link_to "← 돌아가기", post_path(@post) %></small></p>
+
+<h2 class="h5 text-dark"><%= @post.title %></h2>
+
+<p class="thread-details">
+  <strong><%= category_link(@post.categories.first) %></strong>
+  • <%= time_ago_in_words(@post.created_at) %>전 등록
+</p>
+</p>
+
+<br />
+
+<%= content_tag :div, id: dom_id(@comment), class: forum_post_classes(@comment) do %>
+  <div class="card-header">
+    <div>
+      <strong class="comment-user"><%= @comment.user.name %></strong>
+      <small class="thread-details align-self-center pl-1">
+        <%= time_ago_in_words(@comment.created_at) %>전 등록
+      </small>
+    </div>
+  </div>
+
+  <div class="card-body">
+    <%= render "form" %>
+  </div>
+<% end %>

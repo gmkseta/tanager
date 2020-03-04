@@ -1,0 +1,8 @@
+<% if @posts.none? %>
+  <div>검색결과가 없습니다. <%= link_to "최신 글", posts_path %>을 확인해보세요.</div>
+<% else %>
+  <%= render partial: "posts/post", collection: @posts %>
+  <div class="forum-post-nav text-center">
+    <%= will_paginate @posts %>
+  </div>
+<% end %>

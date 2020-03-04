@@ -1,0 +1,32 @@
+<%= form_for [@post, @comment],
+  url: (@comment.persisted? ? post_comment_path(@post, @comment) : post_comments_path(@post)),
+  html: { data: { behavior: "comment-form" } } do |f| %>
+
+  <% if @comment.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@comment.errors.count, "error") %> prohibited this forum_post from being saved:</h2>
+
+      <ul>
+        <% @comment.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="form-group">
+    <%= f.text_area :body, placeholder: "글 등록하기", rows: 8, class: "form-control simplemde", data: { behavior: "comment-body" } %>
+  </div>
+
+  <div class="text-right">
+    <div class="pull-left">
+      <small>
+        <%# Describe text formatting options here with a link %>
+        <%#= link_to "Parsed with Markdown", "https://guides.github.com/features/mastering-markdown/", target: "_blank" %>
+      </small>
+    </div>
+
+    <%= f.button "#{f.object.new_record? ? "등록하기" : "수정하기"  }", class: "btn btn-primary", data: {disable_with: "<i class='fa fa-spinner fa-spin'></i> 저장 중.."} %>
+  </div>
+
+<% end %>

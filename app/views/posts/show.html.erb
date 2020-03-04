@@ -1,0 +1,30 @@
+<div class="d-flex flex-row">
+  <div>
+    <h1 class="h5 text-dark"><%= @post.title %></h1>
+    <div class="thread-details">
+      <% @post.categories.each do |category| %>
+      <%= category_link(category) %>
+      <% end %>
+      <p class="p-1">
+        <strong><%= @post.user.name %></strong>님
+        <%= "#{time_ago_in_words(@post.created_at)} 전 등록" %>
+      </p>
+    </div>
+  </div>
+  
+
+  <% if is_moderator_or_owner?(@post) %>
+    <div class="ml-auto">
+      <%= link_to "수정하기", edit_post_path(@post),
+        class: "text-muted",
+        data: { toggle: "tooltip", placement: "left" },
+        title: "수정하기" %>
+    </div>
+  <% end %>
+
+</div>
+
+
+
+<%= render partial: "comments/comment", collection: @post.comments.includes(:user).sorted %>
+<%= render partial: "comments/form" %>

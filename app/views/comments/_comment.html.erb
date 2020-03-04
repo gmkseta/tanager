@@ -1,0 +1,30 @@
+<%# We don't currently cache the forum posts because they have permissions to deal with %>
+
+<%= content_tag :div, id: dom_id(comment), class: forum_post_classes(comment) do %>
+  <div class="card-header">
+
+    <div class="d-flex flex-row">
+      <a class="forum-comment-user">
+        <%= comment.user.name %> <%= forum_user_badge(comment.user) %>
+      </a>
+      <small class="thread-details align-self-center pl-1">
+        <%= time_ago_in_words(comment.created_at) %>전 등록
+      </small>
+      <div class="ml-auto">
+      <% if is_moderator_or_owner?(comment) %>
+        <div class="pull-right">
+          <%= link_to "수정하기", edit_post_comment_path(@post, comment),
+            class: "text-muted",
+            data: { toggle: "tooltip", placement: "left" },
+            title: "수정하기"
+          %>
+        </div>
+      <% end %>
+      </div>
+    </div>
+  </div>
+
+  <div class="card-body">
+    <%= formatted_content comment.body %>
+  </div>
+<% end %>

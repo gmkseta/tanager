@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>캐시노트 커뮤니티</title>
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.4.1.js" integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU=" crossorigin="anonymous"></script>
+    <script src="//developers.kakao.com/sdk/js/kakao.min.js"></script>
+
+    <%= stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
+
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css" integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">    
+    
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway:600,800">
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="/css/cashnote.css">
+  </head>
+  <body>
+    <% if @is_kakaotalk %>
+      <div class="container small p-0" id="kakao_loading_container">
+        <center>
+          <div class="w-100 mt-5" style="max-width: 500px;">
+            <h5>
+              카카오톡으로 자동 로그인 중입니다 ☺️
+            </h5>
+          </div>
+        </center>
+      </div>
+    <% end %>
+    <div class="container small p-0" id="login_container" style="<%= @is_kakaotalk ? "display: none;" : "" %>">
+      <center>
+        <div class="w-100 mt-5" style="max-width: 500px;">
+          <div class="mt-3 text-left pl-3 pr-3">
+            <center>
+              <h5 class="mt-3" style="color: #02ACA6;">
+                <b>캐시노트 커뮤니티</b>
+              </h5>
+              <h5 class="mt-3" style="color: #02ACA6;">
+                <b>로그인</b>
+              </h5>
+              <p>보안을 위해 한번 더 로그인이 필요합니다.</p>
+            </center>
+          </div>
+
+          <div class="mt-5 width-300 text-left">
+            <div class="form-group float-label-control">
+              <label for="input_user_login">휴대전화번호 또는 아이디</label>
+              <input id="input_user_login" class="form-control"/>
+            </div>
+
+            <div class="form-group float-label-control">
+              <label for="">비밀번호</label>
+              <input id="input_user_password" class="form-control password" placeholder="비밀번호" type="password" style="font-family: san-serif;"/>
+            </div>
+
+            <div class="btn cashnote-button w-100 mt-4" onclick="login()">
+              로그인하기
+            </div>
+
+            <div class="btn kakao-button w-100 mt-4" onclick="login_with_kakao()" id="btn_kakao">
+              <i class="fas fa-comment"></i> 카카오 로그인
+            </div>
+
+            <center>
+              <div class="d-flex">
+                <div class="col-6">
+                  <a href="https://app.cashnote.kr/signup">
+                    <div class="mt-5" style="color: #02ACA6; cursor: pointer;">
+                      회원가입
+                    </div>
+                  </a>
+                </div>
+                <div class="col-6">
+                  <a href="https://app.cashnote.kr/password/reset">
+                    <div class="mt-5" style="color: #02ACA6; cursor: pointer;">
+                      비밀번호 재발급
+                    </div>
+                  </a>
+                </div>
+            </center>
+          </div>
+        </div>
+      </center>
+    </div>
+
+    <script>
+      $(function () {
+        Kakao.init("feb203689c7ef3e3a2ce7d5af8a869c8");
+        <% if @is_kakaotalk %>
+          $("#btn_kakao").trigger("click");
+          setTimeout(function(){
+            $("#kakao_loading_container").fadeOut('fast', function() {
+              $("#login_container").fadeIn('fast');
+            });
+          }, 2500);
+        <% end %>
+      });
+
+      function login() {
+        login = $("#input_user_login").val();
+        password = $("#input_user_password").val();
+
+        var formData = new FormData();
+        formData.append("login", login);
+        formData.append("password", password);
+
+        $.ajax({
+          url: "/cashnotes/login",
+          type: "POST",
+          data: formData,
+          async: false,
+          cache: true,
+          contentType: false,
+          processData: false,
+          success: function (response) {
+            console.log(response);
+            jsonResponse = JSON.parse(JSON.stringify(response));
+            console.log(jsonResponse.redirect_to);
+            <% if params.key?(:callback_url) %>
+              location.href = "<%= params[:callback_url].gsub("-", "&") %>".replace(/&amp;/g, "&");
+            <% else %>
+              if (jsonResponse.redirect_to){
+                location.href = jsonResponse.redirect_to;
+              } else {
+                location.href = "/forum";
+              }
+            <% end %>
+          },
+          error: function (response) {
+            jsonResponse = JSON.parse(JSON.stringify(response));
+            if (jsonResponse.message){
+              alert(jsonResponse.message);
+            }else{
+              alert("로그인 시도를 실패했습니다.");
+            }
+          }
+        });
+      }
+
+      function login_with_kakao() {
+        Kakao.Auth.login({
+          success: function(authObj) {
+            console.log(authObj);
+            var formData = new FormData();
+            formData.append("access_token", authObj["access_token"]);
+            <% if @business_id.present? %>
+              formData.append("business_id", <%= @business_id %>);
+            <% end %>
+
+            $.ajax({
+              url: "/cashnotes/login_with_kakao",
+              type: "POST",
+              data: formData,
+              async: false,
+              cache: true,
+              contentType: false,
+              processData: false,
+              success: function (response) {
+                <% if params.key?(:callback_url) %>
+                  location.href = "<%= params[:callback_url].gsub("-", "&") %>".replace(/&amp;/g, "&");
+                <% else %>
+                  location.href = "/forum"
+                <% end %>
+              },
+              error: function (response) {
+                if (response.responseJSON["message"] != undefined){                  
+                  alert(response.responseJSON["message"]);
+                }else{
+                  alert("로그인 시도를 실패했습니다.");
+                }
+                location.href = "https://app.cashnote.kr/signup";
+              }
+            });
+          },
+          fail: function(err) {
+            console.log(err);
+            alert("카카오 연동에 오류가 발생하였습니다!");
+            $("#kakao_loading_container").fadeOut('fast', function() {
+              $("#login_container").fadeIn('fast');
+            });
+          }
+        });
+      };
+    </script>
+  </body>
+</html>
