@@ -42,9 +42,9 @@ phases:
       - docker push $SIDEKIQ_REPOSITORY_URI:latest
       - docker push $SIDEKIQ_REPOSITORY_URI:$IMAGE_TAG
       - echo Writing image definitions file...
-      - printf '[{"name":"swallow_nginx_staging","imageUri":"%s"}]' $NGINX_REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
-      - printf '[{"name":"swallow_rails_staging","imageUri":"%s"}]' $RAILS_REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
-      - printf '[{"name":"swallow_sidekiq_staging","imageUri":"%s"}]' $SIDEKIQ_REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
+      - printf '[{"name":"swallow_staging_nginx","imageUri":"%s"}]' $NGINX_REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
+      - printf '[{"name":"swallow_staging_rails","imageUri":"%s"}]' $RAILS_REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
+      - printf '[{"name":"swallow_staging_sidekiq","imageUri":"%s"}]' $SIDEKIQ_REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
 artifacts:
   files: 
     - imagedefinitions.json
