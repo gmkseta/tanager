@@ -1,0 +1,82 @@
+<div class="d-flex col-md-12">
+  <div class="col-md-3 p-2">
+    <h1 class="h3 align-self-center mb-0">
+      <a style="color: #02ACA6; font-weight: bold;"href="/forum">커뮤니티</a>
+    </h1>
+  </div>
+  <div class="col-md-9 text-right align-self-center">
+    <% if current_user %>
+      <div class="row justify-content-end">
+      <%= link_to current_user.name, current_user, class: "btn" %>
+      <%= link_to "홈으로", "/forum", class: "btn" %>
+      </div>
+    <% else %>
+    <div class="row justify-content-end">
+      <%= link_to "회원가입", signup_path, class: "btn" %>
+      <%= link_to "로그인", login_path, class: "btn" %>
+    </div>
+    <% end %>
+  </div>
+</div>
+
+<div class="row simple_discussion">
+<% if @post.blank? %>
+  <div class="col-md-3 mb-3">
+    <div class="card card-body">
+      <%= link_to "글 올리기", new_post_path, class: "btn btn-outline-primary btn-circle" %>
+      <hr />
+
+      <div class="forum-post-filters">
+        <div>
+          <%= forum_link_to posts_path, exact: true do %>
+            <%= icon "bars" %>
+            모든 글 보기
+          <% end %>
+        </div>
+        <% if current_user %>
+          <div>
+            <%= forum_link_to "/posts/mine" do %><%= icon "user-circle-o" %>
+              내글 보기
+            <% end %>
+          </div>
+          <div>
+            <%= forum_link_to "/posts/participating" do %>
+              <%= icon "comments-o" %>
+              참여글보기
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+
+      <hr />
+
+      <div class="forum-post-filters">
+        <h6>
+          <strong>
+            카테고리 선택
+          </strong>
+        </h6>
+        <div><%= forum_link_to "/posts", exact: true do %><%= icon "circle" %> 전체보기<% end %></div>
+        <% Category.sorted.each do |category| %>
+          <div>
+            <%= forum_link_to category_path(category) do %>
+              <%= icon "circle", style: "color: #{category.color}" %>
+              <%= category.name %>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+<% end %>
+
+  <div class="col-md-9 mb-3">
+
+    <div class="card card-body">
+      <%= yield %>
+    </div>
+
+  </div>
+</div>
+
+<% parent_layout("application") %>
