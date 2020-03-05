@@ -38,6 +38,10 @@ COPY Gemfile.lock $RAILS_ROOT/Gemfile.lock
 # Run bundle install to install gems inside the gemfile
 RUN bundle install
 
+RUN rm -rf node_modules yarn-offline-cache && yarn cache clean
+
+RUN yarn --update-checksums
+
 # Copy the whole app
 COPY . $RAILS_ROOT
 

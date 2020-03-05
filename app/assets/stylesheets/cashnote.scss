@@ -1,0 +1,289 @@
+@import url(https://cdn.jsdelivr.net/gh/moonspam/NanumSquare@1.0/nanumsquare.css);
+@import url(//spoqa.github.io/spoqa-han-sans/css/SpoqaHanSans-kr.css);
+
+body {
+  font-family: "Spoqa Han Sans", "NanumSquare", sans-serif !important;
+}
+.sticky {
+  position: fixed !important;
+  top: 0 !important;
+  width: 100% !important;
+  max-width: 500px !important;
+}
+
+.default-font-size {
+  font-size: 1rem;
+}
+
+.password {
+  font-family: sans-serif !important;
+}
+
+.truncate {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.truncate_2line {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  height: 40px;
+}
+
+.kakaotalk-preview {
+  white-space: pre-wrap;
+  white-space: -moz-pre-wrap;
+  white-space: -pre-wrap;
+  white-space: -o-pre-wrap;
+  word-wrap: break-word;
+  font-size: 1em;
+  padding-left: 12px;
+  padding-right: 12px;
+  padding-top: 12px;
+  font-family: -apple-system, blinkmacsystemfont;
+}
+
+.notice-pre {
+  white-space: pre-wrap;
+  white-space: -moz-pre-wrap;
+  white-space: -pre-wrap;
+  white-space: -o-pre-wrap;
+  word-wrap: break-word;
+  font-size: 1em;
+  padding-top: 12px;
+  font-family: -apple-system, blinkmacsystemfont;
+}
+
+.cashnote-color {
+  color: #02a6ac;
+}
+.kakaotalk-button {
+  border: solid 1px #91c6e1;
+  color: #91c6e1;
+  padding: 12px;
+  margin-left: 4px;
+  margin-right: 4px;
+}
+
+.border-box {
+  border: 1px solid #cecece;
+  width: 400px;
+  margin-top: 10px;
+  font-size: 0.85rem;
+  padding: 10px;
+  text-align: left;
+}
+
+.btn-success {
+  background-color: #02a6ac !important;
+}
+
+/* 아래는 룰에 따라 제거 및 수정 될 예정입니다 */
+.min-width-300 {
+  min-width: 300px;
+}
+
+.min-width-200 {
+  min-width: 200px;
+}
+
+.min-width-100 {
+  min-width: 100px;
+}
+
+.width-100 {
+  width: 100px;
+}
+
+.width-300 {
+  width: 300px;
+}
+
+.width-500 {
+  width: 500px;
+}
+
+.width-700 {
+  width: 700px;
+}
+
+.width-50p {
+  width: 49%;
+}
+
+.min-height-300 {
+  min-height: 300px;
+}
+
+.min-height-600 {
+  min-height: 600px;
+}
+
+.height-600 {
+  height: 600px;
+}
+
+.height-300 {
+  height: 300px;
+}
+
+.bg-yellow {
+  background: #fce841;
+}
+
+.bg-sky-blue {
+  background: #9bbbd4;
+}
+
+.bg-purple {
+  background: #848cb5;
+}
+
+.bg-gray {
+  background-color: rgba(210, 210, 210, 0.23) !important;
+}
+
+.bg-darkgray {
+  background: #515151;
+}
+
+.bg-lightgray {
+  background: #f2f2f2;
+}
+
+.purple-button {
+  display: block;
+  border-radius: 30px;
+  padding: 10px;
+  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.3);
+  font-size: 0.8rem;
+  background-color: #848cb5;
+  color: white;
+}
+
+.red-button {
+  display: block;
+  border-radius: 30px;
+  padding: 10px;
+  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.3);
+  font-size: 0.8rem;
+  background-color: #f4424e;
+  color: white;
+}
+
+.gray-button {
+  display: block;
+  border-radius: 30px;
+  padding: 10px;
+  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.3);
+  font-size: 0.8rem;
+  background-color: gray;
+  color: white;
+}
+
+.yellow-button {
+  display: block;
+  border-radius: 30px;
+  padding: 10px;
+  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.3);
+  font-size: 0.8rem;
+  background-color: #fde000;
+  color: #593302;
+}
+
+.cashnote-button {
+  background: #00cccc !important;
+  color: white !important;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  border: 0;
+  padding: 14px;
+  cursor: pointer;
+}
+
+.cashnote-button:disabled,
+.cashnote-button[disabled] {
+  background: #cccccc;
+}
+
+.white-box {
+  background: white;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: rgba(204, 204, 204, 0.35) 2px 2px 8px 0px;
+}
+
+.kakao-button {
+  background: #f9e000 !important;
+  color: #3b1e1e !important;
+  font-size: 0.8rem;
+  border: 0;
+  padding: 14px;
+}
+
+.top-header-height {
+  height: 62px;
+}
+
+.margin-top-header {
+  padding-top: 62px !important;
+}
+
+.top-header-arrow {
+  position: absolute;
+  top: 0;
+  padding: 10px;
+  height: 48px;
+}
+
+.top-header-text {
+  position: absolute;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  left: 50%;
+  transform: translate(-50%, -0%);
+}
+
+.max-width-500 {
+  max-width: 500px;
+}
+
+.border-bottom {
+  border-bottom: 1px solid #d7d7d7;
+}
+
+.title-with-bottom-line {
+  font-size: 19px;
+  line-height: 30px;
+  text-transform: uppercase;
+  letter-spacing: 0px;
+  color: #000000;
+  border-bottom: 6px solid #02a6ac70;
+  display: inline-block;
+  height: 28px;
+  font-weight: 800;
+}
+
+.title-with-bottom-line-white {
+  font-size: 19px;
+  line-height: 30px;
+  text-transform: uppercase;
+  letter-spacing: 0px;
+  color: white;
+  border-bottom: 6px solid #02a6ac70;
+  display: inline-block;
+  height: 28px;
+  font-weight: 800;
+}
+
+.table-dark td,
+.table-dark th,
+.table-dark thead th {
+  border: transparent !important;
+}
+
+.display-none {
+  display: none;
+}

@@ -8,13 +8,10 @@ fi
 bundle exec rails db:create db:migrate
 
 if [ "$RAILS_ENV" = "production" ]; then
-  echo 'cleaning cache'
-  rm -rf node_modules yarn-offline-cache && yarn cache clean
-  echo 'updating checksums'
-  yarn --update-checksums
   echo 'precompiling assets'
   bundle exec rails assets:precompile
 else
+  echo 'webpacker install'
   bundle exec rails webpacker:install
 fi
 
