@@ -14,6 +14,8 @@ if [ "$RAILS_ENV" = "production" ]; then
   yarn --update-checksums
   echo 'precompiling assets'
   bundle exec rails assets:precompile
+else
+  bundle exec rails webpacker:install
 fi
 
 bundle exec puma -C config/docker_puma.rb -p 3000
