@@ -1,0 +1,2 @@
+class TaxAccountant < ApplicationRecord
+end

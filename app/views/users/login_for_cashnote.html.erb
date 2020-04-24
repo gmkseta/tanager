@@ -89,7 +89,11 @@
 
     <script>
       $(function () {
+        <% if Rails.env.development? %>
+        Kakao.init("e214a1102cf823220318b8032d1b3809");
+        <% else %>
         Kakao.init("feb203689c7ef3e3a2ce7d5af8a869c8");
+        <% end %>
         <% if @is_kakaotalk %>
           $("#btn_kakao").trigger("click");
           setTimeout(function(){

@@ -8,14 +8,6 @@ gem 'rails', '~> 6.0.0'
 gem 'pg', '~> 1.0.0'
 # Use Puma as the app server
 gem 'puma', '~> 3.11'
-# Use SCSS for stylesheets
-gem 'sass-rails', '~> 5'
-# Transpile app-like JavaScript. Read more: https://github.com/rails/webpacker
-gem 'webpacker', '~> 4.0'
-# Turbolinks makes navigating your web application faster. Read more: https://github.com/turbolinks/turbolinks
-gem 'turbolinks', '~> 5'
-# Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
-gem 'jbuilder', '~> 2.7'
 # Use Redis adapter to run Action Cable in production
 gem 'redis', '~> 4.0'
 # Use Active Model has_secure_password
@@ -28,11 +20,15 @@ gem 'bcrypt', '~> 3.1.7'
 gem 'bootsnap', '>= 1.4.2', require: false
 
 gem 'activerecord-import'
+gem 'attr_encrypted', '~> 3.1.0'
 gem 'sidekiq'
 gem 'friendly_id', '~> 5.2.4' # Note: You MUST use 5.0.0 or greater for Rails 4.0+
-gem 'font-awesome-sass', '~> 4.7.0'
+gem 'graphql-client'
+gem 'httparty'
+gem 'knock'
 gem 'will_paginate', '>= 3.1.0'
 gem 'rails-i18n'
+gem 'strong_migrations'
 gem 'graphql-client'
 
 group :development, :test do

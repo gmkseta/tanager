@@ -27,7 +27,7 @@ services:
       context: .
       dockerfile: ./docker/rails/Dockerfile    
     volumes:
-      - ./:/swallow_app
+      - ./:/tanager_app
     entrypoint: dockerize -wait tcp://${POSTGRESQL_HOST}:5432 -timeout 20s
     command: /bin/bash -c ./docker-entrypoint.sh
     depends_on:

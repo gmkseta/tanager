@@ -1,0 +1,2 @@
+class IndividualPrepaidTax < ApplicationRecord
+end

@@ -9,9 +9,9 @@ phases:
       - echo Logging in to Amazon ECR...
       - aws --version
       - $(aws ecr get-login --registry-ids 760101598804 --region ap-northeast-2 --no-include-email)
-      - NGINX_REPOSITORY_URI=760101598804.dkr.ecr.ap-northeast-2.amazonaws.com/swallow_staging_nginx
-      - RAILS_REPOSITORY_URI=760101598804.dkr.ecr.ap-northeast-2.amazonaws.com/swallow_staging_rails
-      - SIDEKIQ_REPOSITORY_URI=760101598804.dkr.ecr.ap-northeast-2.amazonaws.com/swallow_staging_sidekiq
+      - NGINX_REPOSITORY_URI=760101598804.dkr.ecr.ap-northeast-2.amazonaws.com/tanager_staging_nginx
+      - RAILS_REPOSITORY_URI=760101598804.dkr.ecr.ap-northeast-2.amazonaws.com/tanager_staging_rails
+      - SIDEKIQ_REPOSITORY_URI=760101598804.dkr.ecr.ap-northeast-2.amazonaws.com/tanager_staging_sidekiq
       - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
       - IMAGE_TAG=${COMMIT_HASH:=latest}
       - docker pull $NGINX_REPOSITORY_URI:latest || true
@@ -42,9 +42,9 @@ phases:
       - docker push $SIDEKIQ_REPOSITORY_URI:latest
       - docker push $SIDEKIQ_REPOSITORY_URI:$IMAGE_TAG
       - echo Writing image definitions file...
-      - printf '[{"name":"swallow_staging_nginx","imageUri":"%s"}]' $NGINX_REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
-      - printf '[{"name":"swallow_staging_rails","imageUri":"%s"}]' $RAILS_REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
-      - printf '[{"name":"swallow_staging_sidekiq","imageUri":"%s"}]' $SIDEKIQ_REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
+      - printf '[{"name":"tanager_staging_nginx","imageUri":"%s"}]' $NGINX_REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
+      - printf '[{"name":"tanager_staging_rails","imageUri":"%s"}]' $RAILS_REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
+      - printf '[{"name":"tanager_staging_sidekiq","imageUri":"%s"}]' $SIDEKIQ_REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
 artifacts:
   files: 
     - imagedefinitions.json

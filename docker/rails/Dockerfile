@@ -27,7 +27,7 @@ RUN wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSI
 ENV TZ Asia/Seoul
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-ENV RAILS_ROOT /swallow_app
+ENV RAILS_ROOT /tanager_app
 
 RUN mkdir -p $RAILS_ROOT
 WORKDIR $RAILS_ROOT
@@ -37,10 +37,6 @@ COPY Gemfile.lock $RAILS_ROOT/Gemfile.lock
 
 # Run bundle install to install gems inside the gemfile
 RUN bundle install
-
-RUN rm -rf node_modules yarn-offline-cache && yarn cache clean
-
-RUN yarn --update-checksums
 
 # Copy the whole app
 COPY . $RAILS_ROOT

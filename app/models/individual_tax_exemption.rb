@@ -1,0 +1,2 @@
+class IndividualTaxExemption < ApplicationRecord
+end

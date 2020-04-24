@@ -1,0 +1,2 @@
+class IndividualSpecialTaxationIncomeDeduction < ApplicationRecord
+end

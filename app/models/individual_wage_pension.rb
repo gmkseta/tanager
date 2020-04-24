@@ -1,0 +1,2 @@
+class IndividualWagePension < ApplicationRecord
+end

@@ -1,0 +1,2 @@
+class IndividualAdditionalTax < ApplicationRecord
+end
