@@ -1,6 +1,6 @@
 class User < ApplicationRecord
-  has_many :user_providers
-  has_many :declare_user
+  has_many :user_providers, dependent: :destroy
+  has_many :declare_user, dependent: :destroy
 
   has_secure_password
 

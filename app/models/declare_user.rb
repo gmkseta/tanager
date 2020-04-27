@@ -1,8 +1,10 @@
 class DeclareUser < ApplicationRecord
   extend AttrEncrypted
-  enum status: %i(empty initialized done)
+  enum status: %i(empty user deductable_persons expenses confirm done)
 
   belongs_to :user
+  has_many :deductable_persons
+
   scope :individual_incomes, ->{ where(declare_type: "income") }
 
   validates :name, :residence_number, :address, :hometax_account, presence: true

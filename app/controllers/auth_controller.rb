@@ -27,6 +27,13 @@ class AuthController < ApplicationController
     render json: { status: "empty", jwt: user.jwt }, status: :ok
   end
 
+  def destroy
+    return render json: { errors: "jwt not available" }, status: :unauthorized if token.blank?
+    user_provider = UserProvider.find_by!(token: token)
+    user_provider.user.destroy
+    render json: { status: "empty" }, status: :ok
+  end
+
   private
 
   def auth_params
