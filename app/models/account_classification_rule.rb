@@ -1,0 +1,2 @@
+class AccountClassificationRule < ApplicationRecord
+end
