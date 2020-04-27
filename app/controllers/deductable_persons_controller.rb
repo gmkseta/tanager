@@ -8,6 +8,11 @@ class DeductablePersonsController < ApplicationController
     render json: { deductable_people: @deductable_persons }, status: :ok
   end
 
+  def classifications
+    @classifications = Classification.relations
+    render json: { relations: @classifications.as_json }, status: :ok
+  end
+
   def create
     @deductable_person = DeductablePerson.new(deductable_person_params)
     @deductable_person.declare_user_id = @declare_user.id
