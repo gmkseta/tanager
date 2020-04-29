@@ -64,7 +64,7 @@ class Snowdon::Business < Snowdon::ApplicationRecord
       .group_by(&:registration_number).map {|k, vs| [k, vs.first]}.to_h
 
     others = need_lookup.map do |h|
-      h[:vendor_classification_code] = lookup[h[:vendor_registration_number]].classification_code
+      h[:vendor_classification_code] = lookup[h[:vendor_registration_number]]&.classification_code
       h
     end
 
