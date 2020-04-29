@@ -6,7 +6,7 @@ class CreateSimplifiedBookkeepings < ActiveRecord::Migration[6.0]
       t.string :registration_number, null: false, comment: "사업자번호"
       t.string :vendor_registration_number, comment: "거래처 사업자번호"
       t.string :vendor_business_name, comment: "거래처 사업자명"
-      t.string :vendor_hometax_classification_code, comment: "거래처 홈택스코드"
+      t.string :vendor_classification_code, comment: "거래처 홈택스코드"
       t.string :purchase_type, comment: "구매타입"
       t.string :account_classification_code, comment: "계정과목코드"
       t.string :account_classification_name, comment: "계정과목명"

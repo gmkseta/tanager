@@ -32,12 +32,17 @@ class Snowdon::Business < Snowdon::ApplicationRecord
       rule = rules[h[:vendor_classification_code]]
       account_classification_code =
         if rule.nil?
-          h[:type] == "CardPurchasesApproval" ? nil : "812033"
+          h[:purchase_type] == "CardPurchasesApproval" ? nil : "812033"
         else
           rule.account_classification_code
         end
 
-      h.attributes.merge({account_classification_code: account_classification_code})
+      h.attributes.merge({
+        account_classification_name: rule&.account_classification_name || "기타",
+        account_classification_code: account_classification_code,
+        business_id: id,
+        registration_number: registration_number
+      })
     end
   end
 
@@ -68,8 +73,6 @@ class Snowdon::Business < Snowdon::ApplicationRecord
         .union(hometax_purchases_cash_receipts_grouped)
         .union(hometax_purchases_invoices_grouped)
         .union(card_purchases_approvals_grouped(excluded_card_ids))
-        # .order(sum_amount: :desc)
-        # .paginate(page: page)
 
     with_codes = add_classification_code(results)
     add_account_classification_code(classification, with_codes)
@@ -83,8 +86,9 @@ class Snowdon::Business < Snowdon::ApplicationRecord
           COALESCE(vendor_registration_number, vendor_business_name) as vendor_registration_number,
           MAX(vendor_business_name) as vendor_business_name,
           MAX(vendor_business_classification_code) as vendor_classification_code,
-          SUM(amount) as sum_amount,
-          'HomataxCardPurchase' as type
+          SUM(amount) as amount,
+          COUNT(*) as purchases_count,
+          'HomataxCardPurchase' as purchase_type
         SQL
         )
   end
@@ -97,8 +101,9 @@ class Snowdon::Business < Snowdon::ApplicationRecord
           COALESCE(vendor_registration_number, vendor_business_name) as vendor_registration_number,
           MAX(vendor_business_name) as vendor_business_name,
           MAX(vendor_business_code) as vendor_classification_code,
-          SUM(amount) as sum_amount,
-          'HomataxPurchasesCashReceipt' as type
+          SUM(amount) as amount,
+          COUNT(*) as purchases_count,
+          'HomataxPurchasesCashReceipt' as purchase_type
         SQL
         )
   end
@@ -111,8 +116,9 @@ class Snowdon::Business < Snowdon::ApplicationRecord
           COALESCE(vendor_registration_number, vendor_business_name) as vendor_registration_number,
           MAX(vendor_business_name) as vendor_business_name,
           null as vendor_classification_code,
-          SUM(amount) as sum_amount,
-          'HomataxPurchasesInvoice' as type
+          SUM(amount) as amount,
+          COUNT(*) as purchases_count,
+          'HomataxPurchasesInvoice' as purchase_type
         SQL
         )
   end
@@ -126,8 +132,9 @@ class Snowdon::Business < Snowdon::ApplicationRecord
           COALESCE(vendor_registration_number, vendor_business_name) as vendor_registration_number,
           MAX(vendor_business_name) as vendor_business_name,
           null as vendor_classification_code,
-          SUM(amount) as sum_amount,
-          'CardPurchasesApproval' as type
+          SUM(amount) as amount,
+          COUNT(*) as purchases_count,
+          'CardPurchasesApproval' as purchase_type
         SQL
         )
 
