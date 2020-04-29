@@ -1,6 +1,6 @@
 class BusinessExpensesController < ApplicationController
   before_action :authorize_request
-  before_action :set_declare_user, only: [:index, :create, :update, :destroy]
+  before_action :set_declare_user, only: [:index, :create, :update, :destroy, :confirm]
   before_action :set_business_expense, only: [:show, :update, :destroy]
   
 
@@ -12,6 +12,12 @@ class BusinessExpensesController < ApplicationController
   def classifications
     @classifications = Classification.business_expenses
     render json: { business_expenses: @classifications.as_json }, status: :ok
+  end
+
+  def summary
+    @business_expenses = BusinessExpense.where(declare_user: @declare_user).group(:classification_id)
+
+    render json: { business_expenses: @business_expenses.as_json }, status: :ok
   end
 
   def create
@@ -37,6 +43,14 @@ class BusinessExpensesController < ApplicationController
       render json: { business_expense: @business_expense }, status: :ok
     else
       render json: { errors: @business_expense.errors.full_messages }, status: :unprocessable_entity
+    end
+  end
+
+  def confirm
+    if @declare_user.update(status: "business_expenses")
+      render json: { status: @declare_user.status }, status: :ok
+    else
+      render json: { errors: @declare_user.errors.full_messages }, status: :unprocessable_entity
     end
   end
 

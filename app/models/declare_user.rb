@@ -1,6 +1,6 @@
 class DeclareUser < ApplicationRecord
   extend AttrEncrypted
-  enum status: %i(empty user deductable_persons expenses confirm done)
+  enum status: %i(empty user deductible_persons business_expenses confirm done)
 
   belongs_to :user
   has_many :deductable_persons
