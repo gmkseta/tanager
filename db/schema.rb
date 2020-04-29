@@ -10,13 +10,67 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_04_12_165214) do
+ActiveRecord::Schema.define(version: 2020_04_29_055710) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
+  create_table "account_classification_rules", force: :cascade do |t|
+    t.string "category", limit: 32, null: false, comment: "내부업종분류"
+    t.string "classification_code", limit: 6, null: false, comment: "주업종코드. 앞 2자리 사용"
+    t.string "account_classification_code", limit: 6, null: false, comment: "계정과목분류코드"
+    t.string "account_classification_name", limit: 32, null: false, comment: "계정과목분류명"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["category", "classification_code", "account_classification_code"], name: "ix_account_classification_rules_on_account_classification_code", unique: true
+  end
+
+  create_table "business_expenses", force: :cascade do |t|
+    t.bigint "declare_user_id", null: false
+    t.bigint "classification_id", null: false
+    t.integer "amount", null: false
+    t.string "memo"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["classification_id"], name: "index_business_expenses_on_classification_id"
+    t.index ["declare_user_id"], name: "index_business_expenses_on_declare_user_id"
+  end
+
+  create_table "classification_code_categories", force: :cascade do |t|
+    t.string "classification_code", limit: 6, null: false, comment: "주업종코드"
+    t.string "category", limit: 32, null: false, comment: "내부업종분류"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["classification_code"], name: "index_classification_code_categories_on_classification_code", unique: true
+  end
+
+  create_table "classifications", force: :cascade do |t|
+    t.string "classification_type"
+    t.string "name"
+    t.string "slug"
+    t.integer "parent_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["classification_type", "name"], name: "index_classifications_on_classification_type_and_name", unique: true
+  end
+
 # Could not dump table "declare_users" because of following StandardError
 #   Unknown type 'decalre_tax_type' for column 'declare_tax_type'
+
+  create_table "deductable_people", force: :cascade do |t|
+    t.bigint "declare_user_id", null: false
+    t.bigint "classification_id", null: false
+    t.string "residence_number", limit: 13, null: false, comment: "주민등록번호"
+    t.string "name", limit: 30, null: false, comment: "성명"
+    t.boolean "disabled", comment: "장애인여부"
+    t.boolean "woman_deduction", comment: "부녀자여부"
+    t.boolean "single_parent", comment: "한부모가족공제여부"
+    t.boolean "basic_livelihood", comment: "수급자"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["classification_id"], name: "index_deductable_people_on_classification_id"
+    t.index ["declare_user_id"], name: "index_deductable_people_on_declare_user_id"
+  end
 
   create_table "individual_additional_taxes", force: :cascade do |t|
     t.bigint "individual_declare_id"
@@ -214,6 +268,15 @@ ActiveRecord::Schema.define(version: 2020_04_12_165214) do
     t.index ["individual_declare_id"], name: "index_wage_pensions_on_declare_default_id"
   end
 
+  create_table "registration_number_classification_codes", force: :cascade do |t|
+    t.string "registration_number", limit: 10, null: false, comment: "사업자등록번호"
+    t.string "classification_code", limit: 6, null: false, comment: "주업종코드"
+    t.string "classification_name", limit: 64, null: false, comment: "주업종명"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["registration_number"], name: "ix_reg_number_classification_codes_on_registration_number", unique: true
+  end
+
   create_table "tax_accountants", force: :cascade do |t|
     t.string "name", limit: 30, null: false, comment: "세무대리인성명"
     t.string "residence_number", limit: 13, null: false, comment: "세무대리인주민등록번호"
@@ -247,7 +310,11 @@ ActiveRecord::Schema.define(version: 2020_04_12_165214) do
     t.index ["login"], name: "index_users_on_login", unique: true
   end
 
+  add_foreign_key "business_expenses", "classifications"
+  add_foreign_key "business_expenses", "declare_users"
   add_foreign_key "declare_users", "users"
+  add_foreign_key "deductable_people", "classifications"
+  add_foreign_key "deductable_people", "declare_users"
   add_foreign_key "individual_additional_taxes", "individual_declares"
   add_foreign_key "individual_business_income_whts", "individual_declares"
   add_foreign_key "individual_business_incomes", "declare_users"
