@@ -38,11 +38,7 @@ class Snowdon::Business < Snowdon::ApplicationRecord
     rules = account_classification_rules(classification, vendor_classification_codes(results))
 
     results.map do |h|
-      rule = if h[:vendor_classification_code].nil?
-               nil
-             else
-               rules[h[:vendor_classification_code][0..1]]
-             end
+      rule = h[:vendor_classification_code].nil? ? nil : rules[h[:vendor_classification_code][0..1]]
 
       account_classification_code =
         if rule.nil?
@@ -52,7 +48,7 @@ class Snowdon::Business < Snowdon::ApplicationRecord
         end
 
       h.attributes.merge({
-        account_classification_name: rule&.account_classification_name || "기타",
+        account_classification_name: rule&.account_classification_name || "기타비용",
         account_classification_code: account_classification_code,
         business_id: id,
         registration_number: registration_number
@@ -61,15 +57,14 @@ class Snowdon::Business < Snowdon::ApplicationRecord
   end
 
   def add_classification_code(results)
-    need_lookup = results.select { |h| h[:vendor_classification_code].nil? }
-    not_need_lookup = results.reject { |h| h[:vendor_classification_code].nil? }
+    need_lookup, not_need_lookup = results.partition { |h| h[:vendor_classification_code].nil? }
 
     lookup = RegistrationNumberClassificationCode
       .where(registration_number: need_lookup.pluck(:vendor_registration_number))
       .group_by(&:registration_number).map {|k, vs| [k, vs.first]}.to_h
 
     others = need_lookup.map do |h|
-      h[:vendor_classification_code] = lookup[h[:registration_number]]
+      h[:vendor_classification_code] = lookup[h[:vendor_registration_number]]
       h
     end
 
