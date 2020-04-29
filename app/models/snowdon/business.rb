@@ -19,17 +19,31 @@ class Snowdon::Business < Snowdon::ApplicationRecord
     end
   end
 
-  def add_account_classification_code(classification, results)
-    vendor_classification_codes =
-        results.uniq.pluck(:vendor_classification_code).map{|c| c.nil? ? nil : c[0..1] }
+  def vendor_classification_codes(results)
+    results
+        .reject {|x| x.vendor_classification_code.nil? }
+        .pluck(:vendor_classification_code)
+        .map{|c| c[0..1] }
+        .uniq
+  end
 
-    rules = AccountClassificationRule
+  def account_classification_rules(classification, vendor_classification_codes)
+    AccountClassificationRule
         .where(category: classification.category)
         .where(classification_code: vendor_classification_codes)
         .group_by(&:classification_code).map { |k, vs| [k, vs.first] }.to_h
+  end
+
+  def add_account_classification_code(classification, results)
+    rules = account_classification_rules(classification, vendor_classification_codes(results))
 
     results.map do |h|
-      rule = rules[h[:vendor_classification_code]]
+      rule = if h[:vendor_classification_code].nil?
+               nil
+             else
+               rules[h[:vendor_classification_code][0..1]]
+             end
+
       account_classification_code =
         if rule.nil?
           h[:purchase_type] == "CardPurchasesApproval" ? nil : "812033"
@@ -47,15 +61,16 @@ class Snowdon::Business < Snowdon::ApplicationRecord
   end
 
   def add_classification_code(results)
-    need_lookup, not_need_lookup =
-        results.partition { |h| h[:vendor_registration_number].nil? }
+    need_lookup = results.select { |h| h[:vendor_classification_code].nil? }
+    not_need_lookup = results.reject { |h| h[:vendor_classification_code].nil? }
 
     lookup = RegistrationNumberClassificationCode
       .where(registration_number: need_lookup.pluck(:vendor_registration_number))
-      .group_by(&:registration_number)
+      .group_by(&:registration_number).map {|k, vs| [k, vs.first]}.to_h
 
     others = need_lookup.map do |h|
       h[:vendor_classification_code] = lookup[h[:registration_number]]
+      h
     end
 
     others + not_need_lookup
