@@ -19,12 +19,7 @@ class Snowdon::Business < Snowdon::ApplicationRecord
     end
   end
 
-  def add_account_classification_code(results)
-    classification =
-        ClassificationCodeCategory.find_by(classification_code: hometax_business.classification_code)
-
-    raise "#{hometax_business.inspect} is not allowed for individual_income" if classification.nil?
-
+  def add_account_classification_code(classification, results)
     rules = AccountClassificationRule
         .where(category: classification.category)
         .where(classification_codes: results.pluck(:vendor_classification_code).map{|c| c[0..1]})
@@ -59,6 +54,11 @@ class Snowdon::Business < Snowdon::ApplicationRecord
   end
 
   def calculate
+    classification =
+        ClassificationCodeCategory.find_by(classification_code: hometax_business.classification_code)
+
+    raise "#{hometax_business.inspect} is not allowed for individual_income" if classification.nil?
+
     excluded_card_ids = excluded_cards.pluck(:id)
 
     results = hometax_card_purchases_grouped
@@ -69,7 +69,7 @@ class Snowdon::Business < Snowdon::ApplicationRecord
         # .paginate(page: page)
 
     with_codes = add_classification_code(results)
-    add_account_classification_code(with_codes)
+    add_account_classification_code(classification, with_codes)
   end
 
   def hometax_card_purchases_grouped
