@@ -20,9 +20,12 @@ class Snowdon::Business < Snowdon::ApplicationRecord
   end
 
   def add_account_classification_code(classification, results)
+    vendor_classification_codes =
+        results.uniq.pluck(:vendor_classification_code).map{|c| c.nil? ? nil : c[0..1] }
+
     rules = AccountClassificationRule
         .where(category: classification.category)
-        .where(classification_codes: results.pluck(:vendor_classification_code).map{|c| c[0..1]})
+        .where(classification_code: vendor_classification_codes)
         .group_by(&:classification_code).map { |k, vs| [k, vs.first] }.to_h
 
     results.map do |h|
