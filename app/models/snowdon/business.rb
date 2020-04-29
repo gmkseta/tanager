@@ -75,9 +75,9 @@ class Snowdon::Business < Snowdon::ApplicationRecord
   def hometax_card_purchases_grouped
     hometax_card_purchases
         .last_year
-        .group(:vendor_registration_number)
+        .group("COALESCE(vendor_registration_number, vendor_business_name)")
         .select(<<-SQL.squish
-          vendor_registration_number,
+          COALESCE(vendor_registration_number, vendor_business_name) as vendor_registration_number,
           MAX(vendor_business_name) as vendor_business_name,
           MAX(vendor_business_classification_code) as vendor_classification_code,
           SUM(amount) as sum_amount,
@@ -89,9 +89,9 @@ class Snowdon::Business < Snowdon::ApplicationRecord
   def hometax_purchases_cash_receipts_grouped
     hometax_purchases_cash_receipts
         .last_year
-        .group(:vendor_registration_number)
+        .group("COALESCE(vendor_registration_number, vendor_business_name)")
         .select(<<-SQL.squish
-          vendor_registration_number,
+          COALESCE(vendor_registration_number, vendor_business_name) as vendor_registration_number,
           MAX(vendor_business_name) as vendor_business_name,
           MAX(vendor_business_code) as vendor_classification_code,
           SUM(amount) as sum_amount,
@@ -103,9 +103,9 @@ class Snowdon::Business < Snowdon::ApplicationRecord
   def hometax_purchases_invoices_grouped
     hometax_purchases_invoices
         .last_year
-        .group(:vendor_registration_number)
+        .group("COALESCE(vendor_registration_number, vendor_business_name)")
         .select(<<-SQL.squish
-          vendor_registration_number,
+          COALESCE(vendor_registration_number, vendor_business_name) as vendor_registration_number,
           MAX(vendor_business_name) as vendor_business_name,
           null as vendor_classification_code,
           SUM(amount) as sum_amount,
@@ -118,14 +118,15 @@ class Snowdon::Business < Snowdon::ApplicationRecord
     card_purchases_approvals
         .where(id: excluded_card_ids)
         .last_year
+        .group("COALESCE(vendor_registration_number, vendor_business_name)")
         .select(<<-SQL.squish
-          vendor_registration_number,
+          COALESCE(vendor_registration_number, vendor_business_name) as vendor_registration_number,
           MAX(vendor_business_name) as vendor_business_name,
           null as vendor_classification_code,
           SUM(amount) as sum_amount,
           'CardPurchasesApproval' as type
         SQL
         )
-        .group(:vendor_registration_number)
+
   end
 end
