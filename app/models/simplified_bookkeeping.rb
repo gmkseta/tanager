@@ -1,0 +1,2 @@
+class SimplifiedBookkeeping < ApplicationRecord
+end
