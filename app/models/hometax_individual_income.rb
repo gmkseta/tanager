@@ -1,0 +1,2 @@
+class HometaxIndividualIncome < ApplicationRecord
+end
