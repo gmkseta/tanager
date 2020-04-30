@@ -4,6 +4,8 @@ class DeclareUser < ApplicationRecord
 
   belongs_to :user
   has_many :deductable_persons
+  has_many :business_expenses
+  has_many :simplified_bookkeepings
 
   scope :individual_incomes, ->{ where(declare_type: "income") }
 

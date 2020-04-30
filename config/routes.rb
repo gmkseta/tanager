@@ -17,4 +17,5 @@ Rails.application.routes.draw do
       get 'account_classifications'
     end
   end
+  resources :simplified_bookkeepings
 end

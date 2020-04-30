@@ -29,6 +29,6 @@ AccountClassificationRule.import!(
     account_classification_rules,
     on_duplicate_key_update: {
         conflict_target: %i(category classification_code account_classification_code),
-        columns: %i(account_classification_name updated_at)
+        columns: %i(account_classification_name classification_id updated_at)
     }
 )
