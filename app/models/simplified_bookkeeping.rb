@@ -1,4 +1,5 @@
 class SimplifiedBookkeeping < ApplicationRecord
+  belongs_to :delcare_user
 
   class << self
     def upsert(rows:)
