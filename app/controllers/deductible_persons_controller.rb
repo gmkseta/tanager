@@ -5,7 +5,7 @@
 
   def index
     @deductible_persons = DeductiblePerson.where(declare_user_id: @declare_user.id)
-    render json: { deductible_people: @deductible_persons }, status: :ok
+    render json: { deductible_persons: @deductible_persons }, status: :ok
   end
 
   def classifications
