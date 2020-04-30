@@ -15,10 +15,20 @@ def parse_to_hash(file_path, col_sep = ",", columns = nil)
   end
 end
 
-parse_to_hash("#{Dir.getwd}/classification_code_categories.csv").map do |params|
-  ClassificationCodeCategory.create!(params)
-end
+classification_code_categories = parse_to_hash("#{Dir.getwd}/classification_code_categories.csv")
+ClassificationCodeCategory.import!(
+    classification_code_categories,
+    on_duplicate_key_update: {
+        conflict_target: %i(classification_code),
+        columns: %i(category updated_at)
+    }
+)
 
-parse_to_hash("#{Dir.getwd}/account_classification_rules.csv").map do |params|
-  AccountClassificationRule.create!(params)
-end
+account_classification_rules = parse_to_hash("#{Dir.getwd}/account_classification_rules.csv")
+AccountClassificationRule.import!(
+    account_classification_rules,
+    on_duplicate_key_update: {
+        conflict_target: %i(category classification_code account_classification_code),
+        columns: %i(account_classification_name updated_at)
+    }
+)
