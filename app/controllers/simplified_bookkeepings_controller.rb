@@ -3,8 +3,14 @@ class SimplifiedBookkeepingsController < ApplicationController
   before_action :set_declare_user, only: [:index, :create, :update, :destroy, :confirm]
   
   def index
-    return head :ok if params[:account_classification_name].blank?
-    render json: { simplified_bookkeepings: @declare_user.simplified_bookkeepings.where(account_classification_name: params[:account_classification_name]) }, status: :ok
+    return head :unprocessable_entity if params[:classification_id].blank?
+    @simplified_bookkeepings = @declare_user.simplified_bookkeepings
+                                .where(classification_id: params[:classification_id])
+                                .paginate(page: params[:page])
+                                .order(amount: :desc)
+    render json: { total_pages: @simplified_bookkeepings.total_pages,
+                   next_page: @simplified_bookkeepings.next_page,
+                   simplified_bookkeepings: @simplified_bookkeepings }, status: :ok
   end
 
   private
