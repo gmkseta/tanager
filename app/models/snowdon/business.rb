@@ -48,8 +48,8 @@ class Snowdon::Business < Snowdon::ApplicationRecord
         end
 
       h.attributes.merge({
-        account_classification_name: rule&.account_classification_name || "기타비용",
         account_classification_code: account_classification_code,
+        classification_id: rule&.classification_id || 32,
         business_id: id,
         registration_number: registration_number
       })

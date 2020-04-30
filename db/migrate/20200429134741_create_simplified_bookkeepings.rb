@@ -9,7 +9,7 @@ class CreateSimplifiedBookkeepings < ActiveRecord::Migration[6.0]
       t.string :vendor_classification_code, comment: "거래처 홈택스코드"
       t.string :purchase_type, comment: "구매타입"
       t.string :account_classification_code, comment: "계정과목코드"
-      t.string :account_classification_name, comment: "계정과목명"
+      t.references :classification, comment: "계정과목분류"
       t.integer :amount, null: false, default: 0, comment: "총 합계"
       t.integer :purchases_count, null: false, default: 0, comment: "구매 수"
 

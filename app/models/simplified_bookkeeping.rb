@@ -1,5 +1,6 @@
 class SimplifiedBookkeeping < ApplicationRecord
-  belongs_to :delcare_user
+  belongs_to :declare_user
+  belongs_to :classification
 
   class << self
     def upsert(rows:)
@@ -7,7 +8,7 @@ class SimplifiedBookkeeping < ApplicationRecord
         rows,
         on_duplicate_key_update: {
             conflict_target: %i(registration_number vendor_registration_number purchase_type),
-            columns: %i(account_classification_code account_classification_name amount purchases_count updated_at),
+            columns: %i(account_classification_code classification_id amount purchases_count updated_at),
         },
       )
     end
