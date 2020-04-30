@@ -3,7 +3,7 @@ Rails.application.routes.draw do
   delete "auth/status", to: "auth#destroy" if Rails.env.development?
 
   resources :declare_users, except: [:index]
-  resources :deductible_persons, :business_expenses do
+  resources :deductible_persons, :business_expenses, :simplified_bookkeepings do
     collection do
       get 'classifications'
       post 'confirm'
@@ -17,5 +17,4 @@ Rails.application.routes.draw do
       get 'account_classifications'
     end
   end
-  resources :simplified_bookkeepings
 end

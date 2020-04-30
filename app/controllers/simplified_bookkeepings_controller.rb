@@ -1,6 +1,6 @@
 class SimplifiedBookkeepingsController < ApplicationController
   before_action :authorize_request
-  before_action :set_declare_user, only: [:index, :create, :update, :destroy, :confirm]
+  before_action :set_declare_user, only: [:index, :update, :confirm, :classifications]
   
   def index
     return head :unprocessable_entity if params[:classification_id].blank?
@@ -11,6 +11,11 @@ class SimplifiedBookkeepingsController < ApplicationController
     render json: { total_pages: @simplified_bookkeepings.total_pages,
                    next_page: @simplified_bookkeepings.next_page,
                    simplified_bookkeepings: @simplified_bookkeepings }, status: :ok
+  end
+
+  def classifications
+    @classifications = Classification.with_amount(Classification.account_classifications.as_json, @declare_user.simplified_bookkeepings.group(:classification_id).sum(:amount))
+    render json: { classifications: @classifications }, status: :ok
   end
 
   private
