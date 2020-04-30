@@ -4,7 +4,7 @@
   before_action :set_deductible_person, only: [:update, :destroy]
 
   def index
-    @deductible_persons = deductiblePerson.where(declare_user_id: @declare_user.id)
+    @deductible_persons = DeductiblePerson.where(declare_user_id: @declare_user.id)
     render json: { deductible_people: @deductible_persons }, status: :ok
   end
 
@@ -14,7 +14,7 @@
   end
 
   def create
-    @deductible_person = deductiblePerson.new(deductible_person_params)
+    @deductible_person = DeductiblePerson.new(deductible_person_params)
     @deductible_person.declare_user_id = @declare_user.id
     if @deductible_person.save
       render json: { deductible_person: json_object }, status: :created
@@ -62,7 +62,7 @@
   end
 
   def set_deductible_person
-    @deductible_person = deductiblePerson.find_by!(id: params[:id], declare_user_id: @declare_user.id)
+    @deductible_person = DeductiblePerson.find_by!(id: params[:id], declare_user_id: @declare_user.id)
   end
 
   def json_object
