@@ -18,12 +18,6 @@ class BusinessExpensesController < ApplicationController
     render json: { classifications: @classifications }, status: :ok
   end
 
-  def summary
-    @business_expenses = BusinessExpense.where(declare_user: @declare_user).group(:classification_id)
-
-    render json: { business_expenses: @business_expenses.as_json }, status: :ok
-  end
-
   def create
     @business_expense = BusinessExpense.new(business_expense_params)
     @business_expense.declare_user_id = @declare_user.id
