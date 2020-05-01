@@ -17,7 +17,7 @@
     @deductible_person = DeductiblePerson.new(deductible_person_params)
     @deductible_person.declare_user_id = @declare_user.id
     if @deductible_person.save
-      render json: { deductible_person: json_object }, status: :created
+      render json: { deductible_person: @deductible_person }, status: :created
     else
       render json: { errors: @deductible_person.errors.full_messages }, status: :unprocessable_entity
     end
@@ -25,7 +25,7 @@
 
   def update
     if @deductible_person.update(deductible_person_params)
-      render json: { deductible_person: json_object }, status: :ok
+      render json: { deductible_person: @deductible_person }, status: :ok
     else
       render json: { deductible_person: @deductible_person.errors.full_messages }, status: :unprocessable_entity
     end
@@ -35,7 +35,7 @@
 
   def destroy
     if @deductible_person.destroy
-      render json: { deductible_person: json_object }, status: :ok
+      render json: { deductible_person: @deductible_person }, status: :ok
     else
       render json: { deductible_person: @deductible_person.errors.full_messages }, status: :unprocessable_entity
     end
@@ -63,9 +63,5 @@
 
   def set_deductible_person
     @deductible_person = DeductiblePerson.find_by!(id: params[:id], declare_user_id: @declare_user.id)
-  end
-
-  def json_object
-    @deductible_person.as_json(only: [:id, :name, :relation, :address, :phone_number, :residence_number])
   end
 end
