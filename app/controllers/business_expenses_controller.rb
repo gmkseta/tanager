@@ -1,17 +1,21 @@
 class BusinessExpensesController < ApplicationController
   before_action :authorize_request
-  before_action :set_declare_user, only: [:index, :create, :update, :destroy, :confirm]
+  before_action :set_declare_user, only: [:index, :classifications, :create, :update, :destroy, :confirm]
   before_action :set_business_expense, only: [:show, :update, :destroy]
   
 
   def index
-    @business_expenses = BusinessExpense.where(declare_user: @declare_user)
-    render json: { business_expenses: @business_expenses.as_json }, status: :ok
+    return head :unprocessable_entity if params[:expense_classification_id].blank?
+    @business_expenses = @declare_user.business_expenses
+                                .where(expense_classification_id: params[:expense_classification_id])
+                                .paginate(page: params[:page])
+                                .order(amount: :desc)
+    render json: { business_expenses: @business_expenses }, status: :ok
   end
 
   def classifications
-    @classifications = Classification.business_expenses
-    render json: { business_expenses: @classifications.as_json }, status: :ok
+    @classifications = Classification.with_amount(Classification.business_expenses.as_json, @declare_user.business_expenses.group(:expense_classification_id).sum(:amount))
+    render json: { classifications: @classifications }, status: :ok
   end
 
   def summary
@@ -57,7 +61,7 @@ class BusinessExpensesController < ApplicationController
   private
 
   def business_expense_params
-    params.permit(:classification_id, :amount, :memo)
+    params.permit(:expense_classification_id, :amount, :memo, :account_classification_id, :vendor_name, :vendor_registration_number)
   end
 
   def set_declare_user
