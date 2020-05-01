@@ -34,7 +34,7 @@ class Snowdon::Business < Snowdon::ApplicationRecord
         .group_by(&:classification_code).map { |k, vs| [k, vs.first] }.to_h
   end
 
-  def add_account_classification_code(classification, results)
+  def add_account_classification_code(classification, results, declare_user_id)
     rules = account_classification_rules(classification, vendor_classification_codes(results))
 
     results.map do |h|
@@ -48,6 +48,7 @@ class Snowdon::Business < Snowdon::ApplicationRecord
         end
 
       h.attributes.merge({
+        declare_user_id: declare_user_id,
         account_classification_code: account_classification_code,
         classification_id: rule&.classification_id || 32,
         business_id: id,
@@ -71,7 +72,7 @@ class Snowdon::Business < Snowdon::ApplicationRecord
     others + not_need_lookup
   end
 
-  def calculate
+  def calculate(declare_user_id)
     classification =
         ClassificationCodeCategory.find_by(classification_code: hometax_business.classification_code)
 
@@ -85,7 +86,7 @@ class Snowdon::Business < Snowdon::ApplicationRecord
         .union(card_purchases_approvals_grouped(excluded_card_ids))
 
     with_codes = add_classification_code(results)
-    add_account_classification_code(classification, with_codes)
+    add_account_classification_code(classification, with_codes, declare_user_id)
   end
 
   def hometax_card_purchases_grouped

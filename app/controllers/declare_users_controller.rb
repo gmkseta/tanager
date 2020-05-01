@@ -15,6 +15,9 @@ class DeclareUsersController < ApplicationController
     @declare_user.hometax_account = @current_user.hometax_account || "XXXXXXX"
 
     if @declare_user.save
+      business = Snowdon::Business.find_by(public_id: @declare_user.user.user_providers.cashnote.uid)
+      simplified_bookkeepings = business.calculate(@declare_user.id)
+      SimplifiedBookkeeping.import(simplified_bookkeepings)
       render json: { declare_user: json_object }, status: :created
     else
       render json: { errors: @declare_user.errors.full_messages }, status: :unprocessable_entity
@@ -26,8 +29,8 @@ class DeclareUsersController < ApplicationController
     render json: { declare_user: json_object }, status: :ok
   end
 
-  def destory
-    return render json: { errors: "unauthorized" }, status: :unauthorized if @declare_user.id != params[:id]
+  def destroy
+    return render json: { errors: "unauthorized" }, status: :unauthorized if @declare_user.id != params[:id].to_i
     @declare_user.destroy
     head :ok
   end
