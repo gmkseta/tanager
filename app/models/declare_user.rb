@@ -3,9 +3,9 @@ class DeclareUser < ApplicationRecord
   enum status: %i(empty user deductible_persons business_expenses confirm done)
 
   belongs_to :user
-  has_many :deductable_persons
-  has_many :business_expenses
-  has_many :simplified_bookkeepings
+  has_many :deductible_persons, dependent: :destroy
+  has_many :business_expenses, dependent: :destroy
+  has_many :simplified_bookkeepings, dependent: :destroy
 
   scope :individual_incomes, ->{ where(declare_type: "income") }
 

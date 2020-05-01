@@ -26,6 +26,12 @@ class DeclareUsersController < ApplicationController
     render json: { declare_user: json_object }, status: :ok
   end
 
+  def destory
+    return render json: { errors: "unauthorized" }, status: :unauthorized if @declare_user.id != params[:id]
+    @declare_user.destroy
+    head :ok
+  end
+
   private
 
   def declare_user_params
