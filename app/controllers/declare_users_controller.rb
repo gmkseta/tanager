@@ -1,6 +1,6 @@
 class DeclareUsersController < ApplicationController
   before_action :authorize_request
-  before_action :set_declare_user, only: [:show, :update, :destroy]
+  before_action :set_declare_user, only: [:show, :update, :destroy, :additional_deduction]
 
   def show
     render json: { declare_user: json_object }, status: :ok
@@ -9,11 +9,9 @@ class DeclareUsersController < ApplicationController
   def create
     @declare_user = DeclareUser.new(declare_user_params)
     @declare_user.declare_tax_type = "income"
-    @declare_user.residence_number = params["residence_number"]
     @declare_user.user_id = @current_user.id
-    @declare_user.status = 1
-    @declare_user.hometax_account = @current_user.hometax_account || "XXXXXXX"
-
+    @declare_user.status = DeclareUser.statuses["user"]
+    @declare_user.hometax_account = @current_user.hometax_account
     if @declare_user.save
       business = Snowdon::Business.find_by(public_id: @declare_user.user.user_providers.cashnote.uid)
       simplified_bookkeepings = business.calculate(@declare_user.id)
@@ -33,6 +31,13 @@ class DeclareUsersController < ApplicationController
     return render json: { errors: "unauthorized" }, status: :unauthorized if @declare_user.id != params[:id].to_i
     @declare_user.destroy
     head :ok
+  end
+
+  def additional_deduction
+    render json: {
+                  applicable_single_parent: @declare_user.applicable_single_parent?,
+                  applicable_woman_deduction: @declare_user.applicable_woman_deduction?
+                 }, status: :ok
   end
 
   private

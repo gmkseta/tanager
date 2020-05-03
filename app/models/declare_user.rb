@@ -1,5 +1,6 @@
 class DeclareUser < ApplicationRecord
   extend AttrEncrypted
+  include PersonalDeduction
   enum status: %i(empty user deductible_persons business_expenses confirm done)
 
   belongs_to :user
@@ -9,7 +10,11 @@ class DeclareUser < ApplicationRecord
 
   scope :individual_incomes, ->{ where(declare_type: "income") }
 
-  validates :name, :residence_number, :address, :hometax_account, presence: true
+  validate :valid_residence_number?
+  validates :residence_number, presence: true, length: { is: 13 }
+  validates :declare_tax_type, presence: true
+  validates :name, presence: true
+  validates :address, presence: true
   
   attr_encrypted :residence_number,
                  key: :encryption_key,
@@ -19,5 +24,19 @@ class DeclareUser < ApplicationRecord
 
   def encryption_key
     Rails.application.credentials.attr_encrypted[:encryption_key]
+  end
+
+  def deduction_amount
+    amount = default_amount + 1500000
+    amount -= 1500000 if dependant?
+    amount
+  end
+
+  def applicable_single_parent?
+    !deductible_persons.has_spouse? && deductible_persons.has_dependant_children?
+  end
+
+  def applicable_woman_deduction?
+    female? && !deductible_persons.has_spouse? && deductible_persons.has_dependant?
   end
 end
