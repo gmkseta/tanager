@@ -12,7 +12,7 @@ class UsersController < ApplicationController
     if @user.save
       render json: { jwt: @user.jwt, json_object(@user) }, status: :created
     else
-      render json: { errors: @user.errors.full_messages }, status: :unprocessable_entity
+      render json: { errors: errors_json(@user.errors) }, status: :unprocessable_entity
     end
   end
 

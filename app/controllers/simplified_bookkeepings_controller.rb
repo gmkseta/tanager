@@ -1,6 +1,6 @@
 class SimplifiedBookkeepingsController < ApplicationController
   before_action :authorize_request
-  before_action :set_declare_user, only: [:index, :update, :confirm, :classifications, :purchase_type, :card_purchases_approvals]
+  before_action :set_declare_user, only: [:index, :update, :classifications, :purchase_type, :card_purchases_approvals]
   
   def index
     return head :unprocessable_entity if params[:classification_id].blank?

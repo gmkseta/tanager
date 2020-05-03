@@ -1,6 +1,6 @@
   class DeductiblePersonsController < ApplicationController
   before_action :authorize_request
-  before_action :set_declare_user, only: [:index, :create, :update, :destroy, :confirm]
+  before_action :set_declare_user, only: [:index, :create, :update, :destroy]
   before_action :set_deductible_person, only: [:update, :destroy]
 
   def index
@@ -19,7 +19,7 @@
     if @deductible_person.save
       render json: { deductible_person: @deductible_person }, status: :created
     else
-      render json: { errors: @deductible_person.errors.as_json }, status: :unprocessable_entity
+      render json: { errors: errors_json(@deductible_person.errors) }, status: :unprocessable_entity
     end
   end
 
@@ -27,7 +27,7 @@
     if @deductible_person.update(deductible_person_params)
       render json: { deductible_person: @deductible_person }, status: :ok
     else
-      render json: { deductible_person: @deductible_person.errors.as_json }, status: :unprocessable_entity
+      render json: { errors: errors_json(@deductible_person.errors) }, status: :unprocessable_entity
     end
   rescue ActiveRecord::RecordNotFound => e
     render json: { errors: e.message }, status: :unauthorized
@@ -37,7 +37,7 @@
     if @deductible_person.destroy
       render json: { deductible_person: @deductible_person }, status: :ok
     else
-      render json: { deductible_person: @deductible_person.errors.as_json }, status: :unprocessable_entity
+      render json: { errors: errors_json(@deductible_person.errors) }, status: :unprocessable_entity
     end
   rescue ActiveRecord::RecordNotFound => e
     render json: { errors: e.message }, status: :unauthorized

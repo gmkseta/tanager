@@ -18,4 +18,8 @@ class ApplicationController < ActionController::API
   def auth
     Knock::AuthToken.new(token: token).payload
   end
+
+  def errors_json(errors)
+    errors.as_json.map {|k,v| {"#{k}": v[0]}}
+  end
 end

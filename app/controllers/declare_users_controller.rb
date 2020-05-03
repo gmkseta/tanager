@@ -1,6 +1,6 @@
 class DeclareUsersController < ApplicationController
   before_action :authorize_request
-  before_action :set_declare_user, only: [:show, :update, :destroy, :additional_deduction]
+  before_action :set_declare_user, only: [:show, :update, :destroy, :additional_deduction, :status]
 
   def show
     render json: { declare_user: json_object }, status: :ok
@@ -18,7 +18,7 @@ class DeclareUsersController < ApplicationController
       SimplifiedBookkeeping.import(simplified_bookkeepings)
       render json: { declare_user: json_object }, status: :created
     else
-      render json: { errors: @declare_user.errors.as_json }, status: :unprocessable_entity
+      render json: { errors: errors_json(@declare_user.errors) }, status: :unprocessable_entity
     end
   end
 
@@ -28,7 +28,7 @@ class DeclareUsersController < ApplicationController
   end
 
   def destroy
-    return render json: { errors: "unauthorized" }, status: :unauthorized if @declare_user.id != params[:id].to_i
+    return render json: { errors: "unauthorized" }, status: :unauthorized if @declare_user.blank?
     @declare_user.destroy
     head :ok
   end
@@ -36,13 +36,14 @@ class DeclareUsersController < ApplicationController
   def additional_deduction
     render json: {
                   applicable_single_parent: @declare_user.applicable_single_parent?,
+                  applicable_woman_deduction: @declare_user.applicable_woman_deduction?,
                   applicable_woman_deduction: @declare_user.applicable_woman_deduction?
                  }, status: :ok
   end
 
   def status
     if @declare_user.update(status: params[:status])
-      head :ok
+      render json: { declare_user: json_object }, status: :ok
     else
       head :unprocessable_entity
     end
@@ -59,6 +60,6 @@ class DeclareUsersController < ApplicationController
   end
 
   def json_object
-    @declare_user.as_json(only: [:id, :name, :residence_number, :address, :phone_number])
+    @declare_user.as_json(only: [:id, :name, :residence_number, :address, :phone_number, :status])
   end
 end

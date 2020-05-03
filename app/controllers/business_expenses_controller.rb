@@ -24,7 +24,7 @@ class BusinessExpensesController < ApplicationController
     if @business_expense.save
       render json: { business_expense: @business_expense }, status: :created
     else
-      render json: { errors: @business_expense.errors.as_json }, status: :unprocessable_entity
+      render json: { errors: errors_json(@business_expense.errors) }, status: :unprocessable_entity
     end
   end
 
@@ -32,7 +32,7 @@ class BusinessExpensesController < ApplicationController
     if @business_expense.update(business_expense_params)
       render json: { business_expense: @business_expense }, status: :ok
     else
-      render json: { errors: @business_expense.errors.as_json }, status: :unprocessable_entity
+      render json: { errors: errors_json(@business_expense.errors) }, status: :unprocessable_entity
     end
   end
 
@@ -40,7 +40,7 @@ class BusinessExpensesController < ApplicationController
     if @business_expense.destroy
       render json: { business_expense: @business_expense }, status: :ok
     else
-      render json: { errors: @business_expense.errors.as_json }, status: :unprocessable_entity
+      render json: { errors: errors_json(@business_expense.errors) }, status: :unprocessable_entity
     end
   end
 
