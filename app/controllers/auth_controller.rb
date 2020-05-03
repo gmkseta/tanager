@@ -3,9 +3,11 @@ class AuthController < ApplicationController
     return render json: { errors: "jwt not available" }, status: :unauthorized if token.blank?
     user_provider = UserProvider.find_by!(token: token)
     if user_provider.declare_user.blank?
-      render json: { status: "empty", jwt: user_provider.user.jwt }, status: :ok
+      render json: { status: "empty", jwt: user_provider.user.jwt.token }, status: :ok
     else
-      render json: { status: user_provider.declare_user.status, jwt: user_provider.user.jwt }, status: :ok
+
+      render json: { declare_user: user_provider.declare_user.as_json(only: DeclareUser::JSON_FIELD),
+                     jwt: user_provider.user.jwt.token }, status: :ok
     end
   rescue ActiveRecord::RecordNotFound => e
     businesses = get_businesses(token)

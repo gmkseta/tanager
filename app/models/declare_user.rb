@@ -2,6 +2,7 @@ class DeclareUser < ApplicationRecord
   extend AttrEncrypted
   include PersonalDeduction
   enum status: %i(empty user deductible_persons business_expenses confirm done)
+  JSON_FIELD = %i(id name residence_number address phone_number status)
 
   belongs_to :user
   has_many :deductible_persons, dependent: :destroy

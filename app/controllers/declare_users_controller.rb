@@ -60,6 +60,6 @@ class DeclareUsersController < ApplicationController
   end
 
   def json_object
-    @declare_user.as_json(only: [:id, :name, :residence_number, :address, :phone_number, :status])
+    @declare_user.as_json(only: DeclareUser::JSON_FIELD)
   end
 end
