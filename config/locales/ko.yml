@@ -14,6 +14,8 @@ ko:
             residence_number:
               invalid: 주민등록번호 형식이 잘못되었습니다.
               taken: 이미 존재하는 주민번호 입니다.
+            classification_id:
+              invalid_type: 허용되지 않는 분류입니다.
         declare_user:
           attributes:
             residence_number:
@@ -23,6 +25,10 @@ ko:
           attributes:
             amount:
               greater_than_zero: 금액은 0보다 커야합니다.
+            expense_classification_id:
+              invalid_type: 허용되지 않는 분류입니다.
+            account_classification_id:
+              invalid_type: 허용되지 않는 분류입니다.
   errors:
     messages:
       blank: 필수로 입력해야하는 값입니다.
