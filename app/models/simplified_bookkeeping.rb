@@ -1,6 +1,10 @@
 class SimplifiedBookkeeping < ApplicationRecord
   belongs_to :declare_user
   belongs_to :classification
+  scope :card_approvals, ->{ where(purchase_type: "CardPurchasesApproval") }
+  scope :hometax_cards, ->{ where(purchase_type: "HomataxCardPurchase") }
+
+  PURCHASE_TYPES = %w(HomataxPurchasesInvoice HomataxPurchasesCashReceipt HomataxCardPurchase CardPurchasesApproval)
 
   class << self
     def upsert(rows:)
