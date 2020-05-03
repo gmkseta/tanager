@@ -22,6 +22,7 @@ gem 'bootsnap', '>= 1.4.2', require: false
 gem 'activerecord-import'
 gem 'active_record_union'
 gem 'attr_encrypted', '~> 3.1.0'
+gem 'dry-initializer'
 gem 'sidekiq'
 gem 'friendly_id', '~> 5.2.4' # Note: You MUST use 5.0.0 or greater for Rails 4.0+
 gem 'graphql-client'

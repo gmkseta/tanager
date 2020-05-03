@@ -9,21 +9,7 @@ class AuthController < ApplicationController
     end
   rescue ActiveRecord::RecordNotFound => e
     businesses = get_businesses(token)
-    user = ActiveRecord::Base.transaction do
-      user = User.create!(
-        login: businesses.first["registrationNumber"],
-        password: businesses.first["registrationNumber"],
-        name: businesses.first["name"],
-      )
-      UserProvider.create!(
-        user_id: user.id,
-        provider: "cashnote",
-        uid: businesses.first["id"],
-        response: businesses,
-        token: token
-      )
-      user
-    end
+    user = CreateUser.call(businesses: businesses, token: token)
     render json: { status: "empty", jwt: user.jwt }, status: :ok
   end
 
