@@ -23,14 +23,20 @@ class DeclareUsersController < ApplicationController
   end
 
   def update
-    @declare_user.update(declare_user_params)
-    render json: { declare_user: json_object }, status: :ok
+    if @declare_user.update(declare_user_params)
+      render json: { declare_user: json_object }, status: :ok
+    else
+      render json: { errors: errors_json(@declare_user.errors) }, status: :unprocessable_entity
+    end
   end
 
   def destroy
-    return render json: { errors: "unauthorized" }, status: :unauthorized if @declare_user.blank?
-    @declare_user.destroy
-    head :ok
+    return render json: { errors: "unauthorized" }, status: :unauthorized if @declare_user.blank? && Rails.env.development?
+    if @declare_user.destroy
+      head :ok
+    else
+      render json: { errors: errors_json(@declare_user.errors) }, status: :unprocessable_entity
+    end
   end
 
   def additional_deduction
@@ -45,7 +51,7 @@ class DeclareUsersController < ApplicationController
     if @declare_user.update(status: params[:status])
       render json: { declare_user: json_object }, status: :ok
     else
-      head :unprocessable_entity
+      render json: { errors: errors_json(@declare_user.errors) }, status: :unprocessable_entity
     end
   end
 
