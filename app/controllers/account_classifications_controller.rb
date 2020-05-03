@@ -12,10 +12,6 @@ class AccountClassficationsController < ApplicationController
     render json: { total_pages: results.total_pages, next_page: results.next_page, results: results.select{ |r| r.sum_amount > 0}.sort_by { |r| -r.sum_amount }.as_json(only: [:vendor_business_name, :vendor_registration_number, :sum_amount, :type])}.to_json
   end
 
-  def summary
-
-  end
-
   private
 
   def set_business

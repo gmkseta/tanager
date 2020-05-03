@@ -1,0 +1,31 @@
+ko:
+  activemodel:
+    errors:
+      messages:
+        record_invalid: 데이터 검증에 실패하였습니다. %{errors}
+  activerecord:    
+    attributes:
+      deductible_person:
+        residence_number: 주민등록번호
+    errors:
+      models:
+        deductible_person:
+          attributes:
+            residence_number:
+              invalid: 주민등록번호 형식이 잘못되었습니다.
+              taken: 이미 존재하는 주민번호 입니다.
+        declare_user:
+          attributes:
+            residence_number:
+              invalid: 주민등록번호 형식이 잘못되었습니다.
+              taken: 이미 존재하는 주민번호 입니다.
+        business_expense:
+          attributes:
+            amount:
+              greater_than_zero: 금액은 0보다 커야합니다.
+  errors:
+    messages:
+      blank: 필수로 입력해야하는 값입니다.
+      required: 필수로 입력해야하는 값입니다.
+      present: 입력값이 없어야 합니다.
+      invalid: 올바르지 않은 형식입니다.

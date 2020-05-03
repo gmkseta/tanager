@@ -7,9 +7,10 @@ class DeductiblePerson < ApplicationRecord
   belongs_to :classification
 
   validate :valid_residence_number?
-  validates :residence_number, presence: true, length: { is: 13 }
+  validates :residence_number, presence: true, length: { is: 13, message: :invalid }
   validates :classification_id, presence: true
   validates :name, presence: true
+  validates :residence_number, uniqueness: {scope: [:declare_user_id], message: :taken}
 
   def spouse?
     classification_id == 1

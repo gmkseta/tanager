@@ -18,7 +18,7 @@ class DeclareUsersController < ApplicationController
       SimplifiedBookkeeping.import(simplified_bookkeepings)
       render json: { declare_user: json_object }, status: :created
     else
-      render json: { errors: @declare_user.errors.full_messages }, status: :unprocessable_entity
+      render json: { errors: @declare_user.errors.as_json }, status: :unprocessable_entity
     end
   end
 
@@ -38,6 +38,14 @@ class DeclareUsersController < ApplicationController
                   applicable_single_parent: @declare_user.applicable_single_parent?,
                   applicable_woman_deduction: @declare_user.applicable_woman_deduction?
                  }, status: :ok
+  end
+
+  def status
+    if @declare_user.update(status: params[:status])
+      head :ok
+    else
+      head :unprocessable_entity
+    end
   end
 
   private
