@@ -47,7 +47,7 @@ class DeclareUsersController < ApplicationController
   end
 
   def set_declare_user
-    @declare_user = @current_user.declare_user.find_by(declare_tax_type: "income")
+    @declare_user = @current_user.declare_user.find(params[:id])
   end
 
   def json_object
