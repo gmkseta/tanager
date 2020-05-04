@@ -1,6 +1,7 @@
 class SimplifiedBookkeepingsController < ApplicationController
   before_action :authorize_request
   before_action :set_declare_user, only: [:index, :update, :classifications, :purchase_type, :card_purchases_approvals]
+  before_action :set_simplified_bookkeeping, only: [:update]
   
   def index
     return head :unprocessable_entity if params[:classification_id].blank?
@@ -11,6 +12,14 @@ class SimplifiedBookkeepingsController < ApplicationController
     render json: { total_pages: @simplified_bookkeepings.total_pages,
                    next_page: @simplified_bookkeepings.next_page,
                    simplified_bookkeepings: @simplified_bookkeepings }, status: :ok
+  end
+
+  def update
+    simplified_bookkeeping = UpdateSimplifiedBookkeeping.call(
+      simplified_bookkeeping: @simplified_bookkeeping,
+      params: simplified_bookkeeping_params
+    )
+    render json: { simplified_bookkeeping: simplified_bookkeeping }, status: :ok
   end
 
   def classifications
@@ -40,7 +49,15 @@ class SimplifiedBookkeepingsController < ApplicationController
 
   private
 
+  def set_simplified_bookkeeping
+    @simplified_bookkeeping = @declare_user.simplified_bookkeepings.find(params[:id])
+  end
+
   def set_declare_user
     @declare_user = @current_user.declare_user.find_by!(declare_tax_type: "income")
+  end
+
+  def simplified_bookkeeping_params
+    params.permit(:deductible, :classification_id)
   end
 end
