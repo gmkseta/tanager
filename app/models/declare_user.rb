@@ -9,6 +9,7 @@ class DeclareUser < ApplicationRecord
   has_many :business_expenses, dependent: :destroy
   has_many :simplified_bookkeepings, dependent: :destroy
   has_many :user_account_classification_rules, dependent: :destroy
+  has_one :hometax_individual_income, dependent: :destroy
 
   scope :individual_incomes, ->{ where(declare_type: "income") }
 

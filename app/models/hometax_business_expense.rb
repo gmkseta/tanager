@@ -1,2 +1,0 @@
-class HometaxBusinessExpense < ApplicationRecord
-end

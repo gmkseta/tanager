@@ -1,0 +1,2 @@
+class HometaxBusinessIncome < ApplicationRecord
+end
