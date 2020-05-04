@@ -27,6 +27,7 @@ ko:
               greater_than_zero: 금액은 0보다 커야합니다.
             expense_classification_id:
               invalid_type: 허용되지 않는 분류입니다.
+              taken: 이미 존재하는 항목 입니다.
             account_classification_id:
               invalid_type: 허용되지 않는 분류입니다.
   errors:
