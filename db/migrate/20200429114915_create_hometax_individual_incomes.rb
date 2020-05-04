@@ -1,6 +1,7 @@
 class CreateHometaxIndividualIncomes < ActiveRecord::Migration[6.0]
   def change
     create_table :hometax_individual_incomes do |t|
+      t.references :user, null: false, foreign_key: true
       t.string :name, null: false, comment: "이름"
       t.string :birthday, null: false, comment: "생년월일"
       t.string :declare_type, null: false, comment: "신고안내유형"
@@ -37,5 +38,6 @@ class CreateHometaxIndividualIncomes < ActiveRecord::Migration[6.0]
 
       t.timestamps
     end
+    add_index :hometax_individual_incomes, [:user_id, :delcare_year], unique: true
   end
 end

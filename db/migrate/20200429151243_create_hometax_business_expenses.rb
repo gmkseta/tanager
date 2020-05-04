@@ -1,6 +1,7 @@
 class CreateHometaxBusinessExpenses < ActiveRecord::Migration[6.0]
   def change
     create_table :hometax_business_expenses do |t|
+      t.references :hometax_individual_income, null: false, foreign_key: true
       t.string :registration_number, comment: "사업자등록번호"
       t.string :business_name, null: false, comment: "상호"      
       t.string :expense_type, null: false, comment: "수입종류구분코드"
@@ -16,5 +17,6 @@ class CreateHometaxBusinessExpenses < ActiveRecord::Migration[6.0]
 
       t.timestamps
     end
+    add_index :hometax_business_expenses, :registration_number
   end
 end
