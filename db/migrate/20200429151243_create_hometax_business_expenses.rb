@@ -8,7 +8,7 @@ class CreateHometaxBusinessExpenses < ActiveRecord::Migration[6.0]
       t.string :classficaition_code, null: false, comment: "업종코드"
       t.string :business_type, null: false, comment: "사업형태"
       t.string :account_type, null: false, comment: "기장의무"
-      t.integer :expnese_amount, null: false, comment: "수입금액"
+      t.integer :expense_amount, null: false, comment: "수입금액"
       t.float :base_expense_rate, null: false, comment: "기준경비율(일반)"
       t.float :self_base_expense_rate, null: false, comment: "기준경비율(자가)"
       t.float :simple_expense_rate, null: false, comment: "단순경비율(일반)"
