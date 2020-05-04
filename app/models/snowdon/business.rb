@@ -36,6 +36,34 @@ class Snowdon::Business < Snowdon::ApplicationRecord
 
   def add_account_classification_code(classification, results, declare_user_id)
     rules = account_classification_rules(classification, vendor_classification_codes(results))
+    user_rules = UserAccountClassificationRule.where(declare_user_id: declare_user_id).group_by{ |r| "#{r.vendor_registration_number}:#{r.purchase_type}" }
+    results.map do |h|
+      merge_data = {
+        declare_user_id: declare_user_id,
+        business_id: id,
+        registration_number: registration_number,
+      }
+      user_rule = user_rules["#{h.vendor_registration_number}:#{h.purchase_type}"]
+      if user_rule.present?
+        merge_data[:classification_id] = user_rule.first.classification_id
+        merge_data[:account_classification_code] = ''
+      else
+        rule = h[:vendor_classification_code].nil? ? nil : rules[h[:vendor_classification_code][0..1]]
+        account_classification_code =
+          if rule.nil?
+            h[:purchase_type] == "CardPurchasesApproval" ? nil : "812033"
+          else
+            rule.account_classification_code
+          end
+        merge_data[:classification_id] = rule&.classification_id || 32
+        merge_data[:account_classification_code] = account_classification_code
+      end
+      h.attributes.merge(merge_data)
+    end
+  end
+
+  def add_user_account_classification_code(classification, declare_user_id)
+    rules = account_classification_rules(classification, vendor_classification_codes(results))
 
     results.map do |h|
       rule = h[:vendor_classification_code].nil? ? nil : rules[h[:vendor_classification_code][0..1]]
