@@ -10,11 +10,12 @@ class CreateHometaxIndividualIncomes < ActiveRecord::Migration[6.0]
 
       t.boolean :interest_income, null: false, comment: "이자소득"
       t.boolean :dividend_income, null: false, comment: "배당소득"
-      t.boolean :business_income, null: false, comment: "사업소득"
       t.boolean :wage_single_income, null: false, comment: "근로소득(단일)"
       t.boolean :wage_multiple_income, null: false, comment: "근로소득(복수)"
       t.boolean :pension_income, null: false, comment: "연금소득"
       t.boolean :other_income, null: false, comment: "기타소득"
+      t.boolean :religions_income, null: false, comment: "종교인기타소득"
+      t.boolean :yearend_settlement_income, null: false, comment: "사업연말정산소득"
 
       t.integer :prepaid_tax, null: false, comment: "기납부세액"
       t.integer :national_pension, null: false, comment: "국민연금보험료"
@@ -23,15 +24,16 @@ class CreateHometaxIndividualIncomes < ActiveRecord::Migration[6.0]
       t.integer :retirement_pension_tax_credit, null: false, comment: "퇴직연금세액공제"
       t.integer :pension_account_tax_credit, null: false, comment: "연금계좌세액공제"
 
-      t.integer :no_declare_penalty, null: false, comment: "무신고 또는 무기장가산세"
+      t.string :declare_penalty_case, null: false, comment: "무신고 또는 무기장가산세"
       t.integer :unfaithful_report_invoice_penalty, null: false, comment: "(세금)계산서관련 보고불성실"
-      t.integer :no_cash_receipits_penalty, null: false, comment: "현금영수증미가맹"
-      t.integer :less_decline_cash_receipits_penalty, null: false, comment: "현금영수증발급거부(10만미만)"
-      t.integer :more_decline_cash_receipits_penalty, null: false, comment: "현금영수증발급거부(10만이상)"
-      t.integer :less_decline_card_penalty, null: false, comment: "신용카드발급거부(10만미만)"
-      t.integer :more_decline_card_penalty, null: false, comment: "신용카드발급거부(10만이상)"
-      t.integer :no_business_report_penalty, null: false, comment: "사업장현황신고불성실"
-      t.integer :no_business_account_penalty, null: false, comment: "사업용계좌미신고"
+      t.string :not_register_cash_receipts, null: false, comment: "현금영수증미가맹"
+      t.integer :not_issued_cash_receipts_amount, null: false, comment: "현금영수증미발급 금액"
+      t.integer :decline_cash_receipts_penalty_count, null: false, comment: "현금영수증발급거부(10만미만)"
+      t.integer :decline_cash_receipts_penalty_amount, null: false, comment: "현금영수증발급거부(10만이상)"
+      t.integer :decline_card_penalty_count, null: false, comment: "신용카드발급거부(10만미만)"
+      t.integer :decline_card_penalty_amount, null: false, comment: "신용카드발급거부(10만이상)"
+      t.integer :unfaithful_business_report_penalty, null: false, comment: "사업장현황신고불성실"
+      t.string :no_business_account_penalty, null: false, comment: "사업용계좌미신고"
 
       t.timestamps
     end
