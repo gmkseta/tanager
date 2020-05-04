@@ -1,13 +1,13 @@
 class CreateHometaxIndividualIncomes < ActiveRecord::Migration[6.0]
   def change
     create_table :hometax_individual_incomes do |t|
-      t.references :user, null: false, foreign_key: true
+      t.references :declare_user, null: false, foreign_key: true
       t.string :name, null: false, comment: "이름"
       t.string :birthday, null: false, comment: "생년월일"
       t.string :declare_type, null: false, comment: "신고안내유형"
       t.string :account_type, null: false, comment: "기장의무구분"
       t.string :base_expense_rate, null: false, comment: "추계신고시 적용경비율"
-      t.string :delcare_year, null: false, comment: "귀속년도"
+      t.string :declare_year, null: false, comment: "귀속년도"
 
       t.boolean :interest_income, null: false, comment: "이자소득"
       t.boolean :dividend_income, null: false, comment: "배당소득"
@@ -38,6 +38,7 @@ class CreateHometaxIndividualIncomes < ActiveRecord::Migration[6.0]
 
       t.timestamps
     end
-    add_index :hometax_individual_incomes, [:user_id, :delcare_year], unique: true
+    add_index :hometax_individual_incomes, [:declare_user_id, :declare_year],
+      name: "index_hometax_individual_incomes_on_declare_user_id_and_year", unique: true
   end
 end
