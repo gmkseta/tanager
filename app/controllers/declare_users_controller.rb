@@ -15,7 +15,7 @@ class DeclareUsersController < ApplicationController
     if @declare_user.save
       business = Snowdon::Business.find_by(public_id: @declare_user.user.user_providers.cashnote.uid)
       simplified_bookkeepings = business.calculate(@declare_user.id)
-      SimplifiedBookkeeping.import(simplified_bookkeepings)
+      SimplifiedBookkeeping.upsert(rows: simplified_bookkeepings)
       render json: { declare_user: json_object }, status: :created
     else
       render json: { errors: errors_json(@declare_user.errors) }, status: :unprocessable_entity
