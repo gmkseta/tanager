@@ -22,4 +22,8 @@ class ApplicationController < ActionController::API
   def errors_json(errors)
     errors.as_json.map {|k,v| {"#{k}": v[0]}}
   end
+
+  def set_declare_user
+    @declare_user = @current_user.declare_user.find_by!(declare_tax_type: "income")
+  end
 end

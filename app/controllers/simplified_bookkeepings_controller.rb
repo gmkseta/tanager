@@ -53,10 +53,6 @@ class SimplifiedBookkeepingsController < ApplicationController
     @simplified_bookkeeping = @declare_user.simplified_bookkeepings.find(params[:id])
   end
 
-  def set_declare_user
-    @declare_user = @current_user.declare_user.find_by!(declare_tax_type: "income")
-  end
-
   def simplified_bookkeeping_params
     params.permit(:deductible, :classification_id)
   end

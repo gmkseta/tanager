@@ -49,10 +49,6 @@
     params.permit(:name, :residence_number, :address, :disabled, :classification_id, :single_parent, :woman_deduction)
   end
 
-  def set_declare_user
-    @declare_user = @current_user.declare_user.find_by(declare_tax_type: "income")
-  end
-
   def set_deductible_person
     @deductible_person = DeductiblePerson.find_by!(id: params[:id], declare_user_id: @declare_user.id)
   end

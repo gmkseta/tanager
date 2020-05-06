@@ -27,4 +27,5 @@ Rails.application.routes.draw do
       get 'account_classifications'
     end
   end
+  get "calculated_taxes", to: "calculated_taxes#index"
 end

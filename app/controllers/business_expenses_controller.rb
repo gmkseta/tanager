@@ -50,10 +50,6 @@ class BusinessExpensesController < ApplicationController
     params.permit(:expense_classification_id, :amount, :memo, :account_classification_id, :vendor_name, :vendor_registration_number, :written_at)
   end
 
-  def set_declare_user
-    @declare_user = @current_user.declare_user.find_by!(declare_tax_type: "income")
-  end
-
   def set_business_expense
     @business_expense = BusinessExpense.find_by!(id: params[:id], declare_user_id: @declare_user.id)
   end
