@@ -47,7 +47,7 @@ class BusinessExpensesController < ApplicationController
   private
 
   def business_expense_params
-    params.permit(:expense_classification_id, :amount, :memo, :account_classification_id, :vendor_name, :vendor_registration_number)
+    params.permit(:expense_classification_id, :amount, :memo, :account_classification_id, :vendor_name, :vendor_registration_number, :written_at)
   end
 
   def set_declare_user
