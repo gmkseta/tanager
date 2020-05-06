@@ -1,7 +1,6 @@
 class DeclareUser < ApplicationRecord
   extend AttrEncrypted
   include PersonalDeduction
-  include IndividualIncomeTaxCalculator
   include TaxCreditCalculator
 
   enum status: %i(empty user deductible_persons business_expenses confirm done)
