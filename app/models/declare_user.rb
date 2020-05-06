@@ -60,7 +60,9 @@ class DeclareUser < ApplicationRecord
   end
 
   def pensions_sum
-    hometax_individual_income.national_pension + hometax_individual_income.merchant_pension_deduction + hometax_individual_income.personal_pension_deduction
+    hometax_individual_income.national_pension +
+      hometax_individual_income.merchant_pension_deduction +
+      hometax_individual_income.personal_pension_deduction
   end
 
   def business_incomes_sum

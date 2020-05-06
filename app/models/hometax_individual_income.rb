@@ -16,11 +16,11 @@ class HometaxIndividualIncome < ApplicationRecord
   end
 
   def penalty_tax_sum
-    (unfaithful_report_invoice_penalty
-    + not_issued_cash_receipts_penalty
-    + decline_cash_receipts_penalty
-    + decline_card_penalty
-    + unfaithful_business_report_penalty).to_i
+    (unfaithful_report_invoice_penalty +
+      not_issued_cash_receipts_penalty +
+      decline_cash_receipts_penalty +
+      decline_card_penalty +
+      unfaithful_business_report_penalty).to_i
   end
 
   def unfaithful_report_invoice_penalty
@@ -46,5 +46,10 @@ class HometaxIndividualIncome < ApplicationRecord
   def expenses_sum_by_ratio
     return hometax_business_incomes.sum(&:expense_by_base_ratio) if base_expense_rate.eql?("기준경비율")
     hometax_business_incomes.sum(&:expense_by_simple_ratio)
+  end
+
+  def expenses_ratio
+    return hometax_business_incomes.first.base_ratio_self if base_expense_rate.eql?("기준경비율")
+    hometax_business_incomes.first.simple_ratio_self
   end
 end
