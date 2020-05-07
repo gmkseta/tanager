@@ -1,6 +1,5 @@
 class User < ApplicationRecord
-  has_many :user_providers, dependent: :destroy
-  has_many :declare_user, dependent: :destroy
+  has_many :declare_users, dependent: :destroy
 
   has_secure_password
 
@@ -24,5 +23,9 @@ class User < ApplicationRecord
 
   def sudo?
     @sudo
+  end
+
+  def declare_user
+    declare_users.find_by(declare_tax_type: "income")
   end
 end

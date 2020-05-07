@@ -1,29 +1,35 @@
 class CreateUser < Service::Base
-  option :businesses
-  option :token
-  option :provider, optional: true
+  option :owner
+  option :token, optional: true
 
-  def run    
-    public_id = businesses.first["id"]
-    business = Snowdon::Business.find_by(public_id: public_id)
-    hometax_business = Snowdon::HometaxBusiness.find_by(business_id: business.id)
+  def run
     user = ActiveRecord::Base.transaction do
+      businesses = owner.businesses.joins(:hometax_business)
       user = User.create!(
-        login: business.registration_number,
-        password: business.registration_number,
-        name: hometax_business.name,
-        hometax_account: hometax_business.login,
-        phone_number: hometax_business.phone_number
+        login: owner.login || businesses.first.registration_number,
+        password: owner.login || businesses.first.registration_number,
+        name: owner.name || businesses.first.owner_name,
+        owner_id: owner.id,
+        token: token,
       )
-      UserProvider.create!(
-        user_id: user.id,
-        provider: provider || "cashnote",
-        uid: public_id,
-        response: businesses,
-        token: token
-      )
+      businesses.each do |b|
+        Business.create!(
+          user_id: user.id,
+          name: b.hometax_name,
+          registration_number: b.registration_number,
+          address: b.hometax_address,
+          public_id: b.public_id,
+          owner_id: owner.id,
+          login: b.hometax_business.login,
+          hometax_classification_code: b.hometax_business.classification_code,
+          taxation_type: b.hometax_business.taxation_type,
+          opened_at: b.hometax_business.opened_at,
+          official_name: b.hometax_business.official_name,
+          official_code: b.hometax_business.official_code,
+          official_number: b.hometax_business.official_number
+        )
+      end
       user
     end
-    user
   end
 end

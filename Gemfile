@@ -30,6 +30,7 @@ gem 'httparty'
 gem 'knock'
 gem 'will_paginate', '>= 3.1.0'
 gem 'rails-i18n'
+gem 'slack-notifier'
 gem 'strong_migrations'
 gem 'graphql-client'
 
