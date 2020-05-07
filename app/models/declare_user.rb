@@ -4,7 +4,7 @@ class DeclareUser < ApplicationRecord
   include TaxCreditCalculator
 
   enum status: %i(empty user deductible_persons business_expenses confirm done)
-  JSON_FIELD = %i(id name residence_number address phone_number status)
+  JSON_FIELD = %i(id name residence_number address phone_number married status)
 
   belongs_to :user
   has_many :deductible_persons, dependent: :destroy
@@ -40,11 +40,15 @@ class DeclareUser < ApplicationRecord
   end
 
   def applicable_single_parent?
-    !deductible_persons.has_spouse? && deductible_persons.has_dependant_children?
+    !married && deductible_persons.has_dependant_children?
   end
 
-  def applicable_woman_deduction?
-    female? && !deductible_persons.has_spouse? && deductible_persons.has_dependant?
+  def applicable_woman_deduction_with_husband?
+    female? && married && total_income_amount <= 30000000
+  end
+
+  def applicable_woman_deduction_without_husband?
+    female? && !married && deductible_persons.has_dependant? && total_income_amount <= 30000000
   end
 
   def deductible_persons_sum
@@ -60,13 +64,13 @@ class DeclareUser < ApplicationRecord
   end
 
   def pensions_sum
-    hometax_individual_income.national_pension +
+    0 || hometax_individual_income.national_pension +
       hometax_individual_income.merchant_pension_deduction +
       hometax_individual_income.personal_pension_deduction
   end
 
   def business_incomes_sum
-    hometax_individual_income.business_income_sum
+    0 || hometax_individual_income.business_income_sum
   end
 
   def simplified_bookkeeping_base_expenses
@@ -74,7 +78,7 @@ class DeclareUser < ApplicationRecord
   end
 
   def expenses_sum
-    [simplified_bookkeeping_base_expenses, hometax_individual_income.expenses_sum_by_ratio].max
+    [simplified_bookkeeping_base_expenses, 0 || hometax_individual_income.expenses_sum_by_ratio].max
   end
 
   def total_income_amount
@@ -94,7 +98,7 @@ class DeclareUser < ApplicationRecord
   end
 
   def base_tax_exemption
-    hometax_individual_income.has_wage_income? ? 130000 : 70000
+    hometax_individual_income&.has_wage_income? ? 130000 : 70000
   end
 
   def tax_exemption_amount
@@ -106,7 +110,7 @@ class DeclareUser < ApplicationRecord
   end
 
   def penalty_tax_sum
-    hometax_individual_income.penalty_tax_sum
+    0 || hometax_individual_income.penalty_tax_sum
   end
 
   def prepaid_tax_sum

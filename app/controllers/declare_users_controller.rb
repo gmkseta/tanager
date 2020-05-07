@@ -45,8 +45,8 @@ class DeclareUsersController < ApplicationController
   def additional_deduction
     render json: {
                   applicable_single_parent: @declare_user.applicable_single_parent?,
-                  applicable_woman_deduction: @declare_user.applicable_woman_deduction?,
-                  applicable_woman_deduction: @declare_user.applicable_woman_deduction?
+                  applicable_woman_deduction_with_husband: @declare_user.applicable_woman_deduction_with_husband?,
+                  applicable_woman_deduction_without_husband: @declare_user.applicable_woman_deduction_without_husband?
                  }, status: :ok
   end
 
