@@ -5,10 +5,6 @@ class ValidateOwner < Service::Base
     account = get_account_and_businesses(token)
     business_ids = account["businesses"]["edges"].map { |b| b["node"]["id"] }
     snowdon_businesses = Snowdon::Business.where(public_id: business_ids)
-    if snowdon_businesses.length > 1
-      SlackBot.ping("#{Rails.env.development? ? "[테스트] " : ""} *세금신고오류* #{snowdon_businesses.first.name}님 - 신고불가(사업장갯수: #{snowdon_businesses.size})", channel: "#labs-ops")
-      return false
-    end
     owner_id = snowdon_businesses.map{ |s| s.owner_id }.first
     Snowdon::User.find(owner_id)
   end
