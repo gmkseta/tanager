@@ -28,4 +28,5 @@ Rails.application.routes.draw do
     end
   end
   get "calculated_taxes", to: "calculated_taxes#index"
+  get "hometax_business_incomes", to: "hometax_business_incomes#index"
 end
