@@ -6,7 +6,7 @@ class AuthController < ApplicationController
     user = User.find_by(owner_id: owner.id)
     return render json: { delcare_user: user.declare_user&.as_json(only: DeclareUser::JSON_FIELD),
                    jwt: user.jwt.token,
-                   status: user.declare_users.blank? ? "empty" : user.declare_user
+                   status: user.declare_users.blank? ? "empty" : user.declare_user.status
                  }, status: :ok if user
     user = CreateUser.call(owner: owner)
     render json: { status: "empty", jwt: user.jwt.token }, status: :ok if user
