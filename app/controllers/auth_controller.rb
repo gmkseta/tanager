@@ -4,7 +4,7 @@ class AuthController < ApplicationController
     owner = ValidateOwner.call(token: token)
     return render json: { errors: "not found user" }, status: :not_found if owner.blank?
     user = User.find_by(owner_id: owner.id)
-    return render json: { declare_user: user.declare_user&.as_json(only: DeclareUser::JSON_FIELD),
+    return render json: { declare_user: user.declare_user&.as_json(except: DeclareUser::EXCEPT_JSON_FIELD),
                    jwt: user.jwt.token,
                    status: user.declare_users.blank? ? "empty" : user.declare_user.status
                  }, status: :ok if user

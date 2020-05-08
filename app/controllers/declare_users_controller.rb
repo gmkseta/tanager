@@ -69,6 +69,6 @@ class DeclareUsersController < ApplicationController
   end
 
   def json_object
-    @declare_user.as_json(only: DeclareUser::JSON_FIELD)
+    @declare_user.as_json(except: DeclareUser::EXCEPT_JSON_FIELD)
   end
 end

@@ -4,7 +4,7 @@ class DeclareUser < ApplicationRecord
   include TaxCreditCalculator
 
   enum status: %i(empty user deductible_persons business_expenses confirm done)
-  JSON_FIELD = %i(id name residence_number address phone_number married status)
+  EXCEPT_JSON_FIELD = %i(user_id encrypted_residence_number encrypted_residence_number_iv hometax_account)
 
   belongs_to :user
   has_many :deductible_persons, dependent: :destroy
@@ -34,9 +34,7 @@ class DeclareUser < ApplicationRecord
   end
 
   def deduction_amount
-    amount = default_amount + 1500000
-    amount -= 1500000 if dependant?
-    amount
+    1500000 + additional_deduction_amount
   end
 
   def applicable_single_parent?
@@ -106,7 +104,7 @@ class DeclareUser < ApplicationRecord
   end
 
   def tax_credit_amount
-    children_tax_credit_amount + newborn_baby_tax_credit_amount
+    children_tax_credit_amount + newborn_baby_tax_credit_amount + pensions_tax_credit_amount
   end
 
   def penalty_tax_sum

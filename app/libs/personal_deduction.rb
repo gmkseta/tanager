@@ -42,9 +42,15 @@ module PersonalDeduction
     (20 >= age || age >= 60)
   end
 
-  def default_amount
+  def default_deduction_amount
     amount = 0
+    amount += 1500000 if spouse?
     amount += 1500000 if dependant?
+    amount
+  end
+
+  def additional_deduction_amount
+    amount = 0
     amount += 2000000 if disabled
     amount += 1000000 if elder?
     amount += 1000000 if single_parent

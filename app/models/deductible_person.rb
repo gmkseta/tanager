@@ -21,23 +21,44 @@ class DeductiblePerson < ApplicationRecord
   end
 
   def deduction_amount
-    amount = default_amount
-    if spouse?
-      amount += 1500000
-      amount -= 1500000 if dependant?
+    default_deduction_amount + additional_deduction_amount
+  end
+
+  class << self
+    def dependants_count
+      select{ |d| d.dependant? && !d.spouse? }.length
     end
-    amount
-  end
 
-  def self.has_spouse?
-    select{ |d| d.classification_id == 1 }.length > 0
-  end
+    def has_dependant?
+      dependants_count > 0
+    end
 
-  def self.has_dependant_children?
-    select{ |d| d.dependant_children? }.length > 0
-  end
+    def dependant_children_count
+      select{ |d| d.dependant_children? }.length
+    end
 
-  def self.has_dependant?
-    select{ |d| d.dependant? && !d.spouse? }.length > 0
+    def has_dependant_children?
+      dependant_children_count > 0
+    end
+
+    def has_spouse?
+      select{ |d| d.classification_id == 1 }.length > 0
+    end
+
+    def elder_count
+      select{ |d| d.elder == true }.length
+    end
+
+    def disabled_count
+      select{ |d| d.disabled == true }.length
+    end
+
+    def single_parent_count
+      select{ |d| d.single_parent == true }.length
+    end
+
+    def woman_deduction_count
+      select{ |d| d.woman_deduction == true }.length
+    end
   end
 end
