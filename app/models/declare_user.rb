@@ -5,6 +5,7 @@ class DeclareUser < ApplicationRecord
 
   enum status: %i(empty user deductible_persons business_expenses confirm done)
   EXCEPT_JSON_FIELD = %i(user_id encrypted_residence_number encrypted_residence_number_iv hometax_account)
+  CREDIT_METHODS = %i(base_tax_credit_amount online_declare_credit_amount children_tax_credit_amount newborn_baby_tax_credit_amount pensions_tax_credit_amount)
 
   belongs_to :user
   has_many :deductible_persons, dependent: :destroy
@@ -95,17 +96,17 @@ class DeclareUser < ApplicationRecord
     deductible_persons.select { |p| p.new_born? }.length
   end
 
-  def base_tax_credit
+  def base_tax_credit_amount
     hometax_individual_income&.has_wage_income? ? 130000 : 70000
   end
 
-  def online_declare_credit
+  def online_declare_credit_amount
     20000
   end
 
   def tax_credit_amount
-    base_tax_credit +
-      online_declare_credit +
+    base_tax_credit_amount +
+      online_declare_credit_amount +
       children_tax_credit_amount +
       newborn_baby_tax_credit_amount +
       pensions_tax_credit_amount
@@ -116,7 +117,7 @@ class DeclareUser < ApplicationRecord
   end
 
   def penalty_tax_sum
-    0 || hometax_individual_income.penalty_tax_sum
+    hometax_individual_income.penalty_tax_sum
   end
 
   def prepaid_tax_sum

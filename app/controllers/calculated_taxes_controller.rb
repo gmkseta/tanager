@@ -48,13 +48,10 @@ class CalculatedTaxesController < ApplicationController
   def tax_credits
     render json: {
       total_amount: @declare_user.tax_credit_amount,
-      tax_credits: {
-        base_tax_credit: @declare_user.base_tax_credit,
-        online_declare_credit: @declare_user.online_declare_credit,
-        children_tax_credit: @declare_user.children_tax_credit_amount,
-        newborn_baby_tax_credit: @declare_user.newborn_baby_tax_credit_amount,
-        pensions_tax_credit: @declare_user.pensions_tax_credit_amount,
-      }
+      tax_credits: @declare_user.as_json(
+        only: [],
+        methods: DeclareUser::CREDIT_METHODS
+      )
     }, status: :ok
   end
 
@@ -63,6 +60,16 @@ class CalculatedTaxesController < ApplicationController
       total_amount: @declare_user.tax_exemption_amount,
       tax_exemptions: {
       }
+    }, status: :ok
+  end
+
+  def penalty_taxes
+    render json: {
+      total_amount: @declare_user.penalty_tax_sum,
+      penalty_taxes: @declare_user.hometax_individual_income.as_json(
+        only: [],
+        methods: HometaxIndividualIncome::PENALTY_METHODS
+      )
     }, status: :ok
   end
 end

@@ -31,6 +31,7 @@ Rails.application.routes.draw do
   get "calculated_taxes/deductions", to: "calculated_taxes#deductions"
   get "calculated_taxes/tax_credits", to: "calculated_taxes#tax_credits"
   get "calculated_taxes/tax_exemptions", to: "calculated_taxes#tax_exemptions"
+  get "calculated_taxes/penalty_taxes", to: "calculated_taxes#penalty_taxes"
   get "hometax_business_incomes", to: "hometax_business_incomes#index"
   get "hometax_business_incomes/incomes", to: "hometax_business_incomes#incomes"
 end
