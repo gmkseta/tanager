@@ -11,6 +11,7 @@ class CreateHometaxSocialInsurances < ActiveRecord::Migration[6.0]
 
       t.timestamps
     end
-    add_index :hometax_social_insurances, [:owner_id, :insurance_type, :year], unique: true
+    add_index :hometax_social_insurances, [:owner_id, :insurance_type, :year],
+    name: "index_hometax_social_insurances_on_owner_type_and_year", unique: true
   end
 end
