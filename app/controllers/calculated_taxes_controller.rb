@@ -44,4 +44,25 @@ class CalculatedTaxesController < ApplicationController
       }
     }, status: :ok
   end
+
+  def tax_credits
+    render json: {
+      total_amount: @declare_user.tax_credit_amount,
+      tax_credits: {
+        children_tax_credit_amount: @declare_user.children_tax_credit_amount,
+        newborn_baby_tax_credit_amount: @declare_user.newborn_baby_tax_credit_amount,
+        pensions_tax_credit_amount: @declare_user.pensions_tax_credit_amount,
+      }
+    }, status: :ok
+  end
+
+  def tax_exemptions
+    render json: {
+      total_amount: @declare_user.tax_exemption_amount,
+      tax_exemptions: {
+        base_tax_exemption: @declare_user.base_tax_exemption,
+        online_declare_exemption: 20000,
+      }
+    }, status: :ok
+  end
 end
