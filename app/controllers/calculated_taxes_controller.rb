@@ -49,6 +49,8 @@ class CalculatedTaxesController < ApplicationController
     render json: {
       total_amount: @declare_user.tax_credit_amount,
       tax_credits: {
+        base_tax_credit: @declare_user.base_tax_credit,
+        online_declare_credit: @declare_user.online_declare_credit,
         children_tax_credit_amount: @declare_user.children_tax_credit_amount,
         newborn_baby_tax_credit_amount: @declare_user.newborn_baby_tax_credit_amount,
         pensions_tax_credit_amount: @declare_user.pensions_tax_credit_amount,
@@ -60,8 +62,6 @@ class CalculatedTaxesController < ApplicationController
     render json: {
       total_amount: @declare_user.tax_exemption_amount,
       tax_exemptions: {
-        base_tax_exemption: @declare_user.base_tax_exemption,
-        online_declare_exemption: 20000,
       }
     }, status: :ok
   end

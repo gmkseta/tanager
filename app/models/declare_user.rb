@@ -95,16 +95,24 @@ class DeclareUser < ApplicationRecord
     deductible_persons.select { |p| p.new_born? }.length
   end
 
-  def base_tax_exemption
+  def base_tax_credit
     hometax_individual_income&.has_wage_income? ? 130000 : 70000
   end
 
-  def tax_exemption_amount
-    base_tax_exemption
+  def online_declare_credit
+    20000
   end
 
   def tax_credit_amount
-    children_tax_credit_amount + newborn_baby_tax_credit_amount + pensions_tax_credit_amount
+    base_tax_credit +
+      online_declare_credit +
+      children_tax_credit_amount +
+      newborn_baby_tax_credit_amount +
+      pensions_tax_credit_amount
+  end
+
+  def tax_exemption_amount
+    0
   end
 
   def penalty_tax_sum
