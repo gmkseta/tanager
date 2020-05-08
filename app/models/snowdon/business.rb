@@ -8,6 +8,7 @@ class Snowdon::Business < Snowdon::ApplicationRecord
   has_many :hometax_card_purchases
   has_many :hometax_purchases_cash_receipts
   has_many :hometax_purchases_invoices
+  has_many :hometax_wht_declarations
 
   def excluded_cards
     exclude = hometax_cards
@@ -58,7 +59,7 @@ class Snowdon::Business < Snowdon::ApplicationRecord
         merge_data[:classification_id] = rule&.classification_id || 32
         merge_data[:account_classification_code] = account_classification_code
       end
-      h.attributes.merge(merge_data)
+      h.attributes.merge(merge_data).symbolize_keys
     end
   end
 
@@ -100,6 +101,43 @@ class Snowdon::Business < Snowdon::ApplicationRecord
     others + not_need_lookup
   end
 
+  def wage
+    hometax_wht_declarations
+        .where(imputed_at: Date.new(2019,1,1)..Date.new(2020,1,1))
+        .map(&:total_amount).reduce(:+)
+  end
+
+  def balance(results)
+    welfare = Classification.find_by(name: "복리후생비")
+    etc = Classification.find_by(name: "기타비용")
+
+    if wage == 0
+      results.map do |row|
+        row[:classification_id] = (row[:classification_id] == welfare.id) ? etc.id : row[:classification_id]
+      end
+    else
+      matched, others = results.partition {|row| row[:classification_id] == welfare.id }
+      matched_sum = matched.map{|r| r[:amount]}.reduce(:+)
+
+      ratio = matched_sum / wage.to_f
+
+      if ratio < 0.3
+        matched + others
+      else
+        sorted = matched.sort_by{|r| r[:amount]}
+
+        replaces = []
+        while !sorted.empty? && matched_sum > wage * 0.3
+          current = sorted.shift
+          current[:classification_id] = etc.id
+          replaces << current
+        end
+
+        replaces + sorted + others
+      end
+    end
+  end
+
   def calculate(declare_user_id)
     classification =
         ClassificationCodeCategory.find_by(classification_code: hometax_business.classification_code)
@@ -113,8 +151,11 @@ class Snowdon::Business < Snowdon::ApplicationRecord
         .union(hometax_purchases_invoices_grouped)
         .union(card_purchases_approvals_grouped(excluded_card_ids))
 
-    with_codes = add_classification_code(results)
-    add_account_classification_code(classification, with_codes, declare_user_id)
+    with_classification_codes = add_classification_code(results)
+    with_account_classification_codes =
+        add_account_classification_code(classification, with_classification_codes, declare_user_id)
+
+    balance(with_account_classification_codes)
   end
 
   def hometax_card_purchases_grouped
