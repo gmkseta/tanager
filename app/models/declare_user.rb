@@ -62,13 +62,13 @@ class DeclareUser < ApplicationRecord
   end
 
   def pensions_sum
-    0 || hometax_individual_income.national_pension +
+    hometax_individual_income.national_pension +
       hometax_individual_income.merchant_pension_deduction +
       hometax_individual_income.personal_pension_deduction
   end
 
   def business_incomes_sum
-    0 || hometax_individual_income.business_income_sum
+    hometax_individual_income.business_income_sum
   end
 
   def simplified_bookkeeping_base_expenses
@@ -76,7 +76,7 @@ class DeclareUser < ApplicationRecord
   end
 
   def expenses_sum
-    [simplified_bookkeeping_base_expenses, 0 || hometax_individual_income.expenses_sum_by_ratio].max
+    [simplified_bookkeeping_base_expenses, hometax_individual_income.expenses_sum_by_ratio].max
   end
 
   def total_income_amount

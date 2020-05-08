@@ -46,7 +46,7 @@ class DeductiblePerson < ApplicationRecord
     end
 
     def elder_count
-      select{ |d| d.elder == true }.length
+      select{ |d| d.elder? == true }.length
     end
 
     def disabled_count

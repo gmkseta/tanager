@@ -14,4 +14,34 @@ class CalculatedTaxesController < ApplicationController
       } 
     }, status: :ok
   end
+
+  def deductions
+    render json: {
+      total_amount: @declare_user.deductible_persons.sum(&:deduction_amount) + @declare_user.deduction_amount + @declare_user.pensions_sum,
+      personal_deduction: {
+        total_amount: @declare_user.deductible_persons.sum(&:deduction_amount) + @declare_user.deduction_amount,
+        self_count: 1,
+        self_base_amount: 1500000,
+        spouse_count: @declare_user.deductible_persons.select {|s| s.spouse? }.length,
+        spouse_base_amount: 1500000,
+        dependants_count: @declare_user.deductible_persons.dependants_count,
+        dependants_base_amount: 1500000,
+        elder_count: @declare_user.deductible_persons.elder_count + (@declare_user.elder? ? 1 : 0),
+        elder_base_amount: 1000000,
+        disabled_count: @declare_user.deductible_persons.disabled_count + (@declare_user.disabled ? 1 : 0),
+        disabled_base_amount: 2000000,
+        single_parent_count: @declare_user.deductible_persons.single_parent_count + (@declare_user.single_parent ? 1 : 0),
+        single_parent_base_amount: 1000000,
+        woman_deduction_count: @declare_user.deductible_persons.woman_deduction_count + (@declare_user.woman_deduction ? 1 : 0),
+        woman_deduction_base_amount: 500000,
+      },
+      pension_deduction: {
+        total_amount: @declare_user.pensions_sum,
+        personal_pension_deduction: @declare_user.hometax_individual_income.personal_pension_deduction,
+        merchant_pension_deduction: @declare_user.hometax_individual_income.merchant_pension_deduction,
+        national_pension_deduction: @declare_user.hometax_individual_income.national_pension,
+
+      }
+    }, status: :ok
+  end
 end
