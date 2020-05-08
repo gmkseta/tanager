@@ -1,0 +1,2 @@
+class HometaxSocialInsurance < ApplicationRecord
+end
