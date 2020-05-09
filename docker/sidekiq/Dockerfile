@@ -25,7 +25,7 @@ COPY Gemfile.lock $RAILS_ROOT/Gemfile.lock
 
 # Run bundle install to install gems inside the gemfile
 RUN gem install bundler --version "2.1.4"
-RUN bundle install
+RUN bundle update
 
 # Copy the whole app
 COPY . $RAILS_ROOT
