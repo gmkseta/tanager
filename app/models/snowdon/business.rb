@@ -102,9 +102,18 @@ class Snowdon::Business < Snowdon::ApplicationRecord
   end
 
   def wage
-    hometax_wht_declarations
-        .where(imputed_at: Date.new(2019,1,1)..Date.new(2020,1,1))
-        .map(&:total_amount).reduce(:+)
+    rows = hometax_wht_declarations
+        .where(imputed_at: 1.year.ago.all_year)
+        .to_a
+
+    max_declared_ats = rows
+        .group_by {|r| r.imputed_at }
+        .map {|k, vs| [k, vs.map(&:declared_at).max]}.to_h
+
+    rows
+        .select { |r| r.declared_at == max_declared_ats[r.imputed_at]}
+        .map { |r| (r.fulltime_employees_payments || 0) + (r.parttime_employees_payments || 0) }
+        .reduce(:+)
   end
 
   def balance(results)
