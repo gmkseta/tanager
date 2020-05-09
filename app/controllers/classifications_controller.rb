@@ -13,4 +13,9 @@ class ClassificationsController < ApplicationController
     @classifications = Classification.account_classifications
     render json: { account_classifications: @classifications.as_json }, status: :ok
   end
+
+  def banks
+    @classifications = Classification.banks
+    render json: { account_classifications: @classifications.as_json }, status: :ok
+  end
 end

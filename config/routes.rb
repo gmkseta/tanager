@@ -25,6 +25,7 @@ Rails.application.routes.draw do
       get 'relations'
       get 'business_expenses'
       get 'account_classifications'
+      get 'banks'
     end
   end
   get "calculated_taxes", to: "calculated_taxes#index"
