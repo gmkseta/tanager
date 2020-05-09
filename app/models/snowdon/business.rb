@@ -138,8 +138,7 @@ class Snowdon::Business < Snowdon::ApplicationRecord
 
         replaces = []
         while !sorted.empty? && matched_sum > wage * 0.3
-          current = sorted.shift
-          current[:classification_id] = etc.id
+          current = {classification_id: etc.id}.merge(sorted.shift)
           replaces << current
         end
 
