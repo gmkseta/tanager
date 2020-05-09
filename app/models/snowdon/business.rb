@@ -123,6 +123,7 @@ class Snowdon::Business < Snowdon::ApplicationRecord
     if wage == 0
       results.map do |row|
         row[:classification_id] = (row[:classification_id] == welfare.id) ? etc.id : row[:classification_id]
+        row
       end
     else
       matched, others = results.partition {|row| row[:classification_id] == welfare.id }
