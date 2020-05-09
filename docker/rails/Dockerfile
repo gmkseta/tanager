@@ -19,6 +19,14 @@ RUN apt-get -y update && \
       apt-get clean && \
       rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
+RUN apt-get install libc6-dev \
+  && wget http://www.freetds.org/files/stable/freetds-1.1.24.tar.gz \
+  && tar -xzvf freetds-1.1.24.tar.gz \
+  && cd freetds-1.1.24 \
+  && ./configure --prefix=/usr/local --with-tdsver=7.3 \
+  && make \
+  && make install
+
 ENV DOCKERIZE_VERSION v0.6.1
 RUN wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
     && tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
@@ -36,6 +44,7 @@ COPY Gemfile $RAILS_ROOT/Gemfile
 COPY Gemfile.lock $RAILS_ROOT/Gemfile.lock
 
 # Run bundle install to install gems inside the gemfile
+RUN gem install bundler --version "2.1.4"
 RUN bundle install
 
 # Copy the whole app

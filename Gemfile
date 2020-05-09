@@ -4,7 +4,7 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 ruby '2.6.3'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '~> 6.0.0'
+gem 'rails', '~> 5.2.3'
 gem 'pg', '~> 1.0.0'
 # Use Puma as the app server
 gem 'puma', '~> 3.11'
@@ -20,19 +20,23 @@ gem 'bcrypt', '~> 3.1.7'
 gem 'bootsnap', '>= 1.4.2', require: false
 
 gem 'activerecord-import'
+gem 'activerecord-import-sqlserver'
+gem 'activerecord-sqlserver-adapter'
 gem 'active_record_union'
 gem 'attr_encrypted', '~> 3.1.0'
+gem 'composite_primary_keys'
 gem 'dry-initializer'
-gem 'sidekiq'
 gem 'friendly_id', '~> 5.2.4' # Note: You MUST use 5.0.0 or greater for Rails 4.0+
 gem 'graphql-client'
 gem 'httparty'
 gem 'knock'
 gem 'will_paginate', '>= 3.1.0'
 gem 'rails-i18n'
+gem 'sidekiq'
 gem 'slack-notifier'
 gem 'strong_migrations'
-gem 'graphql-client'
+gem 'tiny_tds'
+
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
@@ -50,11 +54,6 @@ group :development do
 end
 
 group :test do
-  # Adds support for Capybara system testing and selenium driver
-  gem 'capybara', '>= 2.15'
-  gem 'selenium-webdriver'
-  # Easy installation and use of web drivers to run system tests with browsers
-  gem 'webdrivers'
 end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
