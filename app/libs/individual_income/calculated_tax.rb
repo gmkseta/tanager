@@ -81,7 +81,7 @@ module IndividualIncome
         total_income: total_income,
         income_deduction: limited_income_deduction,
         base_taxation: base_taxation,
-        tax_rate: tax_rate,
+        tax_rate: (tax_rate * 100).to_i,
         calculated_tax: calculated_tax,
         tax_exemption: limited_tax_exemption,
         tax_credit: limited_tax_credit,
