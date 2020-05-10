@@ -61,7 +61,7 @@ class DeclareUsersController < ApplicationController
   private
 
   def declare_user_params
-    params.permit(:name, :residence_number, :address, :declare_tax_type, :disabled, :single_parent, :woman_deduction, :status, :married)
+    params.permit(:name, :residence_number, :address, :declare_tax_type, :disabled, :single_parent, :woman_deduction, :status, :married, :bank_account_number, :bank_code)
   end
 
   def set_declare_user

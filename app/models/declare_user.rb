@@ -19,11 +19,13 @@ class DeclareUser < ApplicationRecord
   scope :individual_incomes, ->{ where(declare_type: "income") }
 
   validate :valid_residence_number?
-  validates :residence_number, presence: true, length: { is: 13 }
+  validates :residence_number, presence: true, format: { with: /\A\d{13}\z/ }
   validates :declare_tax_type, presence: true
   validates :name, presence: true
   validates :address, presence: true
-  
+  validates :bank_account_number, format: { with: /\A\d{6,16}\z/ }, allow_nil: true
+  validates :bank_code, inclusion: { in: Classification.banks.map { |b| b.slug }, message: :wrong_code }, allow_nil: true
+
   attr_encrypted :residence_number,
                  key: :encryption_key,
                  encode: true,

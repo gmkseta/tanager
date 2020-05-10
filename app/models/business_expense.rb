@@ -7,6 +7,7 @@ class BusinessExpense < ApplicationRecord
   validates :expense_classification_id, presence: true, inclusion: { in: Classification.business_expenses.ids, message: :invalid_type }
   validates :account_classification_id, inclusion: { in: Classification.account_classifications.ids, message: :invalid_type }, allow_nil: true
   validates :amount, presence: true, numericality: { greater_than: 0, message: :greater_than_zero }
+  validates :registration_number, format: { with: /\A\d{10}\z/ }, allow_nil: true
 
   def validate_unique_expense?
     return false if Classification::EXPENSE_INVOICE_CLASSIFICATION.any?(expense_classification_id)
