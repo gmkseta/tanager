@@ -5,7 +5,7 @@ class DeclareUser < ApplicationRecord
 
   enum status: %i(empty user deductible_persons business_expenses confirm done)
   EXCEPT_JSON_FIELD = %i(user_id encrypted_residence_number encrypted_residence_number_iv hometax_account)
-  CREDIT_METHODS = %i(base_tax_credit_amount online_declare_credit_amount children_tax_credit_amount newborn_baby_tax_credit_amount pensions_tax_credit_amount)
+  CREDIT_METHODS = %i(base_tax_credit_amount online_declare_credit_amount children_tax_credit_amount newborn_baby_tax_credit_amount pension_account_tax_credit_amount retirement_pension_tax_credit_amount)
 
   belongs_to :user
   has_many :deductible_persons, dependent: :destroy
@@ -109,7 +109,8 @@ class DeclareUser < ApplicationRecord
       online_declare_credit_amount +
       children_tax_credit_amount +
       newborn_baby_tax_credit_amount +
-      pensions_tax_credit_amount
+      pension_account_tax_credit_amount +
+      retirement_pension_tax_credit_amount
   end
 
   def tax_exemption_amount
