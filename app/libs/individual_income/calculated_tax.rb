@@ -55,7 +55,7 @@ module IndividualIncome
     end
 
     def payment_tax
-      @payment_tax =calculated_tax - tax_exemption - tax_credit + penalty_tax - prepaid_tax
+      @payment_tax = [calculated_tax - tax_exemption - tax_credit + penalty_tax, 0].max - prepaid_tax
     end
 
     def as_json
