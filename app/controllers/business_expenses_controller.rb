@@ -8,9 +8,11 @@ class BusinessExpensesController < ApplicationController
     return head :unprocessable_entity if params[:expense_classification_id].blank?
     @business_expenses = @declare_user.business_expenses
                                 .where(expense_classification_id: params[:expense_classification_id])
+                                .includes(:expense_classification)
+                                .includes(:account_classification)
                                 .paginate(page: params[:page])
                                 .order(amount: :desc)
-    render json: { business_expenses: @business_expenses }, status: :ok
+    render json: { business_expenses: @business_expenses.as_json(methods: [:expense_classification_name, :account_classification_name]) }, status: :ok
   end
 
   def classifications

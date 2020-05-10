@@ -15,4 +15,12 @@ class BusinessExpense < ApplicationRecord
       errors.add(:expense_classification_id, :taken)
     end
   end
+
+  def expense_classification_name
+    expense_classification&.name
+  end
+
+  def account_classification_name
+    account_classification&.name
+  end
 end

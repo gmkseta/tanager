@@ -18,4 +18,8 @@ class SimplifiedBookkeeping < ApplicationRecord
       )
     end
   end
+
+  def classification_name
+    classification.name
+  end
 end

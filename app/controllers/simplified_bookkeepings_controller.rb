@@ -7,11 +7,12 @@ class SimplifiedBookkeepingsController < ApplicationController
     return head :unprocessable_entity if params[:classification_id].blank?
     @simplified_bookkeepings = @declare_user.simplified_bookkeepings
                                 .where(classification_id: params[:classification_id])
+                                .includes(:classification)
                                 .paginate(page: params[:page])
                                 .order(amount: :desc)
     render json: { total_pages: @simplified_bookkeepings.total_pages,
                    next_page: @simplified_bookkeepings.next_page,
-                   simplified_bookkeepings: @simplified_bookkeepings }, status: :ok
+                   simplified_bookkeepings: @simplified_bookkeepings.as_json(methods: [:classification_name]) }, status: :ok
   end
 
   def update
