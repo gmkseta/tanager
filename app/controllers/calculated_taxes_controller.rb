@@ -4,7 +4,7 @@ class CalculatedTaxesController < ApplicationController
   def index    
     render json: {
       base_expense_rate: @declare_user.hometax_individual_income.base_expense_rate,
-      expense_ratio: @declare_user.hometax_individual_income.expenses_ratio,
+      expense_ratio: (@declare_user.hometax_individual_income.expenses_ratio / 100).round(3),
       declare_from: Date.today.last_year.beginning_of_year.strftime,
       declare_to: Date.today.last_year.end_of_year.strftime,
       declare_user: @declare_user.as_json(except: DeclareUser::EXCEPT_JSON_FIELD),
