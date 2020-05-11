@@ -12,7 +12,7 @@ class SimplifiedBookkeepingsController < ApplicationController
                                 .order(amount: :desc)
     render json: { total_pages: @simplified_bookkeepings.total_pages,
                    next_page: @simplified_bookkeepings.next_page,
-                   simplified_bookkeepings: @simplified_bookkeepings.as_json(methods: [:classification_name]) }, status: :ok
+                   simplified_bookkeepings: @simplified_bookkeepings.as_json(methods: [:classification_name, :purchase_type_name]) }, status: :ok
   end
 
   def update
@@ -45,7 +45,7 @@ class SimplifiedBookkeepingsController < ApplicationController
                                 .order(amount: :desc)
     render json: { total_pages: @simplified_bookkeepings.total_pages,
                    next_page: @simplified_bookkeepings.next_page,
-                   simplified_bookkeepings: @simplified_bookkeepings }, status: :ok
+                   simplified_bookkeepings: @simplified_bookkeepings.as_json(:classification_name, :purchase_type_name) }, status: :ok
   end
 
   private
