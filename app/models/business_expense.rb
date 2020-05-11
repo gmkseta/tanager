@@ -33,4 +33,11 @@ class BusinessExpense < ApplicationRecord
   def account_classification_name
     account_classification&.name
   end
+
+  def self.personal_cards_sum(declare_user_id)
+    BusinessExpense.where(
+      declare_user_id: declare_user_id,
+      expense_classification_id: Classification::PERSONAL_CARD_CLASSIFICATION_ID
+    ).sum(:amount)
+  end
 end

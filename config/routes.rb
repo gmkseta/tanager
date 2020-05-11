@@ -11,6 +11,7 @@ Rails.application.routes.draw do
   resources :business_expenses do
     collection do
       get 'classifications'
+      get 'personal_cards'
     end
   end
   resources :simplified_bookkeepings do
