@@ -128,6 +128,8 @@ class Snowdon::Business < Snowdon::ApplicationRecord
           .map { |r| (r.fulltime_employees_payments || 0) + (r.parttime_employees_payments || 0) }
           .reduce(:+)
     end
+
+    @wage ||= 0
   end
 
   def balance(results)
@@ -188,15 +190,15 @@ class Snowdon::Business < Snowdon::ApplicationRecord
     fee, tx_count = card_sales_fees
     {
         id: nil,
+        amount: fee,
+        vendor_business_name: "카드사 수수료",
+        vendor_registration_number: "0000000000",
+        vendor_classification_code: "659206",
+        purchases_count: tx_count,
+        purchase_type: "CardSalesTransactions",
         declare_user_id: declare_user_id,
         business_id: id,
         registration_number: registration_number,
-        vendor_registration_number: "0000000000",
-        vendor_business_name: "카드사 수수료",
-        vendor_classfication_code: "659206",
-        purchase_type: "CardSalesTransactions",
-        purchase_count: tx_count,
-        amount: fee,
         classification_id: card_fee_classification.id,
         account_classification_code: "812022"
     }
