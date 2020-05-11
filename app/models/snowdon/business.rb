@@ -190,11 +190,11 @@ class Snowdon::Business < Snowdon::ApplicationRecord
     fee, tx_count = card_sales_fees
     {
         id: nil,
-        amount: fee,
+        amount: fee || 0,
         vendor_business_name: "카드사 수수료",
         vendor_registration_number: "0000000000",
         vendor_classification_code: "659206",
-        purchases_count: tx_count,
+        purchases_count: tx_count || 0,
         purchase_type: "CardSalesTransactions",
         declare_user_id: declare_user_id,
         business_id: id,
