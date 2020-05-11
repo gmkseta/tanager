@@ -1,5 +1,6 @@
 class User < ApplicationRecord
   has_many :declare_users, dependent: :destroy
+  has_many :businesses, dependent: :destroy
 
   has_secure_password
 

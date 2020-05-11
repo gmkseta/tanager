@@ -3,11 +3,12 @@ class DeclareUser < ApplicationRecord
   include PersonalDeduction
   include TaxCreditCalculator
 
-  enum status: %i(empty user deductible_persons business_expenses confirm done)
+  enum status: %i(empty user deductible_persons business_expenses confirm payment done)
   EXCEPT_JSON_FIELD = %i(user_id encrypted_residence_number encrypted_residence_number_iv hometax_account)
   CREDIT_METHODS = %i(base_tax_credit_amount online_declare_credit_amount children_tax_credit_amount newborn_baby_tax_credit_amount pension_account_tax_credit_amount retirement_pension_tax_credit_amount)
 
   belongs_to :user
+  has_many :businesses, through: :user
   has_many :deductible_persons, dependent: :destroy
   has_many :business_expenses, dependent: :destroy
   has_many :simplified_bookkeepings, dependent: :destroy
@@ -15,6 +16,7 @@ class DeclareUser < ApplicationRecord
 
   has_one :hometax_individual_income, dependent: :destroy
   has_many :hometax_business_incomes, through: :hometax_individual_income, dependent: :destroy
+  has_many :hometax_social_insurances, dependent: :destroy
 
   scope :individual_incomes, ->{ where(declare_type: "income") }
 
@@ -149,5 +151,10 @@ class DeclareUser < ApplicationRecord
       penalty_tax: penalty_tax_sum,
       prepaid_tax: prepaid_tax_sum,
     )
+  end
+
+  def wage_sum
+    public_ids = businesses.map { |b| b.public_id }
+    Snowdon::Business.where(public_id: public_ids).sum(&:wage)
   end
 end

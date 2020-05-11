@@ -26,7 +26,7 @@ ko:
         business_expense:
           attributes:
             amount:
-              greater_than_zero: 금액은 0보다 커야합니다.
+              greater_than_or_equal_to_zero: 금액은 0보다 작을 수 없습니다.
             expense_classification_id:
               invalid_type: 허용되지 않는 분류입니다.
               taken: 이미 존재하는 항목 입니다.

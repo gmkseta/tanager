@@ -14,6 +14,9 @@ class BusinessExpensesController < ApplicationController
                                 .order(amount: :desc)
     render json: {
       expense_classification_id: params[:expense_classification_id],
+      local_insurances_sum: @declare_user.hometax_social_insurances.last_year.local_insurances_sum,
+      businesses_insurances_sum: @declare_user.hometax_social_insurances.last_year.businesses_insurances_sum,
+      wage_sum: @declare_user.wage_sum,
       total_amount: @business_expenses.sum(:amount),
       business_expenses: @business_expenses.as_json(methods: [:expense_classification_name, :account_classification_name])
     }, status: :ok

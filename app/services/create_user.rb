@@ -11,6 +11,8 @@ class CreateUser < Service::Base
         name: owner.name || businesses.first.owner_name,
         owner_id: owner.id,
         token: token,
+        address: owner.hometax_businesses.first.owner_address,
+        phone_number: owner.phone.number,
       )
       businesses.each do |b|
         Business.create!(
@@ -21,12 +23,14 @@ class CreateUser < Service::Base
           public_id: b.public_id,
           owner_id: owner.id,
           login: b.hometax_business.login,
+          hometax_classification_name: b.hometax_business.classification_name,
           hometax_classification_code: b.hometax_business.classification_code,
           taxation_type: b.hometax_business.taxation_type,
           opened_at: b.hometax_business.opened_at,
           official_name: b.hometax_business.official_name,
           official_code: b.hometax_business.official_code,
           official_number: b.hometax_business.official_number
+          closed_at: b.closed_at,
         )
       end
       user
