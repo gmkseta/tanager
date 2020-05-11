@@ -1,4 +1,4 @@
-class CreateHometaxSocialInsurances < ActiveRecord::Migration[6.0]
+class CreateHometaxSocialInsurances < ActiveRecord::Migration[5.2]
   def change
     create_table :hometax_social_insurances do |t|
       t.references :declare_user, foreign_key: true
