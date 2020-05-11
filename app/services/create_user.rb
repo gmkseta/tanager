@@ -11,7 +11,7 @@ class CreateUser < Service::Base
         name: owner.name || businesses.first.owner_name,
         owner_id: owner.id,
         token: token,
-        address: owner.hometax_businesses.first.owner_address,
+        hometax_address: owner.hometax_businesses.last.owner_address,
         phone_number: owner.phone.number,
       )
       businesses.each do |b|
@@ -29,7 +29,7 @@ class CreateUser < Service::Base
           opened_at: b.hometax_business.opened_at,
           official_name: b.hometax_business.official_name,
           official_code: b.hometax_business.official_code,
-          official_number: b.hometax_business.official_number
+          official_number: b.hometax_business.official_number,
           closed_at: b.closed_at,
         )
       end

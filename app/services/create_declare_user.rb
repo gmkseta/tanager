@@ -1,10 +1,11 @@
 class CreateDeclareUser < Service::Base
   param :user
-  option :name
-  option :residence_number
-  option :address
-  option :declare_tax_type, optional: true
+  option :validate
+  option :name, optional: true
   option :hometax_account, optional: true
+  option :residence_number, optional: true
+  option :address, optional: true
+  option :declare_tax_type, optional: true
   option :disabled, optional: true
   option :single_parent, optional: true
   option :woman_deduction, optional: true
@@ -13,13 +14,14 @@ class CreateDeclareUser < Service::Base
 
   def run
     ActiveRecord::Base.transaction do
-      hometax_account ||= user.hometax_account || "XXXXXX"
       declare_user = DeclareUser.find_or_initialize_by(
         user_id: user.id,
         declare_tax_type: "income",
+        taxation_month: 1.year.ago.beginning_of_year,
       )
-      declare_user.name = name
+      is_new_record = declare_user.new_record?
       declare_user.residence_number = residence_number
+      declare_user.name = name
       declare_user.address = address
       declare_user.disabled = disabled
       declare_user.single_parent = single_parent
@@ -27,15 +29,12 @@ class CreateDeclareUser < Service::Base
       declare_user.hometax_account = hometax_account
       declare_user.status = status || DeclareUser.statuses["user"]
       declare_user.married = married
-      declare_user.save!
+      declare_user.save!(validate: validate)
 
-      if declare_user.new_record?
-        hometax_individual_incomes = HometaxIndividualIncome.where(owner_id: user.owner_id)
-        if hometax_individual_incomes.blank?
-          SlackBot.ping("#{Rails.env.development? ? "[테스트] " : ""} *세금신고오류* #{declare_user.name}님 - 신고불가: 홈택스 데이터 없음)", channel: "#labs-ops")
-          raise ActiveRecord::RecordInvalid.new(InvalidRecord.new)
-        end
-        hometax_individual_incomes.update_all(declare_user_id: declare_user.id)
+      if is_new_record
+        hometax_individual_incomes = HometaxIndividualIncome.where(owner_id: user.id)
+        hometax_individual_incomes.update(declare_user_id: declare_user.id)
+        HometaxSocialInsurance.where(owner_id: user.owner_id).update(declare_user_id: declare_user.id)
         businesses = Snowdon::Business.where(owner_id: user.owner_id)
         businesses.each do |b|
           next if b.hometax_business.blank?

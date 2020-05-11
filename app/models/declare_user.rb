@@ -38,6 +38,10 @@ class DeclareUser < ApplicationRecord
     Rails.application.credentials.attr_encrypted[:encryption_key]
   end
 
+  def hometax_address
+    user.hometax_address
+  end
+
   def deduction_amount
     1500000 + additional_deduction_amount
   end

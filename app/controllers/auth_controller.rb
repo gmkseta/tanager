@@ -9,7 +9,20 @@ class AuthController < ApplicationController
                    status: user.declare_users.blank? ? "empty" : user.declare_user.status
                  }, status: :ok if user
     user = CreateUser.call(owner: owner)
-    render json: { status: "empty", jwt: user.jwt.token }, status: :ok if user
+    hometax_individual_incomes = HometaxIndividualIncome.where(owner_id: user.owner_id)
+    if hometax_individual_incomes.blank?
+      user.delete
+      SlackBot.ping("#{Rails.env.development? ? "[테스트] " : ""} *세금신고오류* #{declare_user.name}님 - 신고불가: 홈택스 데이터 없음)", channel: "#labs-ops")
+      return render json: { errors: "hometax not available" }, status: :not_found
+    else
+      declare_user = CreateDeclareUser.call(
+        user,
+        validate: false,
+        name: hometax_individual_incomes.last.name,
+        hometax_account: hometax_individual_incomes.last.hometax_account,
+      )
+      render json: { status: "empty", declare_user: declare_user, jwt: user.jwt.token }, status: :ok if user
+    end
   end
 
   def destroy
