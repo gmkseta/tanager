@@ -4,6 +4,8 @@ class Snowdon::Business < Snowdon::ApplicationRecord
   has_many :cards
   has_many :card_purchases_approvals
 
+  has_many :card_sales_transactions
+
   has_many :hometax_cards
   has_many :hometax_card_purchases
   has_many :hometax_purchases_cash_receipts
@@ -18,6 +20,16 @@ class Snowdon::Business < Snowdon::ApplicationRecord
     else
       cards.where.not(hometax_cards.include_number_query)
     end
+  end
+
+  def card_sales_fees
+    card_sales_transactions
+        .approved
+        .where(transacted_at: 1.year.ago.all_year)
+        .pluck(
+            "SUM(COALESCE(fee, 0))",
+            "COUNT(1)"
+        ).flatten
   end
 
   def vendor_classification_codes(results)
@@ -140,7 +152,8 @@ class Snowdon::Business < Snowdon::ApplicationRecord
 
         replaces = []
         while !sorted.empty? && matched_sum > wage * 0.3
-          current = {classification_id: etc.id}.merge(sorted.shift)
+          current = sorted.shift
+          current[:classification_id] = etc.id
           replaces << current
         end
 
@@ -166,7 +179,27 @@ class Snowdon::Business < Snowdon::ApplicationRecord
     with_account_classification_codes =
         add_account_classification_code(classification, with_classification_codes, declare_user_id)
 
-    balance(with_account_classification_codes)
+    balanced = balance(with_account_classification_codes)
+    balanced << card_sales_expense(declare_user_id)
+  end
+
+  def card_sales_expense(declare_user_id)
+    card_fee_classification = Classification.find_by(name: "지급수수료")
+    fee, tx_count = card_sales_fees
+    {
+        id: nil,
+        declare_user_id: declare_user_id,
+        business_id: id,
+        registration_number: registration_number,
+        vendor_registration_number: "0000000000",
+        vendor_business_name: "카드사 수수료",
+        vendor_classfication_code: "659206",
+        purchase_type: "CardSalesTransactions",
+        purchase_count: tx_count,
+        amount: fee,
+        classification_id: card_fee_classification.id,
+        account_classification_code: "812022"
+    }
   end
 
   def hometax_card_purchases_grouped
