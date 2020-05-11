@@ -1,6 +1,6 @@
 class BusinessExpensesController < ApplicationController
   before_action :authorize_request
-  before_action :set_declare_user, only: [:index, :classifications, :create, :update, :destroy, :confirm]
+  before_action :set_declare_user
   before_action :set_business_expense, only: [:show, :update, :destroy]
   
 
@@ -49,7 +49,7 @@ class BusinessExpensesController < ApplicationController
   private
 
   def business_expense_params
-    params.permit(:expense_classification_id, :amount, :memo, :account_classification_id, :vendor_name, :vendor_registration_number, :written_at)
+    params.permit(:expense_classification_id, :amount, :memo, :account_classification_id, :vendor_name, :vendor_registration_number, :issued_at)
   end
 
   def set_business_expense
