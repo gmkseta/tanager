@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  get "/", to: proc { [200, {}, ['']] }
   get "auth/status", to: "auth#status"
   get "declare_users/:id/additional_deduction", to: "declare_users#additional_deduction"
   post "declare_users/:id/status", to: "declare_users#status"
