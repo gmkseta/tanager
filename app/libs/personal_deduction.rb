@@ -45,7 +45,7 @@ module PersonalDeduction
   def default_deduction_amount
     amount = 0
     amount += 1500000 if spouse?
-    amount += 1500000 if dependant?
+    amount += 1500000 if dependant? && !spouse?
     amount
   end
 

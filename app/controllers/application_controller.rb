@@ -28,7 +28,7 @@ class ApplicationController < ActionController::API
   end
 
   def authorize_owl_request
-    if request.headers["X-Tanager-Api-Key"] == Rails.application.credentials.client_api_key[:owl]
+    if request.headers["X-Tanager-Api-Key"] == Rails.application.credentials[Rails.env.to_sym].dig(:client_api_key, :owl)
       @owner_id = params[:owner_id]
     else
       render json: { errors: "unauthorized" }, status: :unauthorized
