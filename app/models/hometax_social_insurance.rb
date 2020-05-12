@@ -6,10 +6,10 @@ class HometaxSocialInsurance < ApplicationRecord
   scope :last_year, ->{ where(year: Date.today.last_year.year) }
 
   def self.local_insurances_sum
-    local.sum(:amount)
+    local.last_year.sum(:amount)
   end
 
   def self.businesses_insurances_sum
-    businesses.sum(:amount)
+    businesses.last_year.sum(:amount)
   end
 end

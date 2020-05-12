@@ -41,6 +41,8 @@ class CreateDeclareUser < Service::Base
           simplified_bookkeepings = b.calculate(declare_user.id)
           SimplifiedBookkeeping.upsert(rows: simplified_bookkeepings)
         end
+        BusinessExpense.create_insurances(declare_user.id)
+        BusinessExpense.create_wage(declare_user.id)
       end
       declare_user
     end

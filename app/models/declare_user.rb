@@ -157,8 +157,16 @@ class DeclareUser < ApplicationRecord
     )
   end
 
-  def wage_sum
+  def snowdon_businesses
     public_ids = businesses.map { |b| b.public_id }
-    Snowdon::Business.where(public_id: public_ids).sum(&:wage)
+    Snowdon::Business.where(public_id: public_ids)
+  end
+
+  def wage_sum
+    snowdon_businesses.sum(&:wage)
+  end
+
+  def registerd_card_this_year?
+    snowdon_businesses.map { |b| b.registerd_card_this_year? }.any?
   end
 end

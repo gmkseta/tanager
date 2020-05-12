@@ -9,6 +9,9 @@ class Classification < ApplicationRecord
 
   EXPENSE_INVOICE_CLASSIFICATION = [18, 19, 53]
   PERSONAL_CARD_CLASSIFICATION_ID = 53
+  LOCAL_INSURANCE_CLASSIFICATION_ID = 20
+  BUSINESS_INSURANCE_CLASSIFICATION_ID = 17
+  WAGE_CLASSIFICATION_ID = 14
 
   def self.with_amount(classifications, results, declare_user_id)
     classifications.each do |c|

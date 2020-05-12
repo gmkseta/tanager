@@ -21,6 +21,10 @@ class Snowdon::Business < Snowdon::ApplicationRecord
     end
   end
 
+  def registerd_card_this_year?
+    included_cards.select { |c| c.created_at >= Date.today.beginning_of_year }.present?
+  end
+
   def card_sales_fees
     card_sales_transactions
         .approved

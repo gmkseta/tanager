@@ -31,4 +31,27 @@ class BusinessExpense < ApplicationRecord
       expense_classification_id: Classification::PERSONAL_CARD_CLASSIFICATION_ID
     ).sum(:amount)
   end
+
+  def self.create_insurances(declare_user_id)
+    local_insurances_sum = DeclareUser.find(declare_user_id).hometax_social_insurances.local_insurances_sum
+    BusinessExpense.create(
+      declare_user_id: declare_user_id,
+      expense_classification_id: Classification::LOCAL_INSURANCE_CLASSIFICATION_ID,
+      amount: local_insurances_sum,
+    )
+    businesses_insurances_sum = DeclareUser.find(declare_user_id).hometax_social_insurances.businesses_insurances_sum
+    BusinessExpense.create(
+      declare_user_id: declare_user_id,
+      expense_classification_id: Classification::BUSINESS_INSURANCE_CLASSIFICATION_ID,
+      amount: businesses_insurances_sum,
+    )
+  end
+
+  def self.create_wage(declare_user_id)
+    BusinessExpense.create(
+      declare_user_id: declare_user_id,
+      expense_classification_id: Classification::WAGE_INSURANCE_CLASSIFICATION_ID,
+      amount: DeclareUser.find(declare_user_id).wage_sum,
+    )
+  end
 end

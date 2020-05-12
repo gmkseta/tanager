@@ -38,7 +38,10 @@ class SimplifiedBookkeepingsController < ApplicationController
     @simplifiedBookkeepings = SimplifiedBookkeeping::PURCHASE_TYPES.map {
       |p| SimplifiedBookkeeping.new(declare_user_id: @declare_user.id, purchase_type: p, amount: @purchase_type_sum[p])
     }
-    render json: { simplified_bookkeepings: @simplifiedBookkeepings }, status: :ok
+    render json: {
+      registerd_card_this_year: @declare_user.registerd_card_this_year?,
+      simplified_bookkeepings: @simplifiedBookkeepings
+    }, status: :ok
   end
 
   def card_purchases_approvals
