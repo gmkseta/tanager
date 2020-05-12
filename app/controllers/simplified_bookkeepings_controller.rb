@@ -27,14 +27,15 @@ class SimplifiedBookkeepingsController < ApplicationController
   def classifications
     @classifications = Classification.with_amount(
       Classification.account_classifications.as_json,
-      @declare_user.simplified_bookkeepings.group(:classification_id).sum(:amount),
+      @declare_user.simplified_bookkeepings.deductibles.group(:classification_id).sum(:amount),
       @declare_user.id,
     )
     render json: { classifications: @classifications }, status: :ok
   end
 
   def purchase_type
-    @purchase_type_sum = @declare_user.simplified_bookkeepings.group(:purchase_type).sum(:amount)
+    @purchase_type_sum = @declare_user.simplified_bookkeepings.deductibles.group(:purchase_type).sum(:amount)
+    @purchase_type_sum["CardPurchasesApproval"] += BusinessExpense.personal_cards_sum(@declare_user.id)
     @simplifiedBookkeepings = SimplifiedBookkeeping::PURCHASE_TYPES.map {
       |p| SimplifiedBookkeeping.new(declare_user_id: @declare_user.id, purchase_type: p, amount: @purchase_type_sum[p])
     }
@@ -50,6 +51,7 @@ class SimplifiedBookkeepingsController < ApplicationController
                                 .order(amount: :desc)
     render json: { total_pages: @simplified_bookkeepings.total_pages,
                    next_page: @simplified_bookkeepings.next_page,
+                   deductible_amount: @simplified_bookkeepings.deductibles.sum(:amount),
                    total_amount: @simplified_bookkeepings.sum(:amount) + BusinessExpense.personal_cards_sum(@declare_user.id),
                    simplified_bookkeepings: @simplified_bookkeepings.as_json(methods: [:classification_name, :purchase_type_name]) }, status: :ok
   end

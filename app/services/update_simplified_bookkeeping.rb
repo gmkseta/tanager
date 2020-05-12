@@ -10,8 +10,8 @@ class UpdateSimplifiedBookkeeping < Service::Base
         vendor_registration_number: simplified_bookkeeping.vendor_registration_number,
         purchase_type: simplified_bookkeeping.purchase_type,
       )
-      rule.classification_id = params[:classification_id]
-      rule.deductible = params[:deductible]
+      rule.classification_id = params[:classification_id] || simplified_bookkeeping.classification_id
+      rule.deductible = params[:deductible] || simplified_bookkeeping.deductible
       rule.save!
       simplified_bookkeeping
     end

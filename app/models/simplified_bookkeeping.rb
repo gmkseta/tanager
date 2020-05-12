@@ -3,6 +3,7 @@ class SimplifiedBookkeeping < ApplicationRecord
   belongs_to :classification
   scope :card_approvals, ->{ where(purchase_type: "CardPurchasesApproval") }
   scope :hometax_cards, ->{ where(purchase_type: "HomataxCardPurchase") }
+  scope :deductibles, ->{ where(deductible: [true, nil]) }
 
   PURCHASE_TYPES = %w(HomataxPurchasesInvoice HomataxPurchasesCashReceipt HomataxCardPurchase CardPurchasesApproval)
 
