@@ -22,4 +22,18 @@ class SimplifiedBookkeeping < ApplicationRecord
   def classification_name
     classification.name
   end
+
+  def purchase_type_name
+    purchase_type_name = case purchase_type
+      when "CardPurchasesApproval"
+        "개인카드"
+      when "HomataxCardPurchase"
+        "사업용카드"
+      when "HomataxPurchasesInvoice"
+        "세금계산서"
+      when "HomataxPurchasesCashReceipt"
+        "현금영수증"
+      end
+    purchase_type_name
+  end
 end

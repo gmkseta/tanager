@@ -12,7 +12,8 @@ class SimplifiedBookkeepingsController < ApplicationController
                                 .order(amount: :desc)
     render json: { total_pages: @simplified_bookkeepings.total_pages,
                    next_page: @simplified_bookkeepings.next_page,
-                   simplified_bookkeepings: @simplified_bookkeepings.as_json(methods: [:classification_name]) }, status: :ok
+                   total_amount: @simplified_bookkeepings.sum(:amount),
+                   simplified_bookkeepings: @simplified_bookkeepings.as_json(methods: [:classification_name, :purchase_type_name]) }, status: :ok
   end
 
   def update
@@ -26,7 +27,8 @@ class SimplifiedBookkeepingsController < ApplicationController
   def classifications
     @classifications = Classification.with_amount(
       Classification.account_classifications.as_json,
-      @declare_user.simplified_bookkeepings.group(:classification_id).sum(:amount)
+      @declare_user.simplified_bookkeepings.group(:classification_id).sum(:amount),
+      @declare_user.id,
     )
     render json: { classifications: @classifications }, status: :ok
   end
@@ -45,7 +47,8 @@ class SimplifiedBookkeepingsController < ApplicationController
                                 .order(amount: :desc)
     render json: { total_pages: @simplified_bookkeepings.total_pages,
                    next_page: @simplified_bookkeepings.next_page,
-                   simplified_bookkeepings: @simplified_bookkeepings }, status: :ok
+                   total_amount: @simplified_bookkeepings.sum(:amount) + BusinessExpense.personal_cards_sum(@declare_user.id),
+                   simplified_bookkeepings: @simplified_bookkeepings.as_json(methods: [:classification_name, :purchase_type_name]) }, status: :ok
   end
 
   private

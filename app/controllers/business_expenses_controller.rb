@@ -12,12 +12,37 @@ class BusinessExpensesController < ApplicationController
                                 .includes(:account_classification)
                                 .paginate(page: params[:page])
                                 .order(amount: :desc)
-    render json: { business_expenses: @business_expenses.as_json(methods: [:expense_classification_name, :account_classification_name]) }, status: :ok
+    render json: {
+      expense_classification_id: params[:expense_classification_id],
+      local_insurances_sum: @declare_user.hometax_social_insurances.last_year.local_insurances_sum,
+      businesses_insurances_sum: @declare_user.hometax_social_insurances.last_year.businesses_insurances_sum,
+      wage_sum: @declare_user.wage_sum,
+      total_amount: @business_expenses.sum(:amount),
+      business_expenses: @business_expenses.as_json(methods: [:expense_classification_name, :account_classification_name])
+    }, status: :ok
   end
 
   def classifications
-    @classifications = Classification.with_amount(Classification.business_expenses.as_json, @declare_user.business_expenses.group(:expense_classification_id).sum(:amount))
+    @classifications = Classification.with_amount(
+      Classification.business_expenses.as_json,
+      @declare_user.business_expenses.group(:expense_classification_id).sum(:amount),
+      @declare_user.id,
+    )
     render json: { classifications: @classifications }, status: :ok
+  end
+
+  def personal_cards
+    @business_expenses = @declare_user.business_expenses
+                                .where(expense_classification_id: Classification::PERSONAL_CARD_CLASSIFICATION_ID)
+                                .includes(:expense_classification)
+                                .includes(:account_classification)
+                                .paginate(page: params[:page])
+                                .order(amount: :desc)
+    render json: {
+      expense_classification_id: Classification::PERSONAL_CARD_CLASSIFICATION_ID,
+      total_amount: @business_expenses.sum(:amount),
+      business_expenses: @business_expenses.as_json(methods: [:expense_classification_name, :account_classification_name])
+    }, status: :ok
   end
 
   def create

@@ -9,6 +9,7 @@ class DeclareUsersController < ApplicationController
   def create
     @declare_user = CreateDeclareUser.call(
       @current_user,
+      validate: true,
       name: declare_user_params[:name],
       residence_number: declare_user_params[:residence_number],
       address: declare_user_params[:address],
@@ -69,6 +70,6 @@ class DeclareUsersController < ApplicationController
   end
 
   def json_object
-    @declare_user.as_json(except: DeclareUser::EXCEPT_JSON_FIELD)
+    @declare_user.as_json(except: DeclareUser::EXCEPT_JSON_FIELD, method: [:hometax_address])
   end
 end

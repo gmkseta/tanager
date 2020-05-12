@@ -11,6 +11,7 @@ Rails.application.routes.draw do
   resources :business_expenses do
     collection do
       get 'classifications'
+      get 'personal_cards'
     end
   end
   resources :simplified_bookkeepings do
@@ -35,4 +36,5 @@ Rails.application.routes.draw do
   get "calculated_taxes/penalty_taxes", to: "calculated_taxes#penalty_taxes"
   get "hometax_business_incomes", to: "hometax_business_incomes#index"
   get "hometax_business_incomes/incomes", to: "hometax_business_incomes#incomes"
+  post "hometax/scraped_callback", to: "hometax#scraped_callback"
 end

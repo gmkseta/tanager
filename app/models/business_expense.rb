@@ -6,23 +6,14 @@ class BusinessExpense < ApplicationRecord
   validate :expense_classification_id, :validate_unique_expense?, on: :create
   validates :expense_classification_id, presence: true, inclusion: { in: Classification.business_expenses.ids, message: :invalid_type }
   validates :account_classification_id, inclusion: { in: Classification.account_classifications.ids, message: :invalid_type }, allow_nil: true
-  validates :amount, presence: true, numericality: { greater_than: 0, message: :greater_than_zero }
+  validates :amount, presence: true, numericality: { greater_than_or_equal_to: 0, message: :greater_than_or_equal_to_zero }
   validates :vendor_registration_number, format: { with: /\A\d{10}\z/ }, allow_nil: true
-  validate :last_year_issued_at?
+  validates :issued_at, inclusion: { in: 1.year.ago.all_year, message: :wrong_date }, allow_nil: true
 
   def validate_unique_expense?
     return false if Classification::EXPENSE_INVOICE_CLASSIFICATION.any?(expense_classification_id)
     if BusinessExpense.where(expense_classification_id: expense_classification_id, declare_user_id: declare_user_id).present?
       errors.add(:expense_classification_id, :taken)
-    end
-  end
-
-  def last_year_issued_at?
-    return true unless Classification::EXPENSE_INVOICE_CLASSIFICATION.any?(expense_classification_id)
-    if issued_at.blank?
-      errors.add(:issued_at, :invalid)
-    elsif !1.year.ago.all_year.include?(issued_at)
-      errors.add(:issued_at, :invalid)
     end
   end
 
@@ -32,5 +23,12 @@ class BusinessExpense < ApplicationRecord
 
   def account_classification_name
     account_classification&.name
+  end
+
+  def self.personal_cards_sum(declare_user_id)
+    BusinessExpense.where(
+      declare_user_id: declare_user_id,
+      expense_classification_id: Classification::PERSONAL_CARD_CLASSIFICATION_ID
+    ).sum(:amount)
   end
 end
