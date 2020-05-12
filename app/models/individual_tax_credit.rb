@@ -1,5 +1,5 @@
 class IndividualTaxCredit < ApplicationRecord
-  has_many: individual_personal_deductions
+  has_many :individual_personal_deductions
 
   def online_declare_tax_code
     "244"
