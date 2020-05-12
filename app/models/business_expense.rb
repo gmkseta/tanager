@@ -50,7 +50,7 @@ class BusinessExpense < ApplicationRecord
   def self.create_wage(declare_user_id)
     BusinessExpense.create(
       declare_user_id: declare_user_id,
-      expense_classification_id: Classification::WAGE_INSURANCE_CLASSIFICATION_ID,
+      expense_classification_id: Classification::WAGE_CLASSIFICATION_ID,
       amount: DeclareUser.find(declare_user_id).wage_sum,
     )
   end
