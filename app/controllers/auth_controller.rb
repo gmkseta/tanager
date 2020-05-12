@@ -11,8 +11,8 @@ class AuthController < ApplicationController
     user = CreateUser.call(owner: owner)
     hometax_individual_incomes = HometaxIndividualIncome.where(owner_id: user.owner_id)
     if hometax_individual_incomes.blank?
-      user.delete
-      SlackBot.ping("#{Rails.env.development? ? "[테스트] " : ""} *세금신고오류* #{declare_user.name}님 - 신고불가: 홈택스 데이터 없음)", channel: "#labs-ops")
+      SlackBot.ping("#{Rails.env.development? ? "[테스트] " : ""} *세금신고오류* #{user.name}님 - 신고불가: 홈택스 데이터 없음)", channel: "#labs-ops")
+      user.destroy
       return render json: { errors: "hometax not available" }, status: :not_found
     else
       declare_user = CreateDeclareUser.call(
