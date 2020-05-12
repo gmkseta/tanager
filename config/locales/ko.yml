@@ -34,6 +34,8 @@ ko:
               invalid_type: 허용되지 않는 분류입니다.
             registration_number:
               invalid: 사업자번호 형식이 잘못되었습니다.
+            issued_at:
+              wrong_date: 2019년 거래일만 추가해주세요.
   errors:
     messages:
       blank: 필수로 입력해야하는 값입니다.
