@@ -12,9 +12,8 @@ class Snowdon::Business < Snowdon::ApplicationRecord
   has_many :hometax_purchases_invoices
   has_many :hometax_wht_declarations
 
-  def excluded_cards
+  def included_cards
     exclude = hometax_cards
-
     if exclude.empty?
       cards
     else
@@ -170,12 +169,13 @@ class Snowdon::Business < Snowdon::ApplicationRecord
 
     raise "#{hometax_business.inspect} is not allowed for individual_income" if classification.nil?
 
-    excluded_card_ids = excluded_cards.pluck(:id)
+    included_card_ids = included_cards.pluck(:id)
+    opened_at = Date.parse(hometax_business.opened_at || "2019-01-01")
 
     results = hometax_card_purchases_grouped
         .union(hometax_purchases_cash_receipts_grouped)
         .union(hometax_purchases_invoices_grouped)
-        .union(card_purchases_approvals_grouped(excluded_card_ids))
+        .union(card_purchases_approvals_grouped(included_card_ids, opened_at))
 
     with_classification_codes = add_classification_code(results)
     with_account_classification_codes =
@@ -249,10 +249,10 @@ class Snowdon::Business < Snowdon::ApplicationRecord
         )
   end
 
-  def card_purchases_approvals_grouped(excluded_card_ids)
+  def card_purchases_approvals_grouped(included_card_ids, opened_at)
     card_purchases_approvals
-        .where(id: excluded_card_ids)
-        .last_year
+        .where(card_id: included_card_ids)
+        .last_year.where("approved_at >= ?", opened_at)
         .group("COALESCE(vendor_registration_number, vendor_business_name)")
         .select(<<-SQL.squish
           COALESCE(vendor_registration_number, vendor_business_name) as vendor_registration_number,
