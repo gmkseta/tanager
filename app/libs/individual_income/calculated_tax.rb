@@ -74,6 +74,34 @@ module IndividualIncome
       @payment_tax ||= [calculated_tax_with_penalty - limited_tax_credit - limited_tax_exemption, 0].max - prepaid_tax
     end
 
+    def calculated_local_tax
+      [(calculated_tax * 0.1).to_i, 0].max
+    end
+
+    def penalty_local_tax
+      0
+    end
+
+    def calculated_local_tax_with_penalty
+      @calculated_local_tax_with_penalty ||= calculated_local_tax + penalty_local_tax
+    end
+
+    def limited_local_tax_credit
+      [calculated_local_tax_with_penalty, (tax_credit * 0.1).to_i].min
+    end
+
+    def limited_local_tax_exemption
+      [calculated_tax_with_penalty - limited_local_tax_credit, (tax_exemption * 0.1).to_i].min
+    end
+
+    def prepaid_local_tax
+      0
+    end
+
+    def payment_local_tax
+      @payment_local_tax ||= [calculated_local_tax_with_penalty - limited_local_tax_credit - limited_local_tax_exemption, 0].max - prepaid_local_tax
+    end
+
     def as_json
       {
         business_incomes: business_incomes,
@@ -88,6 +116,7 @@ module IndividualIncome
         penalty_tax: penalty_tax,
         prepaid_tax: prepaid_tax,
         payment_tax: payment_tax,
+        payment_local_tax: payment_local_tax,
       }.as_json
     end
   end
