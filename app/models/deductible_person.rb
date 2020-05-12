@@ -24,6 +24,10 @@ class DeductiblePerson < ApplicationRecord
     default_deduction_amount + additional_deduction_amount
   end
 
+  def relation_name
+    classification.name
+  end
+
   class << self
     def dependants_count
       select{ |d| d.dependant? && !d.spouse? }.length
