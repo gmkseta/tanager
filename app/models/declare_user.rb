@@ -97,7 +97,7 @@ class DeclareUser < ApplicationRecord
   end
 
   def children_size
-    deductible_persons.select { |p| p.korean_age >= 7 && p.korean_age <= 20 }.length
+    deductible_persons.select { |p| p.age >= 7 && p.age <= 20 }.length
   end
 
   def newborn_baby_size

@@ -22,16 +22,11 @@ module PersonalDeduction
   end
 
   def age
-    now = Date.today
-    now.year - birthday.year - (now.strftime('%m%d') < birthday.strftime('%m%d') ? 1 : 0)
-  end
-
-  def korean_age
-    Date.today.year - birthday.year + 1
+    Date.today.last_year.year - birthday.year
   end
 
   def new_born?
-    twentieth_century? && residence_number.start_with?((Date.today.year % 100).to_s)
+    Date.today.last_year.beginning_of_year <= birthday
   end
 
   def elder?
