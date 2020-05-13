@@ -13,12 +13,8 @@ module IndividualIncome
       @total_income ||= [business_incomes - expenses, 0].max
     end
 
-    def limited_income_deduction
-      [0, total_income - income_deduction].max
-    end
-
     def base_taxation
-      @base_taxation ||= limited_income_deduction
+      @base_taxation ||= [0, total_income - income_deduction].max
     end
 
     def tax_rate
@@ -71,7 +67,7 @@ module IndividualIncome
     end
 
     def payment_tax
-      @payment_tax ||= [calculated_tax_with_penalty - limited_tax_credit - limited_tax_exemption, 0].max - prepaid_tax
+      @payment_tax ||= [(calculated_tax_with_penalty - limited_tax_credit - limited_tax_exemption), 0].max - prepaid_tax
     end
 
     def calculated_local_tax
@@ -91,7 +87,7 @@ module IndividualIncome
     end
 
     def limited_local_tax_exemption
-      [calculated_tax_with_penalty - limited_local_tax_credit, (tax_exemption * 0.1).to_i].min
+      [(calculated_tax_with_penalty - limited_local_tax_credit), (tax_exemption * 0.1).to_i].min
     end
 
     def prepaid_local_tax
@@ -99,7 +95,7 @@ module IndividualIncome
     end
 
     def payment_local_tax
-      @payment_local_tax ||= [calculated_local_tax_with_penalty - limited_local_tax_credit - limited_local_tax_exemption, 0].max - prepaid_local_tax
+      @payment_local_tax ||= [(calculated_local_tax_with_penalty - limited_local_tax_credit - limited_local_tax_exemption), 0].max - prepaid_local_tax
     end
 
     def as_json
@@ -107,7 +103,7 @@ module IndividualIncome
         business_incomes: business_incomes,
         expenses: expenses,
         total_income: total_income,
-        income_deduction: limited_income_deduction,
+        income_deduction: income_deduction,
         base_taxation: base_taxation,
         tax_rate: (tax_rate * 100).to_i,
         calculated_tax: calculated_tax,
