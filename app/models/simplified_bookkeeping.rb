@@ -1,4 +1,5 @@
 class SimplifiedBookkeeping < ApplicationRecord
+  self.per_page = 10000
   belongs_to :declare_user
   belongs_to :classification
   scope :card_approvals, ->{ where(purchase_type: "CardPurchasesApproval") }
