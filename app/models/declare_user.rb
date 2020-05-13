@@ -67,7 +67,7 @@ class DeclareUser < ApplicationRecord
   end
 
   def simplified_bookkeepings_sum
-    simplified_bookkeepings.where(deductible: [true, nil]).sum(&:amount)
+    simplified_bookkeepings.deductibles.sum(&:amount)
   end
 
   def pensions_sum

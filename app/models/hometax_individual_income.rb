@@ -4,12 +4,32 @@ class HometaxIndividualIncome < ApplicationRecord
   include PensionDeductionCalculator
   PENALTY_METHODS = %w{unfaithful_business_report_amount not_issued_cash_receipts_penalty unfaithful_business_report_penalty decline_cash_receipts_penalty decline_card_penalty}
 
+  def declarable?
+    is_simplified_bookkeeping? && !has_other_incomes? && !has_penalty_tax? && !(business_income_by_registration_number.length > 1) && !(hometax_business_incomes.freelancers.length > 0)
+  end
+
+  def is_simplified_bookkeeping?
+    account_type.eql?("간편장부대상자")
+  end
+
   def business_income_sum
     hometax_business_incomes.sum(&:income_amount)
   end
 
   def has_wage_income?
     wage_single_income && wage_multiple_income
+  end
+
+  def has_penalty_tax?
+    penalty_tax_sum > 0
+  end
+
+  def has_other_incomes?
+    interest_income || dividend_income || wage_single_income || wage_multiple_income || pension_income || other_income || religions_income
+  end
+
+  def has_freelancer_incomes?
+    hometax_business_incomes.where(registration_number: [nil, '']).group_by(&:registration_number)
   end
 
   def business_income_by_registration_number
