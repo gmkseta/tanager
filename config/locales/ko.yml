@@ -23,10 +23,15 @@ ko:
               taken: 이미 존재하는 주민번호 입니다.
             bank_account_number:
               wrong_code: 은행코드가 잘못되었습니다.
+        simplified_bookkeeping:
+          attributes:
+            amount:
+              maximum_length: 최대 허용 금액을 초과하였습니다.
         business_expense:
           attributes:
             amount:
               greater_than_or_equal_to_zero: 금액은 0보다 작을 수 없습니다.
+              maximum_length: 최대 허용 금액을 초과하였습니다.
             expense_classification_id:
               invalid_type: 허용되지 않는 분류입니다.
               taken: 이미 존재하는 항목 입니다.

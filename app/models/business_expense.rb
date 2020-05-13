@@ -6,6 +6,7 @@ class BusinessExpense < ApplicationRecord
   validate :expense_classification_id, :validate_unique_expense?, on: :create
   validates :expense_classification_id, presence: true, inclusion: { in: Classification.business_expenses.ids + Classification.personal_cards.ids, message: :invalid_type }
   validates :account_classification_id, inclusion: { in: Classification.account_classifications.ids, message: :invalid_type }, allow_nil: true
+  validates :amount, length: { maximum: 15, message: :maximum_length }
   validates :amount, presence: true, numericality: { greater_than_or_equal_to: 0, message: :greater_than_or_equal_to_zero }
   validates :vendor_registration_number, format: { with: /\A\d{10}\z/ }, allow_nil: true
   validates :issued_at, inclusion: { in: 1.year.ago.all_year, message: :wrong_date }, allow_nil: true
