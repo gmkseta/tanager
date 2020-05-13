@@ -21,7 +21,7 @@ ko:
             residence_number:
               invalid: 주민등록번호 형식이 잘못되었습니다.
               taken: 이미 존재하는 주민번호 입니다.
-            bank_account_number:
+            bank_code:
               wrong_code: 은행코드가 잘못되었습니다.
         simplified_bookkeeping:
           attributes:
