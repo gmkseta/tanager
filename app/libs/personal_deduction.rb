@@ -10,7 +10,7 @@ module PersonalDeduction
   end
 
   def birthday
-    (twentieth_century? ? "20" : "19" + residence_number[0..5]).to_date
+    ((twentieth_century? ? "20" : "19") + residence_number[0..5]).to_date
   end
 
   def twentieth_century?

@@ -36,7 +36,7 @@ module IndividualIncome
     end
 
     def calculated_tax
-      @calculated_tax =amount = base_taxation * tax_rate
+      amount = base_taxation * tax_rate
       case tax_rate
       when 0.15
         amount -= 1080000
@@ -51,7 +51,7 @@ module IndividualIncome
       when 0.42
         amount -= 35400000
       end
-      [0, amount.to_i].max
+      @calculated_tax ||= [0, amount.to_i].max
     end
 
     def calculated_tax_with_penalty
@@ -71,7 +71,7 @@ module IndividualIncome
     end
 
     def calculated_local_tax
-      [(calculated_tax * 0.1).to_i, 0].max
+      [(calculated_tax * 0.1).round(3).to_i, 0].max
     end
 
     def penalty_local_tax
@@ -83,11 +83,11 @@ module IndividualIncome
     end
 
     def limited_local_tax_credit
-      [calculated_local_tax_with_penalty, (tax_credit * 0.1).to_i].min
+      [calculated_local_tax_with_penalty, (tax_credit * 0.1).round(3).to_i].min
     end
 
     def limited_local_tax_exemption
-      [(calculated_tax_with_penalty - limited_local_tax_credit), (tax_exemption * 0.1).to_i].min
+      [(calculated_tax_with_penalty - limited_local_tax_credit), (tax_exemption * 0.1).round(3).to_i].min
     end
 
     def prepaid_local_tax

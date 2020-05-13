@@ -18,11 +18,11 @@ module TaxCreditCalculator
   end
 
   def pension_account_tax_credit_amount
-    ([hometax_individual_income.pension_account_tax_credit, pension_account_tax_credit_limit].min * pension_tax_rate).to_i
+    ([hometax_individual_income.pension_account_tax_credit, pension_account_tax_credit_limit].min * pension_tax_rate).round(3).to_i
   end
 
   def retirement_pension_tax_credit_amount
     limit_amount = [7000000 - pension_account_tax_credit_limit, hometax_individual_income.retirement_pension_tax_credit].min
-    (limit_amount * pension_tax_rate).to_i
+    (limit_amount * pension_tax_rate).round(3).to_i
   end
 end

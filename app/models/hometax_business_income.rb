@@ -4,10 +4,10 @@ class HometaxBusinessIncome < ApplicationRecord
   scope :freelancers, ->{ where(registration_number: [nil, '']) }
 
   def expense_by_base_ratio
-    (income_amount * base_ratio_self * 0.01).to_i
+    (income_amount * (base_ratio_self * 0.01).round(3)).to_i
   end
 
   def expense_by_simple_ratio
-    (income_amount * simple_ratio_self * 0.01).to_i
+    (income_amount * (simple_ratio_self * 0.01).round(3)).to_i
   end
 end
