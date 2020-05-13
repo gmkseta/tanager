@@ -35,7 +35,8 @@ class SimplifiedBookkeepingsController < ApplicationController
 
   def purchase_type
     @purchase_type_sum = @declare_user.simplified_bookkeepings.deductibles.group(:purchase_type).sum(:amount)
-    (@purchase_type_sum["CardPurchasesApproval"] || 0) + BusinessExpense.personal_cards_sum(@declare_user.id)
+    @purchase_type_sum["CardPurchasesApproval"] ||= 0
+    @purchase_type_sum["CardPurchasesApproval"] += BusinessExpense.personal_cards_sum(@declare_user.id)
     @simplifiedBookkeepings = SimplifiedBookkeeping::PURCHASE_TYPES.map {
       |p| SimplifiedBookkeeping.new(declare_user_id: @declare_user.id, purchase_type: p, amount: @purchase_type_sum[p])
     }
