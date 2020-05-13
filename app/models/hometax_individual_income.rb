@@ -2,30 +2,47 @@ class HometaxIndividualIncome < ApplicationRecord
   belongs_to :declare_user
   has_many :hometax_business_incomes
   include PensionDeductionCalculator
+
   PENALTY_METHODS = %w{unfaithful_business_report_amount not_issued_cash_receipts_penalty unfaithful_business_report_penalty decline_cash_receipts_penalty decline_card_penalty}
 
+  def business_income_sum
+    hometax_business_incomes.sum(&:income_amount)
+  end
+
   def declarable?
-    is_simplified_bookkeeping? && !has_other_incomes? && !has_penalty_tax? && !(business_income_by_registration_number.length > 1) && !(hometax_business_incomes.freelancers.length > 0)
+    is_simplified_bookkeeping? && !(has_other_incomes?) && !(has_penalty_tax?) && !(has_multiple_businesses?) && !(has_freelancer_income?) && !(has_co_founder?) && !(real_estate_rental?)
   end
 
   def is_simplified_bookkeeping?
     account_type.eql?("간편장부대상자")
   end
 
-  def business_income_sum
-    hometax_business_incomes.sum(&:income_amount)
+  def has_other_incomes?
+    interest_income || dividend_income || wage_single_income || wage_multiple_income || pension_income || other_income || religions_income
+  end
+
+  def has_penalty_tax?
+    penalty_tax_sum > 0 || not_register_cash_receipts.present? || no_business_account_penalty.present?
+  end
+
+  def has_multiple_businesses?
+    business_income_by_registration_number.length > 1
+  end
+
+  def has_freelancer_income?
+    hometax_business_incomes.freelancers.length > 0
+  end
+
+  def has_co_founder?
+    hometax_business_incomes.co_founders.length > 0
+  end
+
+  def real_estate_rental?
+    hometax_business_incomes.map { |b| %{701101 701102 701103 701104 701301}.include?(b.classification_code) }.any?
   end
 
   def has_wage_income?
     wage_single_income && wage_multiple_income
-  end
-
-  def has_penalty_tax?
-    penalty_tax_sum > 0
-  end
-
-  def has_other_incomes?
-    interest_income || dividend_income || wage_single_income || wage_multiple_income || pension_income || other_income || religions_income
   end
 
   def has_freelancer_incomes?

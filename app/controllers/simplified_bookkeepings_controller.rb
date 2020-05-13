@@ -42,6 +42,7 @@ class SimplifiedBookkeepingsController < ApplicationController
     }
     render json: {
       registerd_card_this_year: @declare_user.registerd_card_this_year?,
+      opened_at_this_year: @declare_user.opened_at_this_year?,
       simplified_bookkeepings: @simplifiedBookkeepings
     }, status: :ok
   end
