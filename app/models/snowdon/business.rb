@@ -256,6 +256,7 @@ class Snowdon::Business < Snowdon::ApplicationRecord
   def card_purchases_approvals_grouped(included_card_ids, opened_at)
     card_purchases_approvals
         .where(card_id: included_card_ids)
+        .approved
         .last_year.where("approved_at >= ?", opened_at)
         .group("COALESCE(vendor_registration_number, vendor_business_name)")
         .select(<<-SQL.squish
