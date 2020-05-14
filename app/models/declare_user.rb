@@ -46,6 +46,16 @@ class DeclareUser < ApplicationRecord
     1500000 + additional_deduction_amount
   end
 
+  def single_parent?
+    false if (single_parent == false)
+    (single_parent == true || single_parent.nil?) && applicable_single_parent?
+  end
+
+  def woman_deduction?
+    false if (woman_deduction == false)
+    (woman_deduction == true || woman_deduction.nil?) && (total_income_amount <= 30000000) && (applicable_woman_deduction_with_husband? || applicable_woman_deduction_without_husband?)
+  end
+
   def applicable_single_parent?
     !married && deductible_persons.has_dependant_children?
   end

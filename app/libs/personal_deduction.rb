@@ -34,7 +34,7 @@ module PersonalDeduction
   end
 
   def dependant?
-    (20 >= age || age >= 60)
+    (20 >= age || age >= 60) || disabled
   end
 
   def default_deduction_amount
@@ -48,8 +48,8 @@ module PersonalDeduction
     amount = 0
     amount += 2000000 if disabled
     amount += 1000000 if elder?
-    amount += 1000000 if single_parent
-    amount += 500000 if woman_deduction && !single_parent
+    amount += 1000000 if single_parent?
+    amount += 500000 if woman_deduction? && !single_parent?
     amount
   end
 end
