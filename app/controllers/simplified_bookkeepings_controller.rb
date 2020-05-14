@@ -5,7 +5,7 @@ class SimplifiedBookkeepingsController < ApplicationController
   
   def index
     return head :unprocessable_entity if params[:classification_id].blank?
-    @simplified_bookkeepings = @declare_user.simplified_bookkeepings
+    @simplified_bookkeepings = @declare_user.simplified_bookkeepings.deductibles
                                 .where(classification_id: params[:classification_id])
                                 .includes(:classification)
     total_amount = @simplified_bookkeepings.sum(:amount)
