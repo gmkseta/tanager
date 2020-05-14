@@ -32,7 +32,7 @@ class CreateDeclareUser < Service::Base
       declare_user.save!(validate: validate)
 
       if is_new_record
-        hometax_individual_incomes = HometaxIndividualIncome.where(owner_id: user.id)
+        hometax_individual_incomes = HometaxIndividualIncome.where(owner_id: user.owner_id)
         hometax_individual_incomes.update(declare_user_id: declare_user.id)
         HometaxSocialInsurance.where(owner_id: user.owner_id).update(declare_user_id: declare_user.id)
         businesses = Snowdon::Business.where(owner_id: user.owner_id)
