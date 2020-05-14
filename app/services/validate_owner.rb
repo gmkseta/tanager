@@ -29,6 +29,7 @@ class ValidateOwner < Service::Base
   QUERY
 
   def get_account_and_businesses(token)
+    Rails.logger.info("token : #{token}")
     results = http_query(token, GetAccountAndBusinesses)
     results["data"]["account"]
   end
