@@ -7,7 +7,7 @@ class AuthController < ApplicationController
     return render json: { declare_user: user.declare_user&.as_json(except: DeclareUser::EXCEPT_JSON_FIELD, methods: [:hometax_address]),
                    jwt: user.jwt.token,
                    status: user.declare_user.blank? ? "empty" : user.declare_user.status
-                 }, status: :ok
+                 }, status: :ok if user
     user = CreateUser.call(owner: owner)
     hometax_individual_incomes = HometaxIndividualIncome.where(owner_id: user.owner_id)
     if hometax_individual_incomes.blank?
