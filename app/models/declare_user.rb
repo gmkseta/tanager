@@ -171,6 +171,6 @@ class DeclareUser < ApplicationRecord
   end
 
   def opened_at_this_year?
-    user.businesses.map{ |b| 1.year.ago.all_year === opened_at }.any?
+    user.businesses.map{ |b| 1.year.ago.all_year === b.opened_at }.any?
   end
 end
