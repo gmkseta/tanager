@@ -5,7 +5,7 @@ module TaxCreditCalculator
   end
 
   def newborn_baby_tax_credit_amount
-    0 unless new_born?
+    return 0 unless new_born?
     return 300000 if children_or_adopted_count <= 1
     return 500000 if children_or_adopted_count <= 2
     return 700000
