@@ -52,8 +52,8 @@ class DeclareUser < ApplicationRecord
   end
 
   def woman_deduction?
-    false if (woman_deduction == false)
-    (woman_deduction == true || woman_deduction.nil?) && (total_income_amount <= 30000000) && (applicable_woman_deduction_with_husband? || applicable_woman_deduction_without_husband?)
+    false if (woman_deduction == false || (total_income_amount > 30000000) || single_parent?)
+    (woman_deduction == true || woman_deduction.nil?) && (applicable_woman_deduction_with_husband? || applicable_woman_deduction_without_husband?)
   end
 
   def applicable_single_parent?

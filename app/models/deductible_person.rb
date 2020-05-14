@@ -66,11 +66,11 @@ class DeductiblePerson < ApplicationRecord
     end
 
     def single_parent_count
-      select{ |d| d.single_parent == true }.length
+      select{ |d| d.single_parent? }.length
     end
 
     def woman_deduction_count
-      select{ |d| d.woman_deduction == true }.length
+      select{ |d| d.woman_deduction? }.length
     end
   end
 end
