@@ -5,6 +5,10 @@ class CreateUser < Service::Base
   def run
     user = ActiveRecord::Base.transaction do
       businesses = owner.businesses.joins(:hometax_business)
+      if businesses.blank?
+        SlackBot.ping("#{Rails.env.development? ? "[테스트] " : ""} *세금신고오류* #{owner.name}님 - 신고불가: 홈택스 사업장 데이터 없음)", channel: "#labs-ops")
+        return nil
+      end
       user = User.create!(
         login: owner.login || businesses.first.registration_number,
         password: owner.login || businesses.first.registration_number,

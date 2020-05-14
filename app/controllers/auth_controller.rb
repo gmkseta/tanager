@@ -2,16 +2,17 @@ class AuthController < ApplicationController
   def status
     return render json: { errors: "jwt not available" }, status: :unauthorized if token.blank?
     owner = ValidateOwner.call(token: token)
-    return render json: { errors: "not found user" }, status: :not_found if owner.blank?
+    return render json: { errors: "Not found user" }, status: :not_found if owner.blank?
     user = User.find_by(owner_id: owner.id)
-    return render json: { declare_user: user.declare_user&.as_json(except: DeclareUser::EXCEPT_JSON_FIELD, methods: [:hometax_address]),
+    return render json: { declare_user: user.declare_user.as_json(except: DeclareUser::EXCEPT_JSON_FIELD, methods: [:hometax_address]),
                    jwt: user.jwt.token,
-                   status: user.declare_user.blank? ? "empty" : user.declare_user.status
-                 }, status: :ok
-    user = CreateUser.call(owner: owner, token: token)
+                   status: user.declare_user.status
+                 }, status: :ok if user && user.declare_user.present?
+    user ||= CreateUser.call(owner: owner, token: token)
+    return render json: { errors: "Not found hometax businesses" }, status: :not_found unless user
     hometax_individual_incomes = HometaxIndividualIncome.where(owner_id: user.owner_id)
     if hometax_individual_incomes.blank?
-      SlackBot.ping("#{Rails.env.development? ? "[테스트] " : ""} *세금신고오류* #{user.name}님 - 신고불가: 홈택스 데이터 없음)", channel: "#labs-ops")
+      SlackBot.ping("#{Rails.env.development? ? "[테스트] " : ""} *세금신고오류* #{user.name}님 - 신고불가: 홈택스 종소세 데이터 없음", channel: "#labs-ops")
       user.destroy
       return render json: { errors: "hometax not available" }, status: :not_found
     else
