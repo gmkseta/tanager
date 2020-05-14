@@ -26,7 +26,7 @@ module PersonalDeduction
   end
 
   def new_born?
-    Date.today.last_year.beginning_of_year <= birthday
+    Date.today.last_year.year == birthday.year
   end
 
   def elder?

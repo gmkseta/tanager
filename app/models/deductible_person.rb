@@ -16,6 +16,14 @@ class DeductiblePerson < ApplicationRecord
     classification_id == 1
   end
 
+  def single_parent?
+    single_parent
+  end
+
+  def woman_deduction?
+    woman_deduction
+  end
+
   def dependant_children?
     20 >= age && [2, 8].any?(classification_id)
   end
@@ -30,7 +38,7 @@ class DeductiblePerson < ApplicationRecord
 
   class << self
     def dependants_count
-      select{ |d| d.dependant? && !d.spouse? }.length
+      select{ |d| (d.dependant? && !d.spouse?) }.length
     end
 
     def has_dependant?

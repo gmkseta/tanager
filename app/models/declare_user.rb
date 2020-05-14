@@ -106,12 +106,12 @@ class DeclareUser < ApplicationRecord
     deductible_persons_sum + pensions_sum
   end
 
-  def children_size
-    deductible_persons.select { |p| p.age >= 7 && p.age <= 20 }.length
+  def children_or_adopted_count
+    deductible_persons.select { |p| [2, 8].any? p.classification_id }.length
   end
 
-  def newborn_baby_size
-    deductible_persons.select { |p| p.new_born? }.length
+  def deductible_children_size
+    deductible_persons.select { |p| (p.age >= 7 && p.age <= 20) || p.disabled }.length
   end
 
   def base_tax_credit_amount
