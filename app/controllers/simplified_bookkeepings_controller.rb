@@ -8,13 +8,14 @@ class SimplifiedBookkeepingsController < ApplicationController
     @simplified_bookkeepings = @declare_user.simplified_bookkeepings
                                 .where(classification_id: params[:classification_id])
                                 .includes(:classification)
-                                .paginate(page: params[:page])
-                                .order(amount: :desc)
+    total_amount = @simplified_bookkeepings.sum(:amount)
+    deductible_amount = @simplified_bookkeepings.deductibles.sum(:amount)
+    @simplified_bookkeepings = @simplified_bookkeepings.paginate(page: params[:page]).order(amount: :desc)
     render json: { total_pages: @simplified_bookkeepings.total_pages,
                    next_page: @simplified_bookkeepings.next_page,
                    wage_sum: @declare_user.wage_sum,
-                   deductible_amount: @declare_user.simplified_bookkeepings.deductibles.where(classification_id: params[:classification_id]).sum(:amount),
-                   total_amount: @declare_user.simplified_bookkeepings.where(classification_id: params[:classification_id]).sum(:amount),
+                   deductible_amount: deductible_amount,
+                   total_amount: total_amount,
                    simplified_bookkeepings: @simplified_bookkeepings.as_json(methods: [:classification_name, :purchase_type_name]) }, status: :ok
   end
 
@@ -50,6 +51,10 @@ class SimplifiedBookkeepingsController < ApplicationController
   end
 
   def card_purchases_approvals
+    business_expenses_card_sum = BusinessExpense.personal_cards_sum(@declare_user.id)
+    deductible_card_sum = @declare_user.simplified_bookkeepings.card_approvals.deductibles.sum(:amount)
+    total_card_sum = @declare_user.simplified_bookkeepings.card_approvals.sum(:amount)
+
     @simplified_bookkeepings = SimplifiedBookkeeping.card_approvals.where(declare_user_id: @declare_user.id)
                                 .paginate(page: params[:page])
                                 .includes(:classification)
@@ -57,8 +62,8 @@ class SimplifiedBookkeepingsController < ApplicationController
     render json: { total_pages: @simplified_bookkeepings.total_pages,
                    next_page: @simplified_bookkeepings.next_page,
                    wage_sum: @declare_user.wage_sum,
-                   deductible_amount: @declare_user.simplified_bookkeepings.card_approvals.deductibles.sum(:amount),
-                   total_amount: @declare_user.simplified_bookkeepings.card_approvals.sum(:amount) + BusinessExpense.personal_cards_sum(@declare_user.id),
+                   deductible_amount: deductible_card_sum + business_expenses_card_sum,
+                   total_amount: total_card_sum + business_expenses_card_sum,
                    simplified_bookkeepings: @simplified_bookkeepings.as_json(methods: [:classification_name, :purchase_type_name]) }, status: :ok
   end
 
