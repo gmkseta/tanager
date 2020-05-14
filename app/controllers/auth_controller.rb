@@ -8,7 +8,7 @@ class AuthController < ApplicationController
                    jwt: user.jwt.token,
                    status: user.declare_user.blank? ? "empty" : user.declare_user.status
                  }, status: :ok
-    user = CreateUser.call(owner: owner)
+    user = CreateUser.call(owner: owner, token: token)
     hometax_individual_incomes = HometaxIndividualIncome.where(owner_id: user.owner_id)
     if hometax_individual_incomes.blank?
       SlackBot.ping("#{Rails.env.development? ? "[테스트] " : ""} *세금신고오류* #{user.name}님 - 신고불가: 홈택스 데이터 없음)", channel: "#labs-ops")
