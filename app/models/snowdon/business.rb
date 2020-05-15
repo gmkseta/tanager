@@ -269,7 +269,12 @@ class Snowdon::Business < Snowdon::ApplicationRecord
               ELSE -abs(amount)
             END
           ) as amount,
-          COUNT(*) as purchases_count,
+          SUM(
+            CASE
+              WHEN status = '승인' THEN 1
+              ELSE 0 
+            END 
+          ) as purchases_count,
           'CardPurchasesApproval' as purchase_type
         SQL
         )
