@@ -3,20 +3,6 @@ class CalculatedTaxesController < ApplicationController
   before_action :set_declare_user
   def index
     individual_income_tax_return = {}
-    if @declare_user.status.eql?("done")
-      individual_income_tax_return = {
-        declared_date: Date.today.strftime,
-        local_tax:{
-           tax_payment: 10,
-           payment_due_date: "2020-08-31",
-           payment_acoount_number: "국세계좌/0126-2001-1-41-63487773"
-        },national_tax:{
-          tax_payment: 10,
-          payment_due_date: "2020-08-31",
-           payment_acoount_number: "국세계좌/0126-2001-1-41-63487773"
-        }
-      }
-    end
     render json: {
       base_expense_rate: @declare_user.hometax_individual_income.base_expense_rate,
       expense_ratio: @declare_user.hometax_individual_income.expenses_ratio,
