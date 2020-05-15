@@ -25,7 +25,13 @@ class HometaxController < ApplicationController
           }
         }
       QUERY
-      results = http_query(query)
+      response = http_query(query)
+      results = response.dig("data", "updateIndividualIncomeTaxReturnProxyAvailability")
+      if results.dig("result", "message").present?
+        message = results.dig("result", "message")
+        Rails.logger.info("updateIndividualIncomeTaxReturnProxyAvailability message : #{message}")
+        SlackBot.ping("#{Rails.env.development? ? "[테스트] " : ""} *종소세 데이터 오류* #{message}", channel: "#labs-ops")
+      end
       head :ok
     else
       head :unprocessable_entity
@@ -35,7 +41,7 @@ class HometaxController < ApplicationController
   def http_query(query)
     uri = URI.parse(Rails.env.development? ? "https://staging-api.cashnote.kr/graphql" : "https://api.cashnote.kr/graphql")
     header = {
-      "X-Bluebird-Api-Key": Rails.application.credentials.dig(:snowdon_api, :key),
+      "X-Bluebird-Api-Key": Rails.application.credentials[Rails.env.to_sym].dig(:snowdon_api, :key),
       "Content-Type": "application/json",
     }
     http = Net::HTTP.new(uri.host, uri.port)

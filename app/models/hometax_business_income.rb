@@ -1,6 +1,6 @@
 class HometaxBusinessIncome < ApplicationRecord
   belongs_to :hometax_individual_income
-  scope :co_founders, ->{ where(business_type: "단독") }
+  scope :co_founders, ->{ where(business_type: "공동") }
   scope :freelancers, ->{ where(registration_number: [nil, '']) }
 
   def expense_by_base_ratio
