@@ -5,11 +5,11 @@ class SimplifiedBookkeepingsController < ApplicationController
   
   def index
     return head :unprocessable_entity if params[:classification_id].blank?
-    @simplified_bookkeepings = @declare_user.simplified_bookkeepings
+    @simplified_bookkeepings = @declare_user.simplified_bookkeepings.deductibles
                                 .where(classification_id: params[:classification_id])
                                 .includes(:classification)
-    total_amount = @simplified_bookkeepings.sum(:amount)
-    deductible_amount = @simplified_bookkeepings.deductibles.sum(:amount)
+    total_amount = @simplified_bookkeepings.sum(:amount).to_i
+    deductible_amount = @simplified_bookkeepings.deductibles.sum(:amount).to_i
     @simplified_bookkeepings = @simplified_bookkeepings.paginate(page: params[:page]).order(amount: :desc)
     render json: { total_pages: @simplified_bookkeepings.total_pages,
                    next_page: @simplified_bookkeepings.next_page,
@@ -52,8 +52,8 @@ class SimplifiedBookkeepingsController < ApplicationController
 
   def card_purchases_approvals
     business_expenses_card_sum = BusinessExpense.personal_cards_sum(@declare_user.id)
-    deductible_card_sum = @declare_user.simplified_bookkeepings.card_approvals.deductibles.sum(:amount)
-    total_card_sum = @declare_user.simplified_bookkeepings.card_approvals.sum(:amount)
+    deductible_card_sum = @declare_user.simplified_bookkeepings.card_approvals.deductibles.sum(:amount).to_i
+    total_card_sum = @declare_user.simplified_bookkeepings.card_approvals.sum(:amount).to_i
 
     @simplified_bookkeepings = SimplifiedBookkeeping.card_approvals.where(declare_user_id: @declare_user.id)
                                 .paginate(page: params[:page])
@@ -62,8 +62,8 @@ class SimplifiedBookkeepingsController < ApplicationController
     render json: { total_pages: @simplified_bookkeepings.total_pages,
                    next_page: @simplified_bookkeepings.next_page,
                    wage_sum: @declare_user.wage_sum,
-                   deductible_amount: deductible_card_sum + business_expenses_card_sum,
-                   total_amount: total_card_sum + business_expenses_card_sum,
+                   deductible_amount: (deductible_card_sum + business_expenses_card_sum).to_i,
+                   total_amount: (total_card_sum + business_expenses_card_sum).to_i,
                    simplified_bookkeepings: @simplified_bookkeepings.as_json(methods: [:classification_name, :purchase_type_name]) }, status: :ok
   end
 

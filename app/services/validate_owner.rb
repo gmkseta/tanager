@@ -3,6 +3,7 @@ class ValidateOwner < Service::Base
 
   def run
     account = get_account_and_businesses(token)
+    return nil unless account
     business_ids = account["businesses"]["edges"].map { |b| b["node"]["id"] }
     snowdon_businesses = Snowdon::Business.where(public_id: business_ids)
     owner_id = snowdon_businesses.map{ |s| s.owner_id }.first
@@ -31,7 +32,10 @@ class ValidateOwner < Service::Base
   def get_account_and_businesses(token)
     Rails.logger.info("token : #{token}")
     results = http_query(token, GetAccountAndBusinesses)
-    results["data"]["account"]
+    error_message = results.dig("errors")
+    return results.dig("data", "account") if error_message.blank?
+    Rails.logger.info("error_message : #{error_message}")
+    nil
   end
 
   def http_query(token, query)

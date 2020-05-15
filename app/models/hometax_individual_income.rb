@@ -38,15 +38,11 @@ class HometaxIndividualIncome < ApplicationRecord
   end
 
   def real_estate_rental?
-    hometax_business_incomes.map { |b| %{701101 701102 701103 701104 701301}.include?(b.classification_code) }.any?
+    hometax_business_incomes.map { |b| %{701101 701102 701103 701104 701301}.include?(b.classficaition_code) }.any?
   end
 
   def has_wage_income?
     wage_single_income && wage_multiple_income
-  end
-
-  def has_freelancer_incomes?
-    hometax_business_incomes.where(registration_number: [nil, '']).group_by(&:registration_number)
   end
 
   def business_income_by_registration_number

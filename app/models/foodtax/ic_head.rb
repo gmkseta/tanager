@@ -10,9 +10,9 @@ module Foodtax
         term_cd: term_cd,
         declare_seq: declare_seq,
         form_cd: '',
-        login_user_id: '',
+        login_user_id: 'KCD',
         return_val1: ''
-      results.flatten.first["result"]
+      Base64.encode64(results.flatten.first["result"].force_encoding("UTF-8").encode("EUC-KR"))
     end
   end
 end

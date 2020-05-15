@@ -46,6 +46,16 @@ class DeclareUser < ApplicationRecord
     1500000 + additional_deduction_amount
   end
 
+  def single_parent?
+    false if (single_parent == false)
+    (single_parent == true || single_parent.nil?) && applicable_single_parent?
+  end
+
+  def woman_deduction?
+    false if (woman_deduction == false || (total_income_amount > 30000000) || single_parent?)
+    (woman_deduction == true || woman_deduction.nil?) && (applicable_woman_deduction_with_husband? || applicable_woman_deduction_without_husband?)
+  end
+
   def applicable_single_parent?
     !married && deductible_persons.has_dependant_children?
   end
@@ -96,12 +106,12 @@ class DeclareUser < ApplicationRecord
     deductible_persons_sum + pensions_sum
   end
 
-  def children_size
-    deductible_persons.select { |p| p.age >= 7 && p.age <= 20 }.length
+  def children_or_adopted_count
+    deductible_persons.select { |p| [2, 8].any? p.classification_id }.length
   end
 
-  def newborn_baby_size
-    deductible_persons.select { |p| p.new_born? }.length
+  def deductible_children_size
+    deductible_persons.select { |p| (p.age >= 7 && p.age <= 20) || p.disabled }.length
   end
 
   def base_tax_credit_amount

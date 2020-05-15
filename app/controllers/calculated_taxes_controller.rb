@@ -45,9 +45,9 @@ class CalculatedTaxesController < ApplicationController
         elder_base_amount: 1000000,
         disabled_count: @declare_user.deductible_persons.disabled_count + (@declare_user.disabled ? 1 : 0),
         disabled_base_amount: 2000000,
-        single_parent_count: @declare_user.deductible_persons.single_parent_count + (@declare_user.single_parent ? 1 : 0),
+        single_parent_count: (@declare_user.single_parent? ? 1 : 0),
         single_parent_base_amount: 1000000,
-        woman_deduction_count: @declare_user.deductible_persons.woman_deduction_count + (@declare_user.woman_deduction ? 1 : 0),
+        woman_deduction_count: (@declare_user.woman_deduction? ? 1 : 0),
         woman_deduction_base_amount: 500000,
       },
       pension_deduction: {

@@ -1,12 +1,14 @@
 module TaxCreditCalculator
   def children_tax_credit_amount
-    return 150000 * children_size if children_size <= 2
-    return 300000 + (300000 * children_size - 2)
+    return 150000 * deductible_children_size if deductible_children_size <= 2
+    300000 + (300000 * (deductible_children_size - 2))
   end
 
   def newborn_baby_tax_credit_amount
-    return newborn_baby_size * 300000 if children_size <= 1
-    return newborn_baby_size * 500000 if children_size <= 2
+    return 0 unless new_born?
+    return 300000 if children_or_adopted_count <= 1
+    return 500000 if children_or_adopted_count <= 2
+    return 700000
   end
 
   def pension_account_tax_credit_limit
