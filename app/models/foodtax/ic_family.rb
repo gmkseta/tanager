@@ -14,9 +14,7 @@ module Foodtax
           .deductible_persons
           .to_a
           .each_with_index
-          .map do |p, i|
-        initialize_by_deductible_person(p, person_cd, i)
-      end
+          .map {| p, i | initialize_by_deductible_person(p, person_cd, "#{i + 1}") }
     end
 
     def initialize_by_deductible_person(deductible_person,

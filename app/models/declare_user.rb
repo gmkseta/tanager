@@ -188,4 +188,23 @@ class DeclareUser < ApplicationRecord
   def opened_at_this_year?
     user.businesses.map{ |b| 1.year.ago.all_year === b.opened_at }.any?
   end
+
+  def gijang_declare_type
+    if apply_bookkeeping?
+      "20"
+    else
+      hometax_individual_income.base_expense_rate
+    end
+  end
+
+  def gijang_duty_type
+    case hometax_individual_income.account_type
+    when "간편장부대상자"
+      "02"
+    when "복식부기의무자"
+      "01"
+    else
+      "03"
+    end
+  end
 end
