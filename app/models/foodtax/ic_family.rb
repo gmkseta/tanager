@@ -7,6 +7,18 @@ module Foodtax
     belongs_to :va_head, foreign_key: :member_cd, primary_key: :member_cd
 
 
+    def initializes_by_declare_user(declare_user)
+      person_cd = "P#{"%06d" % declare_user.id}"
+
+      declare_user
+          .deductible_persons
+          .to_a
+          .each_with_index
+          .map do |p, i|
+        initialize_by_deductible_person(p, person_cd, i)
+      end
+    end
+
     def initialize_by_deductible_person(deductible_person,
                                         person_cd,
                                         seq_no)
