@@ -37,6 +37,7 @@ class CreateUser < Service::Base
           closed_at: b.closed_at,
         )
       end
+      SlackBot.ping("#{Rails.env.development? ? "[테스트] " : ""} *종소세* #{user.name} 종소세 진입", channel: "#labs-ops")
       user
     end
   end

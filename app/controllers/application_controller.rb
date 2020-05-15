@@ -1,9 +1,11 @@
 class ApplicationController < ActionController::API
+  before_action :set_raven_context
   include Knock::Authenticable
 
   def authorize_request
     begin
       @current_user = User.find(auth['sub'])
+      Raven.user_context(id: @current_user.id) if @current_user
     rescue ActiveRecord::RecordNotFound => e
       render json: { errors: e.message }, status: :unauthorized
     rescue JWT::DecodeError => e
@@ -33,5 +35,9 @@ class ApplicationController < ActionController::API
     else
       render json: { errors: "unauthorized" }, status: :unauthorized
     end
+  end
+
+  def set_raven_context
+    Raven.extra_context(params: params.to_unsafe_h, url: request.url)
   end
 end

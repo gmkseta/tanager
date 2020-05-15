@@ -34,6 +34,7 @@ gem 'will_paginate', '>= 3.1.0'
 gem 'rails-i18n'
 gem 'sidekiq'
 gem 'slack-notifier'
+gem 'sentry-raven'
 gem 'tiny_tds'
 
 
