@@ -277,7 +277,13 @@ class Snowdon::Business < Snowdon::ApplicationRecord
           ) as purchases_count,
           'CardPurchasesApproval' as purchase_type
         SQL
-        )
-
+        ).having(<<-SQL.squish)
+        SUM(
+          CASE
+            WHEN status = '승인' THEN amount
+            ELSE -abs(amount)
+          END
+        ) > 0
+        SQL
   end
 end
