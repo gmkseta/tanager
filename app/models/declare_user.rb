@@ -119,7 +119,7 @@ class DeclareUser < ApplicationRecord
   end
 
   def online_declare_credit_amount
-    20000
+    0
   end
 
   def tax_credit_amount
