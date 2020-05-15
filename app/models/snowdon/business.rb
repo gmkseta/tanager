@@ -263,7 +263,12 @@ class Snowdon::Business < Snowdon::ApplicationRecord
           COALESCE(vendor_registration_number, vendor_business_name) as vendor_registration_number,
           MAX(vendor_business_name) as vendor_business_name,
           null as vendor_classification_code,
-          SUM(amount) as amount,
+          SUM(
+            CASE 
+              WHEN status = '승인' THEN amount
+              ELSE -abs(amount)
+            END
+          ) as amount,
           COUNT(*) as purchases_count,
           'CardPurchasesApproval' as purchase_type
         SQL
