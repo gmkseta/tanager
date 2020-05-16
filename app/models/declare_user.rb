@@ -149,7 +149,7 @@ class DeclareUser < ApplicationRecord
   end
 
   def calculated_tax_by_bookkeeping
-    IndividualIncome::CalculatedTax.new(
+    @calculated_tax_by_bookkeeping ||= IndividualIncome::CalculatedTax.new(
       business_incomes: business_incomes_sum,
       expenses: simplified_bookkeeping_base_expenses,
       income_deduction: income_deduction,
@@ -161,7 +161,7 @@ class DeclareUser < ApplicationRecord
   end
     
   def calculated_tax_by_ratio
-    IndividualIncome::CalculatedTax.new(
+    @calculated_tax_by_ratio ||= IndividualIncome::CalculatedTax.new(
       business_incomes: business_incomes_sum,
       expenses: hometax_individual_income.expenses_sum_by_ratio,
       income_deduction: income_deduction,
@@ -170,6 +170,10 @@ class DeclareUser < ApplicationRecord
       penalty_tax: penalty_tax_sum,
       prepaid_tax: prepaid_tax_sum,
     )
+  end
+
+  def apply_bookkeeping?
+    calculated_tax_by_bookkeeping.payment_tax > calculated_tax_by_ratio.payment_tax
   end
 
   def snowdon_businesses
@@ -189,22 +193,11 @@ class DeclareUser < ApplicationRecord
     user.businesses.map{ |b| 1.year.ago.all_year === b.opened_at }.any?
   end
 
-  def gijang_declare_type
-    if apply_bookkeeping?
-      "20"
-    else
-      hometax_individual_income.base_expense_rate
-    end
+  def total_deduction_amount
+    deductible_persons.sum(&:deduction_amount) + deduction_amount + pensions_sum
   end
 
-  def gijang_duty_type
-    case hometax_individual_income.account_type
-    when "간편장부대상자"
-      "02"
-    when "복식부기의무자"
-      "01"
-    else
-      "03"
-    end
+  def person_cd
+    "P#{"%06d" % id}"
   end
 end

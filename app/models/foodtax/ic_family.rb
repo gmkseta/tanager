@@ -3,48 +3,54 @@ module Foodtax
     include FoodtaxHelper
     self.primary_keys = :cmpy_cd, :person_cd, :term_cd, :declare_seq, :seq_no
 
-    belongs_to :cm_member, foreign_key: :member_cd, primary_key: :member_cd
-    belongs_to :va_head, foreign_key: :member_cd, primary_key: :member_cd
+    belongs_to :ic_person, foreign_key: :person_cd
 
-
-    def initializes_by_declare_user(declare_user)
-      person_cd = "P#{"%06d" % declare_user.id}"
-
-      declare_user
-          .deductible_persons
+    def self.import_by_declare_user(declare_user)
+      self.import!(declare_user.deductible_persons
           .to_a
           .each_with_index
-          .map {| p, i | initialize_by_deductible_person(p, person_cd, "#{i + 1}") }
+          .map {| p, i | self.find_or_initialize_by_deductible_person(
+            p,
+            declare_user.person_cd,
+            "#{1.year.ago.year}",
+            "1",
+            "#{i + 1}")
+        }
+      )
     end
 
-    def initialize_by_deductible_person(deductible_person,
+    def self.find_or_initialize_by_deductible_person(deductible_person,
                                         person_cd,
+                                        term_cd,
+                                        declare_seq,
                                         seq_no)
-      self.cmpy_cd = "00025"
-      self.person_cd = person_cd
-      self.term_cd = "2019"
-      self.declare_seq = "1"
-      self.seq_no = seq_no
-      self.jumin_no = deductible_person.residence_number
-      self.name = deductible_person.name
-      self.relation_cd = deductible_person.classification.slug
-      self.relation_nm = deductible_person.relation_name
-      self.senior_yn = deductible_person.elder? ? "Y" : "N"
-      self.disabled_yn = deductible_person.disabled ? "Y": "N"
-      self.women_yn = deductible_person.woman_deduction? ? "Y" : "N"
-      self.child6_yn = "N"
-      self.oneparent_yn = deductible_person.single_parent? ? "Y" : "N"
-      self.native_cd = "1"
-      self.basic_yn = deductible_person.basic_yn? ? "Y" : "N"
-      self.delivery_yn = deductible_person.new_born? ? "Y" : "N"
-      self.partner_yn = deductible_person.spouse? ? "Y" : "N"
-      self.resident_yn = "1"
-      self.insu_yn = "N"
-      self.medi_yn = "N"
-      self.edu_yn = "N"
-      self.card_yn = "N"
-      self.children_yn = deductible_person.dependant_children? ? "Y" : "N"
-      self.resident_national_cd = "KR"
+      ic_family = self.find_or_initialize_by(
+          cmpy_cd: "00025",
+          person_cd: person_cd,
+          term_cd: term_cd,
+          declare_seq: declare_seq)
+      ic_family.seq_no = seq_no
+      ic_family.jumin_no = deductible_person.residence_number
+      ic_family.name = deductible_person.name
+      ic_family.relation_cd = deductible_person.classification.slug
+      ic_family.relation_nm = deductible_person.relation_name
+      ic_family.senior_yn = deductible_person.elder? ? "Y" : "N"
+      ic_family.disabled_yn = deductible_person.disabled ? "Y": "N"
+      ic_family.women_yn = deductible_person.woman_deduction? ? "Y" : "N"
+      ic_family.child6_yn = "N"
+      ic_family.oneparent_yn = deductible_person.single_parent? ? "Y" : "N"
+      ic_family.native_cd = "1"
+      ic_family.basic_yn = deductible_person.basic_yn? ? "Y" : "N"
+      ic_family.delivery_yn = deductible_person.new_born? ? "Y" : "N"
+      ic_family.partner_yn = deductible_person.spouse? ? "Y" : "N"
+      ic_family.resident_yn = "1"
+      ic_family.insu_yn = "N"
+      ic_family.medi_yn = "N"
+      ic_family.edu_yn = "N"
+      ic_family.card_yn = "N"
+      ic_family.children_yn = deductible_person.dependant_children? ? "Y" : "N"
+      ic_family.resident_national_cd = "KR"
+      ic_family
     end
   end
 end

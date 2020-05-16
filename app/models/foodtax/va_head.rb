@@ -12,7 +12,7 @@ module Foodtax
       self.biz_addr1 = business.hometax_business.address.split&.first
       self.biz_addr2 = business.hometax_business.address.split&.second
       self.cp_no = business.hometax_business.phone_number || business.owner.phone_number
-      self.tax_type = foodtax_tax_type(business.hometax_business)
+      self.tax_type = foodtax_tax_type(business.hometax_business.taxation_type)
       self.upjong_cd = business.hometax_business.classification_code if business.hometax_business.classification_code
       self.closure_yn = "Y" if business.closed_at.present?
       self.closure_dt = business.closed_at.strftime("%Y%m%d") if business.closed_at.present?
