@@ -6,7 +6,9 @@ module Foodtax
     belongs_to :ic_person, foreign_key: :person_cd
 
     def self.import_by_declare_user(declare_user)
-      self.import!(declare_user.deductible_persons
+      self.import!(
+        declare_user
+          .deductible_persons
           .to_a
           .each_with_index
           .map {| p, i | self.find_or_initialize_by_deductible_person(
