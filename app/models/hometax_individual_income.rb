@@ -77,13 +77,17 @@ class HometaxIndividualIncome < ApplicationRecord
     (decline_cards_amount * 0.05 + decline_cards_count * 5000).to_i
   end
 
+  def is_simple_ratio?
+    base_expense_rate.eql?("단순경비율")
+  end
+
   def expenses_sum_by_ratio
-    return hometax_business_incomes.sum(&:expense_by_base_ratio) if base_expense_rate.eql?("기준경비율")
-    hometax_business_incomes.sum(&:expense_by_simple_ratio)
+    return hometax_business_incomes.sum(&:expense_by_simple_ratio) if is_simple_ratio?
+    hometax_business_incomes.sum(&:expense_by_base_ratio)
   end
 
   def expenses_ratio
-    return hometax_business_incomes.first.base_ratio_self if base_expense_rate.eql?("기준경비율")
-    hometax_business_incomes.first.simple_ratio_self
+    return hometax_business_incomes.first.simple_ratio_basic if is_simple_ratio?
+    hometax_business_incomes.first.base_ratio_basic
   end
 end
