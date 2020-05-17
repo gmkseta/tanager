@@ -28,6 +28,9 @@ class DeclareUsersController < ApplicationController
 
   def update
     if @declare_user.update(declare_user_params)
+      if declare_user_params[:status]
+        SlackBot.ping("#{Rails.env.development? ? "[테스트] " : ""} *종소세* #{@declare_user.name}님 #{@declare_user.status_word} 진행완료", channel: "#labs-ops")
+      end
       render json: { declare_user: json_object }, status: :ok
     else
       render json: { errors: errors_json(@declare_user.errors) }, status: :unprocessable_entity
