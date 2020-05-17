@@ -208,4 +208,8 @@ class DeclareUser < ApplicationRecord
   def person_cd
     "P#{"%06d" % id}"
   end
+
+  def member_cd
+    "M#{"%06d" % id}"
+  end
 end

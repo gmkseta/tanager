@@ -13,10 +13,13 @@ module Foodtax
     has_one :va_pseudo_sum, foreign_key: :member_cd, primary_key: :member_cd
 
     def self.find_or_initialize_by_declare_user(declare_user)
-      cm_member = self.find_or_initialize_by(cmpy_cd: "00025", member_cd: "M#{"%06d" % declare_user.id}")
+      cm_member = self.find_or_initialize_by(
+        cmpy_cd: "00025",
+        member_cd: declare_user.member_cd
+      )
       phone_number = declare_user.user.phone_number
       business = declare_user.businesses.first
-      cm_member.member_cd = "M#{"%06d" % declare_user.id}"
+      cm_member.member_cd = declare_user.member_cd
       cm_member.biz_addr1 = business.address.split&.first
       cm_member.biz_addr2 = business.address.split&.second
       cm_member.cp_no1 = phone_number[0..2]
