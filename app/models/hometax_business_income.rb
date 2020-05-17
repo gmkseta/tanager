@@ -17,7 +17,7 @@ class HometaxBusinessIncome < ApplicationRecord
   end
 
   def expense_by_simple_ratio
-    (income_amount * (simple_ratio_self * 0.01).round(3)).to_i
+    (income_amount * (simple_ratio_basic * 0.01).round(3)).to_i
   end
 
   def is_simplified_bookkeeping?
