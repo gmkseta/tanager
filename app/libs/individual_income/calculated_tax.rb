@@ -54,6 +54,10 @@ module IndividualIncome
       @calculated_tax ||= [0, amount.to_i].max
     end
 
+    def determined_tax
+      [calculated_tax - tax_credit - tax_exemption, 0].max
+    end
+
     def calculated_tax_with_penalty
       @calculated_tax_with_penalty ||= calculated_tax + penalty_tax
     end
