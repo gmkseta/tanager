@@ -7,11 +7,11 @@ class HometaxBusinessIncome < ApplicationRecord
   RATIO_FOR_SIMPLE_EXPENSE=3.2
 
   def expense_by_base_ratio
-    default_expense_by_base_ratio = (income_amount * (base_ratio_self * 0.01).round(3)).to_i
+    default_expense_by_base_ratio = (income_amount * (base_ratio_basic * 0.01).round(3)).to_i
     calculated_expnese_base_ratio = if is_simplified_bookkeeping?
-      [(expense_by_simple_ratio * RATIO_FOR_BASE_EXPENSE).to_i, default_expense_by_base_ratio].max
+      [income_amount - (income_amount * ((100 - simple_ratio_basic) * 0.01) * RATIO_FOR_BASE_EXPENSE).to_i , default_expense_by_base_ratio].max
     else
-      [(expense_by_simple_ratio * RATIO_FOR_SIMPLE_EXPENSE).to_i, default_expense_by_base_ratio].max
+      [income_amount - (income_amount * ((100 - simple_ratio_basic) * 0.01) * RATIO_FOR_SIMPLE_EXPENSE).to_i, default_expense_by_base_ratio].max
     end
     calculated_expnese_base_ratio
   end
