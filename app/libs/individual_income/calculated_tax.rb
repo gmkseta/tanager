@@ -66,7 +66,7 @@ module IndividualIncome
         end
       end
       return online_declare_credit_amount if base_amount >= minimum_tax
-      online_declare_credit_amount - [online_declare_credit_amount, minualtax - base_amount].min
+      online_declare_credit_amount - [online_declare_credit_amount, minimum_tax - base_amount].min
     end
 
     def calculated_tax_with_penalty
