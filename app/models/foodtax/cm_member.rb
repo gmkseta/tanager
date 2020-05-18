@@ -22,9 +22,11 @@ module Foodtax
       cm_member.member_cd = declare_user.member_cd
       cm_member.biz_addr1 = business.address.split&.first
       cm_member.biz_addr2 = business.address.split&.second
-      cm_member.cp_no1 = phone_number[0..2]
-      cm_member.cp_no2 = phone_number[3..6]
-      cm_member.cp_no3 = phone_number[7..]
+      if phone_number
+        cm_member.cp_no1 = phone_number[0..2]
+        cm_member.cp_no2 = phone_number[3..6]
+        cm_member.cp_no3 = phone_number[7..]
+      end
       cm_member.boss_jumin_no = declare_user.residence_number
       cm_member.tax_type = FoodtaxHelper.foodtax_tax_type(business.taxation_type)
       cm_member.corp_yn = (business.taxation_type == "법인사업자") ? "Y" : "N"
