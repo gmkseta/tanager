@@ -12,8 +12,9 @@ class AuthController < ApplicationController
     end
     user = User.find_by(owner_id: owner.id)
     if user && user.declare_user.present?
-      if user.declare_user.status.eql?("payment") && RequestIndividualTaxReturn.call(token: user.token)
-        user.declare_user.update!(status: "done")
+      if ["payment", "declare"].any?(user.declare_user.status)
+        status = RequestIndividualTaxReturn.call(token: user.token)
+        user.declare_user.update!(status: status) if status
       end
       return render json: {
         declare_user: user.declare_user.as_json(except: DeclareUser::EXCEPT_JSON_FIELD, methods: [:hometax_address]),

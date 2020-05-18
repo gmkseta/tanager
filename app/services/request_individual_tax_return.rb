@@ -16,11 +16,12 @@ class RequestIndividualTaxReturn < Service::Base
     error_message = response.dig("errors")
     if error_message.present?
       Rails.logger.info("error_message : #{error_message}")
-      return false
+      return nil
     end
     account = response.dig("data", "account")
     status = account&.dig("individualIncomeTaxReturn", "status")
-    ["PAID", "FINISHED"].any?(status)
+    return "declare" if "PAID".eql?(status)
+    return "done" if "FINISHED".eql?(status)
   end
 end
 
