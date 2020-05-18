@@ -111,6 +111,10 @@ class DeclareUser < ApplicationRecord
     deductible_persons_sum + pensions_sum
   end
 
+  def new_born_children_or_adopted_count
+    deductible_persons.select { |p| ([2, 8].any? p.classification_id) && p.new_born? }.length
+  end
+
   def children_or_adopted_count
     deductible_persons.select { |p| [2, 8].any? p.classification_id }.length
   end
