@@ -62,6 +62,7 @@ class Snowdon::Business < Snowdon::ApplicationRecord
       user_rule = user_rules["#{h.vendor_registration_number}:#{h.purchase_type}"]
       if user_rule.present?
         merge_data[:classification_id] = user_rule.first.classification_id
+        merge_data[:deductible] = user_rule.first.deductible
         merge_data[:account_classification_code] = ''
       else
         rule = h[:vendor_classification_code].nil? ? nil : rules[h[:vendor_classification_code][0..1]]
@@ -204,7 +205,8 @@ class Snowdon::Business < Snowdon::ApplicationRecord
         business_id: id,
         registration_number: registration_number,
         classification_id: card_fee_classification.id,
-        account_classification_code: "812022"
+        account_classification_code: "812022",
+        deductible: true,
     }
   end
 
@@ -218,7 +220,8 @@ class Snowdon::Business < Snowdon::ApplicationRecord
           MAX(vendor_business_classification_code) as vendor_classification_code,
           SUM(amount) as amount,
           COUNT(*) as purchases_count,
-          'HomataxCardPurchase' as purchase_type
+          'HomataxCardPurchase' as purchase_type,
+          BOOL_AND(deductible) as deductible
         SQL
         )
   end
@@ -233,7 +236,8 @@ class Snowdon::Business < Snowdon::ApplicationRecord
           MAX(vendor_business_code) as vendor_classification_code,
           SUM(amount) as amount,
           COUNT(*) as purchases_count,
-          'HomataxPurchasesCashReceipt' as purchase_type
+          'HomataxPurchasesCashReceipt' as purchase_type,
+          TRUE as deductible
         SQL
         )
   end
@@ -248,7 +252,8 @@ class Snowdon::Business < Snowdon::ApplicationRecord
           null as vendor_classification_code,
           SUM(amount) as amount,
           COUNT(*) as purchases_count,
-          'HomataxPurchasesInvoice' as purchase_type
+          'HomataxPurchasesInvoice' as purchase_type,
+          TRUE as deductible
         SQL
         )
   end
@@ -275,7 +280,8 @@ class Snowdon::Business < Snowdon::ApplicationRecord
               ELSE 0 
             END 
           ) as purchases_count,
-          'CardPurchasesApproval' as purchase_type
+          'CardPurchasesApproval' as purchase_type,
+          FALSE as deductible
         SQL
         ).having(<<-SQL.squish)
         SUM(

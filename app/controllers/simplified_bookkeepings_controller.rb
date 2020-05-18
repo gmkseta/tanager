@@ -1,6 +1,6 @@
 class SimplifiedBookkeepingsController < ApplicationController
   before_action :authorize_request
-  before_action :set_declare_user, only: [:index, :update, :classifications, :purchase_type, :card_purchases_approvals]
+  before_action :set_declare_user, only: [:index, :update, :classifications, :purchase_type, :card_purchases_approvals, :hometax_card_purchases]
   before_action :set_simplified_bookkeeping, only: [:update]
   
   def index
@@ -64,6 +64,22 @@ class SimplifiedBookkeepingsController < ApplicationController
                    wage_sum: @declare_user.wage_sum,
                    deductible_amount: (deductible_card_sum + business_expenses_card_sum).to_i,
                    total_amount: (total_card_sum + business_expenses_card_sum).to_i,
+                   simplified_bookkeepings: @simplified_bookkeepings.as_json(methods: [:classification_name, :purchase_type_name]) }, status: :ok
+  end
+
+  def hometax_card_purchases
+    deductible_card_sum = @declare_user.simplified_bookkeepings.hometax_cards.deductibles.sum(:amount).to_i
+    total_card_sum = @declare_user.simplified_bookkeepings.hometax_cards.sum(:amount).to_i
+
+    @simplified_bookkeepings = SimplifiedBookkeeping.hometax_cards.where(declare_user_id: @declare_user.id)
+                                .paginate(page: params[:page])
+                                .includes(:classification)
+                                .order(amount: :desc)
+    render json: { total_pages: @simplified_bookkeepings.total_pages,
+                   next_page: @simplified_bookkeepings.next_page,
+                   wage_sum: @declare_user.wage_sum,
+                   deductible_amount: (deductible_card_sum).to_i,
+                   total_amount: (total_card_sum).to_i,
                    simplified_bookkeepings: @simplified_bookkeepings.as_json(methods: [:classification_name, :purchase_type_name]) }, status: :ok
   end
 

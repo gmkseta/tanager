@@ -20,6 +20,7 @@ Rails.application.routes.draw do
       get 'classifications'
       get 'purchase_type'
       get 'card_purchases_approvals'
+      get 'hometax_card_purchases'
     end
   end
   resources :classifications do
