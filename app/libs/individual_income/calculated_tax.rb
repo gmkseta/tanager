@@ -98,7 +98,7 @@ module IndividualIncome
     end
 
     def limited_local_tax_credit
-      [calculated_local_tax_with_penalty, (tax_credit * 0.1).round(3).to_i].min
+      [calculated_local_tax_with_penalty, ((tax_credit + online_declare_credit_amount) * 0.1).round(3).to_i].min
     end
 
     def limited_local_tax_exemption

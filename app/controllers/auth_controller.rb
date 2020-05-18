@@ -11,10 +11,11 @@ class AuthController < ApplicationController
       return render json: { errors: "Not found user" }, status: :not_found
     end
     user = User.find_by(owner_id: owner.id)
-    return render json: { declare_user: user.declare_user.as_json(except: DeclareUser::EXCEPT_JSON_FIELD, methods: [:hometax_address]),
-                   jwt: user.jwt.token,
-                   status: user.declare_user.status
-                 }, status: :ok if user && user.declare_user.present?
+    return render json: {
+      declare_user: user.declare_user.as_json(except: DeclareUser::EXCEPT_JSON_FIELD, methods: [:hometax_address]),
+      jwt: user.jwt.token,
+      status: user.declare_user.status
+    }, status: :ok if user && user.declare_user.present?
     user ||= CreateUser.call(owner: owner, token: token)
     return render json: { errors: "Not found hometax businesses" }, status: :not_found if !user
     hometax_individual_incomes = HometaxIndividualIncome.where(owner_id: user.owner_id)
@@ -29,7 +30,11 @@ class AuthController < ApplicationController
         name: hometax_individual_incomes.last.name,
         hometax_account: hometax_individual_incomes.last.hometax_account,
       )
-      render json: { status: "empty", declare_user: declare_user, jwt: user.jwt.token }, status: :ok
+      render json: {
+        status: "empty",
+        declare_user: declare_user.as_json(except: DeclareUser::EXCEPT_JSON_FIELD, methods: [:hometax_address]),
+        jwt: user.jwt.token
+      }, status: :ok
     end
   end
 

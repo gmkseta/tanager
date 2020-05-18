@@ -18,9 +18,9 @@ class CalculatedTaxesController < ApplicationController
 
   def deductions
     render json: {
-      total_amount: @declare_user.deductible_persons.sum(&:deduction_amount) + @declare_user.deduction_amount + @declare_user.pensions_sum,
+      total_amount: @declare_user.income_deduction,
       personal_deduction: {
-        total_amount: @declare_user.deductible_persons.sum(&:deduction_amount) + @declare_user.deduction_amount,
+        total_amount: @declare_user.deductible_persons_sum,
         self_count: 1,
         self_base_amount: 1500000,
         spouse_count: @declare_user.deductible_persons.select {|s| s.spouse? }.length,
@@ -48,7 +48,7 @@ class CalculatedTaxesController < ApplicationController
 
   def tax_credits
     render json: {
-      total_amount: @declare_user.tax_credit_amount,
+      total_amount: @declare_user.calculated_tax.limited_tax_credit,
       tax_credits: @declare_user.as_json(
         only: [],
         methods: DeclareUser::CREDIT_METHODS
