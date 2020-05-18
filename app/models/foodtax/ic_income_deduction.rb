@@ -108,6 +108,7 @@ module Foodtax
           "F29"
         )
         personal_deduction.create_deduction(personal_deduction_amount, 0, 0)
+        Foodtax::IcPensionIncomeDeduction.create_personal_pension(declare_user)
       end
 
       national_pension_deduction_amount = declare_user

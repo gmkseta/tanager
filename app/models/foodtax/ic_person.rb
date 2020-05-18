@@ -6,11 +6,11 @@ module Foodtax
 
     has_many :ic_families, class_name: "IcFamily", foreign_key: [:cmpy_cd, :person_cd]
 
-    def self.find_or_initialize_by_declare_user(declare_user, member_cd)
+    def self.find_or_initialize_by_declare_user(declare_user)
       ic_person = self.find_or_initialize_by(
         cmpy_cd: "00025",
         person_cd: declare_user.person_cd,
-        member_cd: member_cd
+        member_cd: declare_user.member_cd,
       )
       ic_person.jumin_no = declare_user.residence_number
       ic_person.name = declare_user.name
