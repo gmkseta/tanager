@@ -79,7 +79,7 @@ class DeclareUsersController < ApplicationController
     default_message = "*종소세* #{@declare_user.name}님"
     default_message = "[테스트] #{default_message}" if Rails.env.development?
     SlackBot.ping("#{default_message} #{@declare_user.status_word} 진행완료", channel: "#tax-ops")
-    if @declare_user.status.eql?("confirm")
+    if @declare_user.status.eql?("payment")
       SlackBot.ping("✅ #{default_message} 납부세액 : #{@declare_user.calculated_tax.payment_tax}", channel: "#tax-ops")
     end
   end

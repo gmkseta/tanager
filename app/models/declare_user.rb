@@ -3,8 +3,8 @@ class DeclareUser < ApplicationRecord
   include PersonalDeduction
   include TaxCreditCalculator
 
-  enum status: %i(empty user deductible_persons business_expenses confirm payment done)
-  STATUS_WORDS = %w(캐시노트로부터진입 유저생성 인적공제 경비확인 신고확인 결제요청 끝!)
+  enum status: %i(empty user deductible_persons business_expenses confirm payment declare done)
+  STATUS_WORDS = %w(캐시노트로부터진입 유저생성 인적공제 경비확인 신고확인 결제요청 신고진행중 끝)
   EXCEPT_JSON_FIELD = %i(user_id encrypted_residence_number encrypted_residence_number_iv hometax_account)
   CREDIT_METHODS = %i(base_tax_credit_amount online_declare_credit_amount children_tax_credit_amount newborn_baby_tax_credit_amount pension_account_tax_credit_amount retirement_pension_tax_credit_amount)
 
@@ -109,6 +109,10 @@ class DeclareUser < ApplicationRecord
 
   def income_deduction
     deductible_persons_sum + pensions_sum
+  end
+
+  def new_born_children_or_adopted_count
+    deductible_persons.select { |p| ([2, 8].any? p.classification_id) && p.new_born? }.length
   end
 
   def children_or_adopted_count
