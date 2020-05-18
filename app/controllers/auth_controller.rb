@@ -1,25 +1,26 @@
 class AuthController < ApplicationController
   def status
     if token.blank?
-      SlackBot.ping("#{Rails.env.development? ? "[테스트] " : ""} ⚠️*세금신고오류* 신고불가: 토큰 전달안됨", channel: "#labs-ops")
+      SlackBot.ping("#{Rails.env.development? ? "[테스트] " : ""} ⚠️*세금신고오류* 신고불가: 토큰 전달안됨", channel: "#tax-ops")
       return render json: { errors: "jwt not available" }, status: :unauthorized
     end
     owner = ValidateOwner.call(token: token)
     if owner.blank?
-      SlackBot.ping("#{Rails.env.development? ? "[테스트] " : ""} ⚠️*세금신고오류* 신고불가: 캐시노트 유저 확인 불가", channel: "#labs-ops")
+      SlackBot.ping("#{Rails.env.development? ? "[테스트] " : ""} ⚠️*세금신고오류* 신고불가: 캐시노트 유저 확인 불가", channel: "#tax-ops")
       Rails.logger.info "Not found user token: #{token}"
       return render json: { errors: "Not found user" }, status: :not_found
     end
     user = User.find_by(owner_id: owner.id)
-    return render json: { declare_user: user.declare_user.as_json(except: DeclareUser::EXCEPT_JSON_FIELD, methods: [:hometax_address]),
-                   jwt: user.jwt.token,
-                   status: user.declare_user.status
-                 }, status: :ok if user && user.declare_user.present?
+    return render json: {
+      declare_user: user.declare_user.as_json(except: DeclareUser::EXCEPT_JSON_FIELD, methods: [:hometax_address]),
+      jwt: user.jwt.token,
+      status: user.declare_user.status
+    }, status: :ok if user && user.declare_user.present?
     user ||= CreateUser.call(owner: owner, token: token)
     return render json: { errors: "Not found hometax businesses" }, status: :not_found if !user
     hometax_individual_incomes = HometaxIndividualIncome.where(owner_id: user.owner_id)
     if hometax_individual_incomes.blank?
-      SlackBot.ping("#{Rails.env.development? ? "[테스트] " : ""} ⚠️*세금신고오류* #{user.name}님 - 신고불가: 홈택스 종소세 안내문 없음", channel: "#labs-ops")
+      SlackBot.ping("#{Rails.env.development? ? "[테스트] " : ""} ⚠️*세금신고오류* #{user.name}님 - 신고불가: 홈택스 종소세 안내문 없음", channel: "#tax-ops")
       user.destroy
       return render json: { errors: "hometax not available" }, status: :not_found
     else
@@ -29,7 +30,11 @@ class AuthController < ApplicationController
         name: hometax_individual_incomes.last.name,
         hometax_account: hometax_individual_incomes.last.hometax_account,
       )
-      render json: { status: "empty", declare_user: declare_user, jwt: user.jwt.token }, status: :ok
+      render json: {
+        status: "empty",
+        declare_user: declare_user.as_json(except: DeclareUser::EXCEPT_JSON_FIELD, methods: [:hometax_address]),
+        jwt: user.jwt.token
+      }, status: :ok
     end
   end
 

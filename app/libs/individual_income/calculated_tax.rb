@@ -54,12 +54,27 @@ module IndividualIncome
       @calculated_tax ||= [0, amount.to_i].max
     end
 
+    def online_declare_credit_amount
+      return 0 if calculated_tax <= 0
+      online_declare_credit_amount = 20000
+      base_amount = calculated_tax - online_declare_credit_amount
+      minimum_tax = begin
+        if calculated_tax <= 30000000
+          (calculated_tax * 0.35).to_i
+        else
+          (10500000 + (calculated_tax - 30000000) * 0.45).to_i
+        end
+      end
+      return online_declare_credit_amount if base_amount >= minimum_tax
+      online_declare_credit_amount - [online_declare_credit_amount, minimum_tax - base_amount].min
+    end
+
     def calculated_tax_with_penalty
       @calculated_tax_with_penalty ||= calculated_tax + penalty_tax
     end
 
     def limited_tax_credit
-      [calculated_tax_with_penalty, tax_credit].min
+      [calculated_tax_with_penalty, tax_credit + online_declare_credit_amount].min
     end
 
     def limited_tax_exemption
@@ -83,7 +98,7 @@ module IndividualIncome
     end
 
     def limited_local_tax_credit
-      [calculated_local_tax_with_penalty, (tax_credit * 0.1).round(3).to_i].min
+      [calculated_local_tax_with_penalty, ((tax_credit + online_declare_credit_amount) * 0.1).round(3).to_i].min
     end
 
     def limited_local_tax_exemption

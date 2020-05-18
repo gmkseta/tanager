@@ -30,7 +30,7 @@ class HometaxController < ApplicationController
       if results.dig("result", "message").present?
         message = results.dig("result", "message")
         Rails.logger.info("updateIndividualIncomeTaxReturnProxyAvailability message : #{message}")
-        SlackBot.ping("#{Rails.env.development? ? "[테스트] " : ""} *종소세 데이터 오류* #{message}", channel: "#labs-ops")
+        SlackBot.ping("#{Rails.env.development? ? "[테스트] " : ""} *종소세 데이터 오류* #{message}", channel: "#tax-ops")
       end
       head :ok
     else

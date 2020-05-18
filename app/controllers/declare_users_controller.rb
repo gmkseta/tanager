@@ -28,9 +28,7 @@ class DeclareUsersController < ApplicationController
 
   def update
     if @declare_user.update(declare_user_params)
-      if declare_user_params[:status]
-        SlackBot.ping("#{Rails.env.development? ? "[테스트] " : ""} *종소세* #{@declare_user.name}님 #{@declare_user.status_word} 진행완료", channel: "#labs-ops")
-      end
+      send_slack_status if declare_user_params[:status]
       render json: { declare_user: json_object }, status: :ok
     else
       render json: { errors: errors_json(@declare_user.errors) }, status: :unprocessable_entity
@@ -56,7 +54,7 @@ class DeclareUsersController < ApplicationController
 
   def status
     if @declare_user.update(status: params[:status])
-      SlackBot.ping("#{Rails.env.development? ? "[테스트] " : ""} *종소세* #{@declare_user.name}님 #{@declare_user.status_word} 진행완료", channel: "#labs-ops")
+      send_slack_status
       render json: { declare_user: json_object }, status: :ok
     else
       render json: { errors: errors_json(@declare_user.errors) }, status: :unprocessable_entity
@@ -75,5 +73,14 @@ class DeclareUsersController < ApplicationController
 
   def json_object
     @declare_user.as_json(except: DeclareUser::EXCEPT_JSON_FIELD, methods: [:hometax_address])
+  end
+
+  def send_slack_status
+    default_message = "*종소세* #{@declare_user.name}님"
+    default_message = "[테스트] #{default_message}" if Rails.env.development?
+    SlackBot.ping("#{default_message} #{@declare_user.status_word} 진행완료", channel: "#tax-ops")
+    if @declare_user.status.eql?("confirm")
+      SlackBot.ping("✅ #{default_message} 납부세액 : #{@declare_user.calculated_tax.payment_tax}", channel: "#tax-ops")
+    end
   end
 end

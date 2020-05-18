@@ -124,12 +124,15 @@ class DeclareUser < ApplicationRecord
   end
 
   def online_declare_credit_amount
-    0
+    if apply_bookkeeping?
+      @calculated_tax_by_bookkeeping.online_declare_credit_amount
+    else
+      @calculated_tax_by_ratio.online_declare_credit_amount
+    end
   end
 
   def tax_credit_amount
     base_tax_credit_amount +
-      online_declare_credit_amount +
       children_tax_credit_amount +
       newborn_baby_tax_credit_amount +
       pension_account_tax_credit_amount +
@@ -173,7 +176,12 @@ class DeclareUser < ApplicationRecord
   end
 
   def apply_bookkeeping?
-    calculated_tax_by_bookkeeping.payment_tax > calculated_tax_by_ratio.payment_tax
+    calculated_tax_by_bookkeeping.payment_tax < calculated_tax_by_ratio.payment_tax
+  end
+
+  def calculated_tax
+    return calculated_tax_by_bookkeeping if apply_bookkeeping?
+    calculated_tax_by_ratio
   end
 
   def snowdon_businesses
@@ -195,5 +203,13 @@ class DeclareUser < ApplicationRecord
 
   def total_deduction_amount
     deductible_persons.sum(&:deduction_amount) + deduction_amount + pensions_sum
+  end
+
+  def person_cd
+    "P#{"%06d" % id}"
+  end
+
+  def member_cd
+    "M#{"%06d" % id}"
   end
 end
