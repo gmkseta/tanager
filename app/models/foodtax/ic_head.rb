@@ -60,13 +60,13 @@ module Foodtax
 
       ic_head.resident_yn = "Y"
       ic_head.resident_national_cd = "KR"
-      ic_head.foreign_yn = declare_user.is_local? ? "Y" : "N"
+      ic_head.foreign_yn = declare_user.is_local? ? "N" : "Y"
       ic_head.foregn_simple_rate_yn = "N"
       ic_head.employ_yn = "N"
       ic_head.house_nonsep_force_yn = "N"
-      ic_head.house_lease_sep_yn = "N"
+      ic_head.house_lease_sep_yn = "X"
       ic_head.house_cnt = "0"
-      ic_head.std_tax_deduct_yn = "Y"
+      ic_head.std_tax_deduct_yn = "N"
 
       ic_head.biz_income_amt = declare_user.business_incomes_sum
       ic_head.salary_sale_amt = "0"
