@@ -5,9 +5,16 @@ module TaxCreditCalculator
   end
 
   def newborn_baby_tax_credit_amount
-    return 0 unless new_born?
-    return 300000 if children_or_adopted_count <= 1
-    return 500000 if children_or_adopted_count <= 2
+    return 0 if new_born_children_or_adopted_count <= 0
+    base_born_order = children_or_adopted_count - new_born_children_or_adopted_count
+    amount = new_born_children_or_adopted_count
+      .times.each_with_index
+      .map { |child, index| newborn_credit_amount(base_born_order + index) }.sum
+  end
+
+  def newborn_credit_amount(born_order)
+    return 300000 if born_order <= 0
+    return 500000 if born_order <= 1
     return 700000
   end
 

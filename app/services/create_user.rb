@@ -6,7 +6,7 @@ class CreateUser < Service::Base
     user = ActiveRecord::Base.transaction do
       businesses = owner.businesses.joins(:hometax_business)
       if businesses.blank?
-        SlackBot.ping("#{Rails.env.development? ? "[테스트] " : ""} *세금신고오류* #{owner.name}님 - 신고불가: 홈택스 사업장 데이터 없음)", channel: "#labs-ops")
+        SlackBot.ping("#{Rails.env.development? ? "[테스트] " : ""} *세금신고오류* #{owner.name}님 - 신고불가: 홈택스 사업장 데이터 없음)", channel: "#tax-ops")
         return nil
       end
       user = User.create!(
@@ -37,7 +37,7 @@ class CreateUser < Service::Base
           closed_at: b.closed_at,
         )
       end
-      SlackBot.ping("#{Rails.env.development? ? "[테스트] " : ""} *종소세* #{user.name} 종소세 진입", channel: "#labs-ops")
+      SlackBot.ping("#{Rails.env.development? ? "[테스트] " : ""} *종소세* #{user.name} 종소세 진입", channel: "#tax-ops")
       user
     end
   end
