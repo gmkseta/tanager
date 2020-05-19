@@ -4,6 +4,9 @@ class BusinessExpense < ApplicationRecord
   belongs_to :expense_classification, class_name: "Classification", foreign_key: :expense_classification_id
   belongs_to :account_classification, class_name: "Classification", foreign_key: :account_classification_id, optional: true
 
+  scope :paper_invoices_receipts, ->{ where(expense_classification_id: [18, 19]) }
+  scope :paper_and_personal_cards, ->{ where(expense_classification_id: [18, 19, 53]) }
+
   validate :expense_classification_id, :validate_unique_expense?, on: :create
   validates :expense_classification_id, presence: true, inclusion: { in: Classification.business_expenses.ids + Classification.personal_cards.ids, message: :invalid_type }
   validates :account_classification_id, inclusion: { in: Classification.account_classifications.ids, message: :invalid_type }, allow_nil: true
@@ -11,6 +14,11 @@ class BusinessExpense < ApplicationRecord
   validates :amount, presence: true, numericality: { greater_than_or_equal_to: 0, message: :greater_than_or_equal_to_zero }
   validates :vendor_registration_number, format: { with: /\A\d{10}\z/ }, allow_nil: true
   validates :issued_at, inclusion: { in: 1.year.ago.all_year, message: :wrong_date }, allow_nil: true
+
+  PERSONAL_CARD_CLASSIFICATION_ID = 53
+  LOCAL_INSURANCE_CLASSIFICATION_ID = 20
+  BUSINESS_INSURANCE_CLASSIFICATION_ID = 17
+  WAGE_CLASSIFICATION_ID = 14
 
   def validate_unique_expense?
     return false if Classification::EXPENSE_INVOICE_CLASSIFICATION.any?(expense_classification_id)
