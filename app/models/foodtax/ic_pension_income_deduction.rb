@@ -19,6 +19,12 @@ module Foodtax
       ic_pension_income_deduction
     end
 
+    def self.import(declare_user)
+      self.create_personal_pension(declare_user) if declare_user.hometax_individual_income.personal_pension
+      self.create_pension_retirement(declare_user) if declare_user.hometax_individual_income.retirement_pension_tax_credit
+      self.create_pension_account(declare_user) if declare_user.hometax_individual_income.pension_account_tax_credit
+    end
+
     def self.create_personal_pension(declare_user)
       ic_pension_income_deduction = self.find_or_initialize_by_declare_user(declare_user, "21")
       if ic_pension_income_deduction.new_record?
