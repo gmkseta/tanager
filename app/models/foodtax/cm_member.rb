@@ -41,6 +41,10 @@ module Foodtax
       cm_member.uptae = division if division.present?
       cm_member.jongmok = business.hometax_classification_name
       cm_member.upjong_cd = business.hometax_classification_code
+      cm_member.bank_cd = ""
+      cm_member.acct_no = ""
+      cm_member.bangi_yn = "X"
+      cm_member.biz_yn = "Y"
       cm_member
     end
 
