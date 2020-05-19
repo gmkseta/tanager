@@ -3,22 +3,20 @@ module Foodtax
     include FoodtaxHelper
     self.primary_keys = :cmpy_cd, :person_cd, :term_cd, :declare_seq, :seq_no
 
-    belongs_to :ic_person, foreign_key: :person_cd
+    belongs_to :ic_person, foreign_key: :person_cd, primary_key: :person_cd
 
     def self.import_by_declare_user(declare_user)
-      self.import!(
-        declare_user
-          .deductible_persons
-          .to_a
-          .each_with_index
-          .map {| p, i | self.find_or_initialize_by_deductible_person(
-            p,
-            declare_user.person_cd,
-            "#{1.year.ago.year}",
-            "1",
-            "#{i + 1}")
-        }
-      )
+      declare_user
+        .deductible_persons
+        .to_a
+        .each_with_index
+        .map {| p, i | self.find_or_initialize_by_deductible_person(
+          p,
+          declare_user.person_cd,
+          "#{1.year.ago.year}",
+          "1",
+          "#{i + 1}").save!
+      }
     end
 
     def self.find_or_initialize_by_deductible_person(deductible_person,
@@ -30,7 +28,8 @@ module Foodtax
           cmpy_cd: "00025",
           person_cd: person_cd,
           term_cd: term_cd,
-          declare_seq: declare_seq)
+          declare_seq: declare_seq,
+          seq_no: seq_no)
       ic_family.seq_no = seq_no
       ic_family.jumin_no = deductible_person.residence_number
       ic_family.name = deductible_person.name
@@ -43,7 +42,7 @@ module Foodtax
       ic_family.oneparent_yn = deductible_person.single_parent? ? "Y" : "N"
       ic_family.native_cd = "1"
       ic_family.basic_yn = deductible_person.basic_yn? ? "Y" : "N"
-      ic_family.delivery_yn = deductible_person.new_born? ? "Y" : "N"
+      ic_family.delivery_yn = deductible_person.new_born? ? "#{declare_user.new_born_children_or_adopted_count}" : "0"
       ic_family.partner_yn = deductible_person.spouse? ? "Y" : "N"
       ic_family.resident_yn = "1"
       ic_family.insu_yn = "N"
