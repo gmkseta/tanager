@@ -16,7 +16,9 @@ class Classification < ApplicationRecord
   def self.with_amount(classifications, results, declare_user_id)
     classifications.each do |c|
       c["amount"] = results[c["id"]] || 0
-      c["amount"] += BusinessExpense.personal_cards_sum(declare_user_id) if c["id"].eql?(Classification::PERSONAL_CARD_CLASSIFICATION_ID)
+      c["amount"] += BusinessExpense.personal_cards_sum(
+          declare_user_id
+        ) if Classification::PERSONAL_CARD_CLASSIFICATION_ID.eql?(c["id"])
     end
     classifications
   end
