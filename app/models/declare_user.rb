@@ -209,6 +209,32 @@ class DeclareUser < ApplicationRecord
     deductible_persons.sum(&:deduction_amount) + deduction_amount + pensions_sum
   end
 
+  def merged_bookkeepings
+    classifications_with_business_expenses = Classification.with_amount(
+      Classification.business_expenses.as_json,
+      business_expenses.group(:expense_classification_id).sum(:amount),
+      id,
+    )
+
+    classifications_with_bookkeepings = Classification.with_amount(
+      Classification.account_classifications.as_json,
+      simplified_bookkeepings.deductibles.group(:classification_id).sum(:amount),
+      id,
+    )
+
+    classifications_with_paper_and_personal_cards = Classification.with_amount(
+      Classification.account_classifications.as_json,
+      business_expenses.paper_and_personal_cards.group(:account_classification_id).sum(:amount),
+      id,
+    )
+
+    merged_bookkeepings = IndividualIncome::MergedBookkeeping.new(
+      classifications_with_business_expenses: classifications_with_business_expenses,
+      classifications_with_bookkeepings: classifications_with_bookkeepings,
+      classifications_with_paper_and_personal_cards: classifications_with_paper_and_personal_cards
+    )
+  end
+
   def person_cd
     "P#{"%06d" % id}"
   end
