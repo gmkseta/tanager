@@ -68,7 +68,7 @@ module FoodtaxHelper
       "20"
     elsif declare_user.hometax_individual_income.base_expense_rate.eql?("기준경비율")
       "31"
-    elsif declare_user.hometax_individual_income.base_expense_rate.eql?("기준경비율")
+    elsif declare_user.hometax_individual_income.base_expense_rate.eql?("단순경비율")
       "32"
     end
   end
