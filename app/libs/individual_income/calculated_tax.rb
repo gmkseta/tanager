@@ -54,6 +54,10 @@ module IndividualIncome
       @calculated_tax ||= [0, amount.to_i].max
     end
 
+    def determined_tax
+      [calculated_tax - limited_tax_credit - tax_exemption, 0].max
+    end
+
     def online_declare_credit_amount
       return 0 if calculated_tax <= 0
       online_declare_credit_amount = 20000
@@ -79,6 +83,10 @@ module IndividualIncome
 
     def limited_tax_exemption
       [calculated_tax_with_penalty - limited_tax_credit, tax_exemption].min
+    end
+
+    def determined_tax
+      [calculated_tax - limited_tax_credit - limited_tax_exemption, 0].max
     end
 
     def payment_tax
@@ -127,6 +135,7 @@ module IndividualIncome
         penalty_tax: penalty_tax,
         prepaid_tax: prepaid_tax,
         payment_tax: payment_tax,
+        determined_tax: determined_tax,
         payment_local_tax: payment_local_tax,
       }.as_json
     end

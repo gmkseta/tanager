@@ -16,6 +16,10 @@ class DeductiblePerson < ApplicationRecord
     classification_id == 1
   end
 
+  def basic_yn?
+    classification_id == 8
+  end
+
   def single_parent?
     single_parent
   end
