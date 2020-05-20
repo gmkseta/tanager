@@ -11,7 +11,7 @@ class AuthController < ApplicationController
       return render json: { errors: "Not found user" }, status: :not_found
     end
     user = User.find_by(owner_id: owner.id)
-    if user && user.declare_user.present?
+    if user && !user.declare_user.nil?
       if ["payment", "declare"].any?(user.declare_user.status)
         status = RequestIndividualTaxReturn.call(token: user.token)
         user.declare_user.update!(status: status) if status
