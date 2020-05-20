@@ -11,8 +11,8 @@ module Foodtax
       ic_simplerate = self.find_or_initialize_by(
         cmpy_cd: "00025",
         person_cd: declare_user.person_cd,
-        term_cd: "#{1.year.ago.year}"
-        declare_seq: "1"
+        term_cd: "#{1.year.ago.year}",
+        declare_seq: "1",
         income_seq_no: "1"
       )
 
@@ -31,5 +31,6 @@ module Foodtax
       ic_simplerate.cost_amt = declare_user.expenses_sum_by_ratio
       ic_simplerate.income_amt = declare_user.total_income_amount
       ic_simplerate
+    end
   end
 end
