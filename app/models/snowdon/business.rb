@@ -147,7 +147,7 @@ class Snowdon::Business < Snowdon::ApplicationRecord
       end
     else
       matched, others = results.partition {|row| row[:classification_id] == welfare.id }
-      matched_sum = matched.map{|r| r[:amount]}.reduce(:+)
+      matched_sum = matched.sum {|r| r[:amount] }
 
       ratio = matched_sum / wage.to_f
 

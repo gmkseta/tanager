@@ -120,7 +120,9 @@ class DeclareUser < ApplicationRecord
   end
 
   def deductible_children_size
-    deductible_persons.select { |p| (p.age >= 7 && p.age <= 20) || p.disabled }.length
+    deductible_persons.select { |p|
+      ([2, 8].any? p.classification_id) && ((p.age >= 7 && p.age <= 20) || p.disabled)
+    }.length
   end
 
   def base_tax_credit_amount
