@@ -81,13 +81,37 @@ class HometaxIndividualIncome < ApplicationRecord
     base_expense_rate.eql?("단순경비율")
   end
 
-  def expenses_sum_by_ratio
-    return hometax_business_incomes.sum(&:expense_by_simple_ratio) if is_simple_ratio?
+  def base_ratio_self
+    hometax_business_incomes.first.base_ratio_self
+  end
+
+  def base_ratio_basic
+    hometax_business_incomes.first.base_ratio_basic
+  end
+
+  def simple_ratio_self
+    hometax_business_incomes.first.simple_ratio_self
+  end
+
+  def simple_ratio_basic
+    hometax_business_incomes.first.simple_ratio_basic
+  end
+
+  def expenses_sum_by_base_ratio
     hometax_business_incomes.sum(&:expense_by_base_ratio)
   end
 
+  def expenses_sum_by_simple_ratio
+    hometax_business_incomes.sum(&:expense_by_simple_ratio)
+  end
+
+  def expenses_sum_by_ratio
+    return expenses_sum_by_simple_ratio if is_simple_ratio?
+    expenses_sum_by_base_ratio
+  end
+
   def expenses_ratio
-    return hometax_business_incomes.first.simple_ratio_basic if is_simple_ratio?
-    hometax_business_incomes.first.base_ratio_basic
+    return simple_ratio_basic if is_simple_ratio?
+    base_ratio_basic
   end
 end
