@@ -5,7 +5,7 @@ module Foodtax
 
     self.table_name = "ic_simplerate"
 
-    belongs_to :cm_member, foreign_key: :member_cd, primary_key: :member_cd
+    belongs_to :ic_person, foreign_key: :person_cd, primary_key: :person_cd
 
     def self.find_or_initialize_by_declare_user(declare_user, cm_member)
       ic_simplerate = self.find_or_initialize_by(
@@ -24,11 +24,11 @@ module Foodtax
       ic_simplerate.upjong_nm = cm_member.jongmok
       ic_simplerate.jata_type = "T"
 
-      ic_simplerate.jaga_rate = declare_user.base_ratio_self
-      ic_simplerate.taga_rate = declare_user.base_ratio_basic
+      ic_simplerate.jaga_rate = declare_user.hometax_individual_income.base_ratio_self
+      ic_simplerate.taga_rate = declare_user.hometax_individual_income.base_ratio_basic
 
-      ic_simplerate.sale_amt = declare_user.business_income_sum
-      ic_simplerate.cost_amt = declare_user.expenses_sum_by_ratio
+      ic_simplerate.sale_amt = declare_user.business_incomes_sum
+      ic_simplerate.cost_amt = declare_user.hometax_individual_income.expenses_sum_by_ratio
       ic_simplerate.income_amt = declare_user.total_income_amount
       ic_simplerate
     end
