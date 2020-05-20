@@ -81,6 +81,10 @@ module IndividualIncome
       [calculated_tax_with_penalty - limited_tax_credit, tax_exemption].min
     end
 
+    def determined_tax
+      [calculated_tax - limited_tax_credit - limited_tax_exemption, 0].max
+    end
+
     def payment_tax
       @payment_tax ||= [(calculated_tax_with_penalty - limited_tax_credit - limited_tax_exemption), 0].max - prepaid_tax
     end
@@ -127,6 +131,7 @@ module IndividualIncome
         penalty_tax: penalty_tax,
         prepaid_tax: prepaid_tax,
         payment_tax: payment_tax,
+        determined_tax: determined_tax,
         payment_local_tax: payment_local_tax,
       }.as_json
     end
