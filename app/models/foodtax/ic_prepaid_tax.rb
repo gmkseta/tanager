@@ -4,6 +4,8 @@ module Foodtax
     self.primary_keys = :cmpy_cd, :person_cd, :term_cd, :declare_seq
     self.table_name = "ic_1100"
 
+    after_initialize :initialize_rural_taxes
+
     belongs_to :ic_person, foreign_key: :person_cd, primary_key: :person_cd
 
     def self.find_or_initialize_by_declare_user(declare_user)
@@ -37,10 +39,10 @@ module Foodtax
     private
 
     def initialize_rural_taxes
-      prepaid_tax.C0120 = 0
-      prepaid_tax.C0130 = 0
-      prepaid_tax.C0140 = 0
-      prepaid_tax.C0150 = 0
+      self.C0120 = 0
+      self.C0130 = 0
+      self.C0140 = 0
+      self.C0150 = 0
     end
   end
 end
