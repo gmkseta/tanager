@@ -46,12 +46,22 @@ class CreateIncomeFoodtax < Service::Base
         declare_user
       )
 
-      ic_simplified_bookkeeping = Foodtax::IcSimplifiedBookkeeping.import(
-        declare_user,
-        cm_member,
-        ic_person,
-        declare_user.merged_bookkeepings
-      )
+      if declare_user.apply_bookkeeping?
+        ic_simplified_bookkeeping = Foodtax::IcSimplifiedBookkeeping.import(
+          declare_user,
+          cm_member,
+          ic_person,
+          declare_user.merged_bookkeepings
+        )
+      else
+        if declare_user.hometax_individual_income.is_simple_ratio?
+          ic_simplerate = Foodtax::IcSimplerate.find_or_initialize_by_declare_user(
+            declare_user,
+            cm_member
+          )
+          ic_simplerate.save!
+        end
+      end
     end
   end
 end
