@@ -18,7 +18,7 @@ module Foodtax
       ic_tax_credit_exemption
     end
 
-    def self.import_credit_exemption(declare_user)
+    def self.import(declare_user)
       index = 1
       if declare_user.base_tax_credit_amount > 0
         base_tax_credit = self.find_or_initialize_by_declare_user(

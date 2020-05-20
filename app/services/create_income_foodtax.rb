@@ -11,7 +11,7 @@ class CreateIncomeFoodtax < Service::Base
       ic_person = Foodtax::IcPerson.find_or_initialize_by_declare_user(declare_user)
       ic_person.save!
 
-      ic_family = Foodtax::IcFamily.import_by_declare_user(declare_user)
+      ic_family = Foodtax::IcFamily.import(declare_user)
 
       ic_head = Foodtax::IcHead.find_or_initialize_by_declare_user(
         ic_person,

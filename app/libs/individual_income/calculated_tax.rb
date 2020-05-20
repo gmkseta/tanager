@@ -55,7 +55,7 @@ module IndividualIncome
     end
 
     def determined_tax
-      [calculated_tax - tax_credit - tax_exemption, 0].max 
+      [calculated_tax - limited_tax_credit -  , 0].max
     end
 
     def online_declare_credit_amount
