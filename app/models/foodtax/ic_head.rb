@@ -68,10 +68,11 @@ module Foodtax
       ic_head.house_cnt = "0"
       ic_head.std_tax_deduct_yn = "N"
 
-      ic_head.biz_income_amt = declare_user.business_incomes_sum
+      ic_head.biz_income_amt = [declare_user.total_income_amount, 0].max
       ic_head.salary_sale_amt = "0"
-      ic_head.total_sale_amt = declare_user.expenses_sum
-      ic_head.income_amt = declare_user.total_income_amount
+      ic_head.total_sale_amt = declare_user.business_incomes_sum
+      ic_head.income_amt = [declare_user.total_income_amount, 0].max
+
       ic_head.deduct_amt = declare_user.total_deduction_amount
       ic_head.income_standard_amt = calculated_tax.base_taxation
       ic_head.income_rate = calculated_tax.tax_rate
