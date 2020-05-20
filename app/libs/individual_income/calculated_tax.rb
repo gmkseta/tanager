@@ -54,6 +54,10 @@ module IndividualIncome
       @calculated_tax ||= [0, amount.to_i].max
     end
 
+    def determined_tax
+      [calculated_tax - limited_tax_credit - tax_exemption, 0].max
+    end
+
     def online_declare_credit_amount
       return 0 if calculated_tax <= 0
       online_declare_credit_amount = 20000

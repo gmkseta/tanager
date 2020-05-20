@@ -23,9 +23,9 @@ module FoodtaxHelper
     end
   end
 
-  def foodtax_tax_type(business)
-    if business.taxation_type == "간이과세자" then 2
-    elsif business.taxation_type == "면세사업자" then 3
+  def self.foodtax_tax_type(taxation_type)
+    if taxation_type == "간이과세자" then 2
+    elsif taxation_type == "면세사업자" then 3
     else 1
     end
   end
@@ -61,5 +61,26 @@ module FoodtaxHelper
 
   def tax_declare_due_date(year: tax_declare_year, term: tax_declare_term)
     (term == 1) ? "#{year}0131" : "#{year}1231"
+  end
+
+  def self.gijang_declare_type(declare_user)
+    if declare_user.apply_bookkeeping?
+      "20"
+    elsif declare_user.hometax_individual_income.base_expense_rate.eql?("기준경비율")
+      "31"
+    elsif declare_user.hometax_individual_income.base_expense_rate.eql?("단순경비율")
+      "32"
+    end
+  end
+
+  def self.gijang_duty_type(declare_user)
+    case declare_user.hometax_individual_income.account_type
+    when "간편장부대상자"
+      "02"
+    when "복식부기의무자"
+      "01"
+    else
+      "03"
+    end
   end
 end

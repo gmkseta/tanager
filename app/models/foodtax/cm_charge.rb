@@ -6,6 +6,15 @@ module Foodtax
 
     belongs_to :cm_member, foreign_key: :member_cd, primary_key: :member_cd
 
+    def self.find_or_initialize_by_declare_user(declare_user)
+      cm_charge = self.find_or_initialize_by(
+        cmpy_cd: "00025",
+        member_cd: declare_user.member_cd,
+        user_id: "KCD"
+      )
+      cm_charge
+    end
+
     private
 
     def default_values

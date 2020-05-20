@@ -1,16 +1,25 @@
 module Foodtax
   class IcPerson < Foodtax::ApplicationRecord
     include FoodtaxHelper
-    self.primary_keys = :member_cd, :cmpy_cd, :term_cd, :declare_seq
-    self.table_name = "VA_ELEC_FILE_CONTENTS"
+    self.primary_keys = :cmpy_cd, :person_cd
     after_initialize :default_user_id
 
-    belongs_to :cm_member, foreign_key: :member_cd, primary_key: :member_cd
-    belongs_to :va_head, foreign_key: :member_cd, primary_key: :member_cd
+    has_many :ic_families, class_name: "IcFamily", foreign_key: [:cmpy_cd, :person_cd]
 
-    private
-
-    def default_user_id
+    def self.find_or_initialize_by_declare_user(declare_user)
+      ic_person = self.find_or_initialize_by(
+        cmpy_cd: "00025",
+        person_cd: declare_user.person_cd,
+        member_cd: declare_user.member_cd,
+      )
+      ic_person.jumin_no = declare_user.residence_number
+      ic_person.name = declare_user.name
+      address = declare_user.hometax_address || declare_user.address
+      split_address = address.split
+      ic_person.addr1 = split_address[0]
+      ic_person.addr2 = split_address[1]
+      ic_person.tel_no = declare_user.user.phone_number
+      ic_person
     end
   end
 end
