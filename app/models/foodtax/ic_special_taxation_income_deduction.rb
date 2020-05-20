@@ -17,27 +17,31 @@ module Foodtax
     end
 
     def self.import_deductions(declare_user)
-      personal_deduction = self.find_or_initialize_by_declare_user(
-        declare_user,
-        "105"
-      )
-      personal_deduction.create_deduction(
-        0,
-        declare_user.hometax_individual_income.personal_pension_deduction,
-        ""
-      )
-      personal_deduction.save!
+      if hometax_individual_income.personal_pension_deduction > 0
+        personal_deduction = self.find_or_initialize_by_declare_user(
+          declare_user,
+          "105"
+        )
+        personal_deduction.create_deduction(
+          0,
+          declare_user.hometax_individual_income.personal_pension_deduction,
+          ""
+        )
+        personal_deduction.save!
+      end
 
-      merchant_deduction = self.find_or_initialize_by_declare_user(
-        declare_user,
-        "115"
-      )
-      merchant_deduction.create_deduction(
-        declare_user.hometax_individual_income.merchant_pension,
-        declare_user.hometax_individual_income.merchant_pension_deduction,
-        declare_user.businesses.first.registration_number
-      )
-      merchant_deduction.save!
+      if declare_user.hometax_individual_income.merchant_pension > 0
+        merchant_deduction = self.find_or_initialize_by_declare_user(
+          declare_user,
+          "115"
+        )
+        merchant_deduction.create_deduction(
+          declare_user.hometax_individual_income.merchant_pension,
+          declare_user.hometax_individual_income.merchant_pension_deduction,
+          declare_user.businesses.first.registration_number
+        )
+        merchant_deduction.save!
+      end
     end
 
     def create_deduction(origin_amount, limited_amount, registration_number)

@@ -17,7 +17,7 @@ module Foodtax
       ic_income_detail_sum.C0020 = 0
       ic_income_detail_sum.C0030 = 0
       ic_income_detail_sum.C0040 = 0
-      ic_income_detail_sum.C0050 = declare_user.total_income_amount < 0 ? 0 : declare_user.total_income_amount
+      ic_income_detail_sum.C0050 = [declare_user.total_income_amount, 0].max
       ic_income_detail_sum
     end
   end

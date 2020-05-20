@@ -28,9 +28,6 @@ class CreateIncomeFoodtax < Service::Base
       ic_income_deduction = 
         Foodtax::IcIncomeDeduction.import_deductions(declare_user)
 
-      ic_special_taxation_income_deduction = 
-        Foodtax::IcSpecialTaxationIncomeDeduction.import_deductions(declare_user)
-
       ic_income_details_sum = Foodtax::IcIncomeDetailsSum
         .find_or_initialize_by_declare_user(
           declare_user

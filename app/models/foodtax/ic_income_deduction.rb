@@ -137,6 +137,8 @@ module Foodtax
           "F59"
         )
         special_deduction.create_deduction(special_deduction_amount, 0, 0)
+        ic_special_taxation_income_deduction =
+          Foodtax::IcSpecialTaxationIncomeDeduction.import_deductions(declare_user)
       end
 
       total_amount = personal_deduction_amount +
