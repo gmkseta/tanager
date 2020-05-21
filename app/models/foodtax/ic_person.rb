@@ -12,6 +12,10 @@ module Foodtax
         person_cd: declare_user.person_cd,
         member_cd: declare_user.member_cd,
       )
+    end
+
+    def self.import(declare_user)
+      ic_person = self.find_or_initialize_by_declare_user(declare_user)
       ic_person.jumin_no = declare_user.residence_number
       ic_person.name = declare_user.name
       address = declare_user.hometax_address || declare_user.address

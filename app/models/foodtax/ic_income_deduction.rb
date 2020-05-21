@@ -16,7 +16,7 @@ module Foodtax
       )
     end
 
-    def self.import_deductions(declare_user)
+    def self.import_deductions(declare_user, total_income_amount)
       self_deduction = self.find_or_initialize_by_declare_user(
         declare_user,
         "F01"
@@ -98,59 +98,91 @@ module Foodtax
         single_parent_deduction.create_deduction(0, 1, 1000000)
       end
 
-      personal_deduction_amount = declare_user
-                                    .deductible_persons.sum(&:deduction_amount) + 
-                                    declare_user
-                                      .deduction_amount
-      if personal_deduction_amount > 0
+      deductible_persons_sum = declare_user.deductible_persons_sum
+
+      if deductible_persons_sum > 0
         personal_deduction = self.find_or_initialize_by_declare_user(
           declare_user, 
           "F29"
         )
-        personal_deduction.create_deduction(personal_deduction_amount, 0, 0)
-        Foodtax::IcPensionIncomeDeduction.create_personal_pension(declare_user)
+        personal_deduction.create_deduction(deductible_persons_sum, 0, 0)
       end
 
       national_pension_deduction_amount = declare_user
                                             .hometax_individual_income
                                             .national_pension
+      base_balanced_amount = total_income_amount
+      balanced_national_pension = [
+        [total_income_amount, 0].max,
+        national_pension_deduction_amount
+      ].min
 
-      if national_pension_deduction_amount > 0
+      if base_balanced_amount > 0 && balanced_national_pension > 0
         national_pension = self.find_or_initialize_by_declare_user(
-          declare_user, 
+          declare_user,
           "F31"
         )
-        national_pension.create_deduction(national_pension_deduction_amount, 0, 0)
+        national_pension.create_deduction(balanced_national_pension, 0, 0)
       end
 
-      personal_pension_deduction = declare_user
-                                    .hometax_individual_income
-                                    .personal_pension_deduction
-      merchant_pension_deduction = declare_user
-                                    .hometax_individual_income
-                                    .merchant_pension_deduction
+      base_balanced_amount = [
+        total_income_amount -
+          balanced_national_pension, 0].max
 
-      special_deduction_amount = personal_pension_deduction + merchant_pension_deduction
+      personal_pension_deduction = declare_user
+                                  .hometax_individual_income
+                                  .personal_pension_deduction
+
+      balanced_personal_pension = 0
+      if base_balanced_amount > 0 && personal_pension_deduction > 0
+        balanced_personal_pension = [
+          base_balanced_amount,
+          personal_pension_deduction
+        ].min
+        Foodtax::IcSpecialTaxationIncomeDeduction.import_personal_pesion(
+          declare_user,
+          balanced_personal_pension
+        )
+        Foodtax::IcPensionIncomeDeduction.create_personal_pension(
+          declare_user,
+          balanced_personal_pension
+        )
+        base_balanced_amount = [base_balanced_amount -
+            balanced_personal_pension, 0
+          ].max
+      end
+
+      balanced_merchant_pension = 0
+      merchant_pension_deduction = declare_user.merchant_pension_deduction
+      if base_balanced_amount > 0 && merchant_pension_deduction > 0
+        balanced_merchant_pension = [
+          base_balanced_amount,
+          merchant_pension_deduction
+        ].min
+        Foodtax::IcSpecialTaxationIncomeDeduction.import_merchant_pesion(
+          declare_user,
+          balanced_merchant_pension
+        )
+      end
+
+      special_deduction_amount = balanced_personal_pension + balanced_merchant_pension
       if special_deduction_amount > 0
         special_deduction = self.find_or_initialize_by_declare_user(
           declare_user, 
           "F59"
         )
         special_deduction.create_deduction(special_deduction_amount, 0, 0)
-        ic_special_taxation_income_deduction =
-          Foodtax::IcSpecialTaxationIncomeDeduction.import_deductions(declare_user)
       end
 
-      total_amount = personal_deduction_amount +
-                      special_deduction_amount +
-                      national_pension_deduction_amount
-
-      if total_amount > 0
+      sum = deductible_persons_sum +
+              balanced_national_pension +
+                special_deduction_amount
+      if sum > 0
         total_deduction = self.find_or_initialize_by_declare_user(
           declare_user, 
           "199"
         )
-        total_deduction.create_deduction(total_amount, 0, 0)
+        total_deduction.create_deduction(sum, 0, 0)
       end
     end
 

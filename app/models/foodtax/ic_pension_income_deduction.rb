@@ -19,13 +19,7 @@ module Foodtax
       ic_pension_income_deduction
     end
 
-    def self.import(declare_user)
-      self.create_personal_pension(declare_user) if declare_user.hometax_individual_income.personal_pension
-      self.create_pension_retirement(declare_user) if declare_user.hometax_individual_income.retirement_pension_tax_credit
-      self.create_pension_account(declare_user) if declare_user.hometax_individual_income.pension_account_tax_credit
-    end
-
-    def self.create_personal_pension(declare_user)
+    def self.create_personal_pension(declare_user, balanced)
       ic_pension_income_deduction = self.find_or_initialize_by_declare_user(declare_user, "21")
       if ic_pension_income_deduction.new_record?
         ic_pension_income_deduction.seq_no = "1"
@@ -39,15 +33,15 @@ module Foodtax
       ic_pension_income_deduction.acct_cd = "111111111111"
       ic_pension_income_deduction.C0040 = ""
       ic_pension_income_deduction.C0050 = declare_user.hometax_individual_income.personal_pension
-      ic_pension_income_deduction.C0060 = declare_user.hometax_individual_income.personal_pension
+      ic_pension_income_deduction.C0060 = declare_user.hometax_individual_income.personal_pension_deduction
       ic_pension_income_deduction.C0070 = 0.0
-      ic_pension_income_deduction.C0080 = declare_user.hometax_individual_income.personal_pension_deduction
+      ic_pension_income_deduction.C0080 = balanced
       ic_pension_income_deduction.trade_nm = ""
       ic_pension_income_deduction.biz_reg_no = ""
       ic_pension_income_deduction.save!
     end
 
-    def self.create_pension_retirement(declare_user)
+    def self.create_pension_retirement(declare_user, balanced_tax_credit, balanced)
       ic_pension_income_deduction = self.find_or_initialize_by_declare_user(declare_user, "11")
       if ic_pension_income_deduction.new_record?
         ic_pension_income_deduction.seq_no = "1"
@@ -61,15 +55,15 @@ module Foodtax
       ic_pension_income_deduction.acct_cd = "111111111111"
       ic_pension_income_deduction.C0040 = ""
       ic_pension_income_deduction.C0050 = declare_user.hometax_individual_income.retirement_pension_tax_credit
-      ic_pension_income_deduction.C0060 = declare_user.hometax_individual_income.retirement_pension_tax_credit
+      ic_pension_income_deduction.C0060 = balanced_tax_credit
       ic_pension_income_deduction.C0070 = declare_user.pension_tax_rate
-      ic_pension_income_deduction.C0080 = declare_user.retirement_pension_tax_credit_amount
+      ic_pension_income_deduction.C0080 = balanced
       ic_pension_income_deduction.trade_nm = ""
       ic_pension_income_deduction.biz_reg_no = ""
       ic_pension_income_deduction.save!
     end
 
-    def self.create_pension_account(declare_user)
+    def self.create_pension_account(declare_user, balanced_tax_credit, balanced)
       ic_pension_income_deduction = self.find_or_initialize_by_declare_user(declare_user, "22")
       if ic_pension_income_deduction.new_record?
         ic_pension_income_deduction.seq_no = "1"
@@ -83,9 +77,9 @@ module Foodtax
       ic_pension_income_deduction.acct_cd = "111111111111"
       ic_pension_income_deduction.C0040 = ""
       ic_pension_income_deduction.C0050 = declare_user.hometax_individual_income.pension_account_tax_credit
-      ic_pension_income_deduction.C0060 = declare_user.hometax_individual_income.pension_account_tax_credit
+      ic_pension_income_deduction.C0060 = balanced_tax_credit
       ic_pension_income_deduction.C0070 = declare_user.pension_tax_rate
-      ic_pension_income_deduction.C0080 = declare_user.pension_account_tax_credit_amount
+      ic_pension_income_deduction.C0080 = balanced
       ic_pension_income_deduction.trade_nm = ""
       ic_pension_income_deduction.biz_reg_no = ""
       ic_pension_income_deduction.save!
