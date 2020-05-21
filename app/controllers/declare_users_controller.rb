@@ -72,7 +72,7 @@ class DeclareUsersController < ApplicationController
   end
 
   def json_object
-    @declare_user.as_json(except: DeclareUser::EXCEPT_JSON_FIELD, methods: [:hometax_address, :estimated_tax])
+    @declare_user.as_json(except: DeclareUser::EXCEPT_JSON_FIELD, methods: [:hometax_address, :estimated_income_tax])
   end
 
   def check_user_status
