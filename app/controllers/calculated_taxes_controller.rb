@@ -39,7 +39,7 @@ class CalculatedTaxesController < ApplicationController
       pension_deduction: {
         total_amount: @declare_user.pensions_sum,
         personal_pension_deduction: @declare_user.hometax_individual_income.personal_pension_deduction,
-        merchant_pension_deduction: @declare_user.hometax_individual_income.merchant_pension_deduction,
+        merchant_pension_deduction: @declare_user.merchant_pension_deduction,
         national_pension_deduction: @declare_user.hometax_individual_income.national_pension,
 
       }
