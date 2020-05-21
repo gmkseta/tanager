@@ -18,7 +18,7 @@ module Foodtax
       ic_tax_credit_exemption
     end
 
-    def self.import(declare_user)
+    def self.import(declare_user, calculated_tax)
       index = 1
       if declare_user.base_tax_credit_amount > 0
         base_tax_credit = self.find_or_initialize_by_declare_user(
@@ -52,7 +52,7 @@ module Foodtax
         )
       end
 
-      if declare_user.calculated_tax.online_declare_credit_amount > 0
+      if calculated_tax.online_declare_credit_amount > 0
         online_declare_tax_credit = self.find_or_initialize_by_declare_user(
           declare_user,
           "244"
@@ -60,34 +60,65 @@ module Foodtax
         online_declare_tax_credit.create_credit_exemption(
           index+=1,
           0,
-          declare_user.calculated_tax.online_declare_credit_amount
+          calculated_tax.online_declare_credit_amount
         )
       end
 
-      if declare_user.retirement_pension_tax_credit_amount > 0
+      base_calculated_tax = [calculated_tax.calculated_tax -
+        declare_user.base_tax_credit_amount -
+          declare_user.children_tax_credit_amount -
+            declare_user.newborn_baby_tax_credit_amount -
+              calculated_tax.online_declare_credit_amount, 0].max
+
+      balanced_retirement = [declare_user.retirement_pension_tax_credit_amount,
+                              base_calculated_tax].min
+
+      if base_calculated_tax > 0 && balanced_retirement > 0
         retirement_pension_tax_credit = self.find_or_initialize_by_declare_user(
           declare_user,
           "275"
         )
+        balanced_retirement_tax_credit = ( balanced_retirement /
+            declare_user.pension_tax_rate
+          ).to_i
         retirement_pension_tax_credit.create_credit_exemption(
           index+=1,
-          declare_user.hometax_individual_income.retirement_pension_tax_credit,
-          declare_user.retirement_pension_tax_credit_amount
+          balanced_retirement_tax_credit,
+          balanced_retirement
         )
-        Foodtax::IcPensionIncomeDeduction.create_pension_retirement(declare_user)
+        Foodtax::IcPensionIncomeDeduction.create_pension_retirement(
+          declare_user,
+          balanced_retirement_tax_credit,
+          balanced_retirement
+        )
       end
 
-      if declare_user.pension_account_tax_credit_amount > 0
+      base_calculated_tax = [base_calculated_tax - balanced_retirement, 0].max
+
+      balanced_pension_account = [ declare_user.pension_account_tax_credit_amount,
+                                   base_calculated_tax].min
+
+      if base_calculated_tax > 0 && balanced_pension_account > 0
         pension_account_tax_credit = self.find_or_initialize_by_declare_user(
           declare_user,
           "276"
         )
+
+        balanced_pension_account_tax_credit = (
+          balanced_pension_account /
+            declare_user.pension_tax_rate
+          ).to_i
+
         pension_account_tax_credit.create_credit_exemption(
           index+=1,
-          declare_user.hometax_individual_income.pension_account_tax_credit,
-          declare_user.pension_account_tax_credit_amount,
+          balanced_pension_account_tax_credit,
+          balanced_pension_account
         )
-        Foodtax::IcPensionIncomeDeduction.create_pension_account(declare_user)
+        Foodtax::IcPensionIncomeDeduction.create_pension_account(
+          declare_user,
+          balanced_pension_account_tax_credit,
+          balanced_pension_account
+        )
       end
     end
 

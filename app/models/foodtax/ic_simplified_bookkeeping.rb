@@ -7,13 +7,13 @@ module Foodtax
     belongs_to :ic_person, foreign_key: :person_cd, primary_key: :person_cd
 
     def self.find_or_initialize_by_declare_user(declare_user)
-      ic_pension_income_deduction = self.find_or_initialize_by(
+      bookkeeping = self.find_or_initialize_by(
         cmpy_cd: "00025",
         person_cd: declare_user.person_cd,
         term_cd: "2019",
         declare_seq: "1"
       )
-      ic_pension_income_deduction
+      bookkeeping
     end
 
     def self.import(declare_user, cm_member, ic_person, merged_bookkeepings)

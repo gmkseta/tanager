@@ -39,4 +39,5 @@ Rails.application.routes.draw do
   get "hometax_business_incomes", to: "hometax_business_incomes#index"
   get "hometax_business_incomes/incomes", to: "hometax_business_incomes#incomes"
   post "hometax/scraped_callback", to: "hometax#scraped_callback"
+  get "estimated_income_taxes", to: "estimated_income_taxes#index"
 end

@@ -7,16 +7,21 @@ module Foodtax
 
     def self.import(declare_user)
       self.import_self(declare_user)
+      start_index = declare_user.children_or_adopted_count -
+        declare_user.new_born_children_or_adopted_count
       declare_user
         .deductible_persons
         .to_a
-        .each_with_index
-        .map {| p, i | self.find_or_initialize_by_deductible_person(
-          p,
-          declare_user.person_cd,
-          "#{1.year.ago.year}",
-          "1",
-          "#{i + 2}").save!
+        .each_with_index{ | p, i |
+          self.find_or_initialize_by_deductible_person(
+            p,
+            declare_user.person_cd,
+            "#{1.year.ago.year}",
+            "1",
+            "#{i + 2}",
+            p.new_born? ? start_index.to_s : "0"
+          ).save!
+          start_index = start_index + 1
       }
     end
 
@@ -27,7 +32,6 @@ module Foodtax
           term_cd: "#{1.year.ago.year}",
           declare_seq: "1",
           seq_no: "1")
-      ic_family.seq_no = "1"
       ic_family.jumin_no = declare_user.residence_number
       ic_family.name = declare_user.name
       ic_family.relation_cd = "0"
@@ -55,7 +59,8 @@ module Foodtax
                                         person_cd,
                                         term_cd,
                                         declare_seq,
-                                        seq_no)
+                                        seq_no,
+                                        delivery_seq)
       ic_family = self.find_or_initialize_by(
           cmpy_cd: "00025",
           person_cd: person_cd,
@@ -74,7 +79,7 @@ module Foodtax
       ic_family.oneparent_yn = deductible_person.single_parent? ? "Y" : "N"
       ic_family.native_cd = "1"
       ic_family.basic_yn = "Y"
-      ic_family.delivery_yn = deductible_person.new_born? ? "#{declare_user.new_born_children_or_adopted_count}" : "0"
+      ic_family.delivery_yn = delivery_seq
       ic_family.partner_yn = deductible_person.spouse? ? "Y" : "N"
       ic_family.resident_yn = "1"
       ic_family.insu_yn = "N"

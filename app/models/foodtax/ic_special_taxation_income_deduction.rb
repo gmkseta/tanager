@@ -16,35 +16,31 @@ module Foodtax
       )
     end
 
-    def self.import_deductions(declare_user)
-      if hometax_individual_income.personal_pension_deduction > 0
-        personal_deduction = self.find_or_initialize_by_declare_user(
+    def self.import_personal_pesion(declare_user, balanced)
+      personal_deduction = self.find_or_initialize_by_declare_user(
           declare_user,
           "105"
         )
-        personal_deduction.create_deduction(
-          0,
-          declare_user.hometax_individual_income.personal_pension_deduction,
-          ""
-        )
-        personal_deduction.save!
-      end
+      personal_deduction.create_deduction(
+        0,
+        balanced
+      )
+      personal_deduction.save!
+    end
 
-      if declare_user.hometax_individual_income.merchant_pension > 0
-        merchant_deduction = self.find_or_initialize_by_declare_user(
+    def self.import_merchant_pesion(declare_user, balanced)
+      merchant_deduction = self.find_or_initialize_by_declare_user(
           declare_user,
           "115"
         )
-        merchant_deduction.create_deduction(
-          declare_user.hometax_individual_income.merchant_pension,
-          declare_user.hometax_individual_income.merchant_pension_deduction,
-          declare_user.businesses.first.registration_number
-        )
-        merchant_deduction.save!
-      end
+      merchant_deduction.create_deduction(
+        declare_user.hometax_individual_income.merchant_pension,
+        balanced
+      )
+      merchant_deduction.save!
     end
 
-    def create_deduction(origin_amount, limited_amount, registration_number)
+    def create_deduction(origin_amount, limited_amount)
       self.gonggam_type = ""
       self.target_amt = origin_amount
       self.deduct_amt = limited_amount

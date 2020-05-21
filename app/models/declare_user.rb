@@ -85,9 +85,19 @@ class DeclareUser < ApplicationRecord
     simplified_bookkeepings.deductibles.sum(&:amount)
   end
 
+  def merchant_pension_deduction
+    if total_income_amount > 100000000
+      return [2000000, hometax_individual_income.merchant_pension].min
+    elsif total_income_amount > 40000000
+      return [3000000, hometax_individual_income.merchant_pension].min
+    else
+      return [5000000, hometax_individual_income.merchant_pension].min
+    end
+  end
+
   def pensions_sum
     hometax_individual_income.national_pension +
-      hometax_individual_income.merchant_pension_deduction +
+      merchant_pension_deduction +
       hometax_individual_income.personal_pension_deduction
   end
 
@@ -243,5 +253,10 @@ class DeclareUser < ApplicationRecord
 
   def member_cd
     "M#{"%06d" % id}"
+  end
+
+  def estimated_income_tax
+    estimated_income_tax = EstimatedCalulatedIncomeTax.find_by(owner_id: user.owner_id)
+    estimated_income_tax&.payment_tax
   end
 end
