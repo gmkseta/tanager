@@ -244,4 +244,9 @@ class DeclareUser < ApplicationRecord
   def member_cd
     "M#{"%06d" % id}"
   end
+
+  def estimated_income_tax
+    estimated_income_tax = EstimatedCalulatedIncomeTax.find_by(owner_id: user.owner_id)
+    estimated_income_tax&.payment_tax
+  end
 end

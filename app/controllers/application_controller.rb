@@ -29,6 +29,15 @@ class ApplicationController < ActionController::API
     @declare_user = @current_user.declare_users.find_by!(declare_tax_type: "income")
   end
 
+  def authorize_cashnote_request
+    if request.headers["X-Tanager-Api-Key"] == Rails.application.credentials[Rails.env.to_sym].dig(:client_api_key, :cashnote)
+      @owner_id = params[:owner_id]
+    else
+      render json: { errors: "unauthorized" }, status: :unauthorized
+    end
+  end
+
+
   def authorize_owl_request
     if request.headers["X-Tanager-Api-Key"] == Rails.application.credentials[Rails.env.to_sym].dig(:client_api_key, :owl)
       @owner_id = params[:owner_id]
