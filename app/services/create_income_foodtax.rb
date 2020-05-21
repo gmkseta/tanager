@@ -8,13 +8,9 @@ class CreateIncomeFoodtax < Service::Base
       cm_member.save!
       cm_charge = Foodtax::CmCharge.find_or_initialize_by_declare_user(declare_user)
       cm_charge.save!
-      ic_person = Foodtax::IcPerson.find_or_initialize_by_declare_user(declare_user)
-      ic_person.save!
-
+      ic_person = Foodtax::IcPerson.import(declare_user)
       ic_family = Foodtax::IcFamily.import(declare_user)
-
       calculated_tax = declare_user.calculated_tax
-
       ic_head = Foodtax::IcHead.find_or_initialize_by_declare_user(
         ic_person,
         declare_user,

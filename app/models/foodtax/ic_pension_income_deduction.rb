@@ -21,11 +21,7 @@ module Foodtax
 
     def self.create_personal_pension(declare_user, balanced)
       ic_pension_income_deduction = self.find_or_initialize_by_declare_user(declare_user, "21")
-      if ic_pension_income_deduction.new_record?
-        ic_pension_income_deduction.seq_no = "1"
-      else
-        ic_pension_income_deduction.seq_no = Foodtax::IcPensionIncomeDeduction.seq_no_size(declare_user) + 1
-      end
+      ic_pension_income_deduction.seq_no = "1"
       bank = Foodtax::IcPensionIncomeBank.unscoped.find_by(bank_cd: BANK_SAMPLE.sample)
 
       ic_pension_income_deduction.C0020 = bank.bank_cd
@@ -43,11 +39,7 @@ module Foodtax
 
     def self.create_pension_retirement(declare_user, balanced_tax_credit, balanced)
       ic_pension_income_deduction = self.find_or_initialize_by_declare_user(declare_user, "11")
-      if ic_pension_income_deduction.new_record?
-        ic_pension_income_deduction.seq_no = "1"
-      else
-        ic_pension_income_deduction.seq_no = Foodtax::IcPensionIncomeDeduction.seq_no_size(declare_user) + 1
-      end
+      ic_pension_income_deduction.seq_no = "2"
       bank = Foodtax::IcPensionIncomeBank.unscoped.find_by(bank_cd: BANK_SAMPLE.sample)
 
       ic_pension_income_deduction.C0020 = bank.bank_cd
@@ -65,11 +57,7 @@ module Foodtax
 
     def self.create_pension_account(declare_user, balanced_tax_credit, balanced)
       ic_pension_income_deduction = self.find_or_initialize_by_declare_user(declare_user, "22")
-      if ic_pension_income_deduction.new_record?
-        ic_pension_income_deduction.seq_no = "1"
-      else
-        ic_pension_income_deduction.seq_no = Foodtax::IcPensionIncomeDeduction.seq_no_size(declare_user) + 1
-      end
+      ic_pension_income_deduction.seq_no = "3"
       bank = Foodtax::IcPensionIncomeBank.unscoped.find_by(bank_cd: BANK_SAMPLE.sample)
 
       ic_pension_income_deduction.C0020 = bank.bank_cd

@@ -129,16 +129,14 @@ module Foodtax
         total_income_amount -
           balanced_national_pension, 0].max
 
-      personal_pension_deduction = declare_user
-                                  .hometax_individual_income
-                                  .personal_pension_deduction
+      balanced_personal_pension = [
+        base_balanced_amount,
+        declare_user
+          .hometax_individual_income
+          .personal_pension_deduction
+      ].min
 
-      balanced_personal_pension = 0
-      if base_balanced_amount > 0 && personal_pension_deduction > 0
-        balanced_personal_pension = [
-          base_balanced_amount,
-          personal_pension_deduction
-        ].min
+      if base_balanced_amount > 0 && balanced_personal_pension > 0
         Foodtax::IcSpecialTaxationIncomeDeduction.import_personal_pesion(
           declare_user,
           balanced_personal_pension
