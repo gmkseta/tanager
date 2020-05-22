@@ -17,7 +17,7 @@ class AuthController < ApplicationController
         user.declare_user.update!(status: status) if status
       end
       return render json: {
-        declare_user: user.declare_user.as_json(except: DeclareUser::EXCEPT_JSON_FIELD, methods: [:hometax_address, :estimated_income_tax]),
+        declare_user: user.declare_user.as_json(except: DeclareUser::EXCEPT_JSON_FIELD, methods: [:hometax_address, :estimated_income_tax, :available_quick_path]),
         jwt: user.jwt.token,
         status: user.declare_user.status
       }, status: :ok
@@ -38,7 +38,7 @@ class AuthController < ApplicationController
       )
       render json: {
         status: "empty",
-        declare_user: declare_user.as_json(except: DeclareUser::EXCEPT_JSON_FIELD, methods: [:hometax_address, :estimated_income_tax]),
+        declare_user: declare_user.as_json(except: DeclareUser::EXCEPT_JSON_FIELD, methods: [:hometax_address, :estimated_income_tax, :available_quick_path]),
         jwt: user.jwt.token
       }, status: :ok
     end
