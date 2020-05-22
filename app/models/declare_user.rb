@@ -259,4 +259,8 @@ class DeclareUser < ApplicationRecord
     estimated_income_tax = EstimatedCalulatedIncomeTax.find_by(owner_id: user.owner_id)
     estimated_income_tax&.payment_tax
   end
+
+  def available_quick_path
+    estimated_income_tax == 0
+  end
 end
