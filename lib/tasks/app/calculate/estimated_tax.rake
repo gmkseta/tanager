@@ -14,7 +14,7 @@ namespace :app do
         users.each do |u|
           amount = 0
           u.hometax_businesses.each do |h_b|
-            next if h_b.classficaition_code.nil?
+            next if (h_b.classification_code.nil?) || (ClassificationCodeCategory.find_by(classification_code: h_b.classification_code).nil?)
             calculated_expenses = h_b.business.calculate(nil).select {
               |d| d[:deductible] == true
               }.map{
