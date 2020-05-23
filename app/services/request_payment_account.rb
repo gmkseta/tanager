@@ -61,8 +61,8 @@ class RequestPaymentAccount < Service::Base
         individual_income_tax_return.merge!(
           local_tax: {
             tax_payment: local_tax["amount"],
-            payment_due_date: national_tax["paymentDueBy"] || "2020-08-31",
-            payment_account_numbers: national_tax["paymentAccounts"]&.map {
+            payment_due_date: local_tax["paymentDueBy"] || "2020-08-31",
+            payment_account_numbers: local_tax["paymentAccounts"]&.map {
               |n| {
                     "bank_name": n["bankName"],
                     "account_number": n["accountNumber"]
@@ -75,6 +75,6 @@ class RequestPaymentAccount < Service::Base
       end
       return individual_income_tax_return
     end
-    nil
+    {}
   end
 end
