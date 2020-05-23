@@ -3,6 +3,10 @@ class CalculatedTaxesController < ApplicationController
   before_action :set_declare_user
   def index
     individual_income_tax_return = {}
+    if ["payment", "done"].any?(@declare_user.status)
+      individual_income_tax_return =
+        GetIndividualIncomeTaxReturn.call(@declare_user.user.token)
+    end
     render json: {
       base_expense_rate: @declare_user.hometax_individual_income.base_expense_rate,
       expense_ratio: @declare_user.hometax_individual_income.expenses_ratio,
