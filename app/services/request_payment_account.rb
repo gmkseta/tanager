@@ -32,7 +32,10 @@ class RequestPaymentAccount < Service::Base
     error_message = response.dig("errors")
     if error_message.present?
       Rails.logger.info("error_message : #{error_message}")
-      SlackBot.ping("#{Rails.env.development? ? "[테스트] " : ""} ⚠️*결제계좌 요청 오류* #{error_message}", channel: "#tax-ops")
+      SendSlackMessageJob.perform_later(
+        "⚠️*결제계좌 요청 오류* #{error_message}",
+        "#tax-ops"
+      )
       return nil
     end
     individual_income_tax_return = {}
