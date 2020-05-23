@@ -25,6 +25,10 @@ module Foodtax
         declare_seq: "1",
         declare_type: "01"
       )
+      ic_head
+    end
+
+    def import_by(declare_user)
       ic_head.hometax_id = declare_user.hometax_account
       ic_head.submit_yyyymm = Date.today.strftime("%Y%m")
       ic_head.return_bank = declare_user.bank_code || ""
