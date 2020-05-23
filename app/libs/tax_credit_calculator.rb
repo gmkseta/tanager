@@ -19,11 +19,11 @@ module TaxCreditCalculator
   end
 
   def pension_account_tax_credit_limit
-    @pension_account_tax_credit_limit ||= total_income_amount > 100000000 ? 3000000 : 4000000
+    @pension_account_tax_credit_limit ||= abs_income_amount > 100000000 ? 3000000 : 4000000
   end
 
   def pension_tax_rate
-    @pension_tax_rate ||= total_income_amount <= 40000000 ? 0.15 : 0.12
+    @pension_tax_rate ||= abs_income_amount <= 40000000 ? 0.15 : 0.12
   end
 
   def pension_account_tax_credit_amount
