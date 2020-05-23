@@ -3,6 +3,7 @@ class CalculateIncomeTaxJob < ApplicationJob
 
   def perform(declare_user_id)
     d = DeclareUser.find(declare_user_id)
+    raise "#{d.inspect} does not have hometax_individual_income" if d.hometax_individual_income.nil?
     defaults = {
         declare_user_id: declare_user_id,
         declare_type: d.apply_bookkeeping? ? "간편장부" : d.hometax_individual_income.base_expense_rate,
@@ -21,7 +22,6 @@ class CalculateIncomeTaxJob < ApplicationJob
       pension_account_tax_credit_amount: d.pension_account_tax_credit_amount || 0,
       retirement_pension_tax_credit_amount: d.retirement_pension_tax_credit_amount || 0
     })
-
     c = CalculatedIncomeTax.find_or_initialize_by(declare_user_id: d.id)
     c.assign_attributes(calculated_income_tax)
     c.save!
