@@ -5,17 +5,10 @@ class EstimatedIncomeTaxesController < ApplicationController
       estimated_income_tax = EstimatedCalulatedIncomeTax.find_by(
         owner_id: params[:owner_id]
       )
-      if estimated_income_tax
-        render json: {
-          estimated_income_tax: estimated_income_tax.payment_tax,
-          available_quick_path: estimated_income_tax.payment_tax <= 1000000
-        }, status: :ok
-      else
-        render json: {
-          estimated_income_tax: nil,
-          available_quick_path: false
-        }, status: :ok
-      end
+      render json: {
+        estimated_income_tax: estimated_income_tax&.payment_tax,
+        available_quick_path: estimated_income_tax.nil? ? false : estimated_income_tax.payment_tax <= 1000000
+      }, status: :ok
     end
   end
 end

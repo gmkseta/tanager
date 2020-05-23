@@ -31,5 +31,6 @@ module Tanager
 
     config.time_zone = "Seoul"
     config.active_record.default_timezone = :local
+    config.active_job.queue_adapter = :sidekiq
   end
 end

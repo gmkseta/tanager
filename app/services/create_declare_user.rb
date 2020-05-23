@@ -44,7 +44,10 @@ class CreateDeclareUser < Service::Base
         BusinessExpense.create_insurances(declare_user.id)
         BusinessExpense.create_wage(declare_user.id)
       end
-      SlackBot.ping("#{Rails.env.development? ? "[테스트] " : ""} *종소세* #{declare_user.name} 종소세 유저생성", channel: "#tax-ops")
+      SendSlackMessageJob.perform_later(
+        "*종소세* #{declare_user.name} 종소세 유저생성",
+        "#tax-ops"
+      )
       declare_user
     end
   end

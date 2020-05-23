@@ -32,13 +32,19 @@ class RequestPaymentAccount < Service::Base
     error_message = response.dig("errors")
     if error_message.present?
       Rails.logger.info("error_message : #{error_message}")
-      SlackBot.ping("#{Rails.env.development? ? "[테스트] " : ""} ⚠️*결제계좌 요청 오류* #{error_message}", channel: "#tax-ops")
+      SendSlackMessageJob.perform_later(
+        "⚠️*결제계좌 요청 오류* #{error_message}",
+        "#tax-ops"
+      )
       return nil
     end
     individual_income_tax_return = {}
     account = response.dig("data", "account")
     status = account&.dig("individualIncomeTaxReturn", "status")
     if ["PAID", "FINISHED"].any?(status)
+      individual_income_tax_return.merge!({
+        declared_date:  account&.dig("individualIncomeTaxReturn", "finishedAt") || "#{Date.today.strftime}"
+      })
       national_tax = account&.dig("individualIncomeTaxReturn","nationalTaxPayment")
       if national_tax
         individual_income_tax_return.merge!(
@@ -61,8 +67,8 @@ class RequestPaymentAccount < Service::Base
         individual_income_tax_return.merge!(
           local_tax: {
             tax_payment: local_tax["amount"],
-            payment_due_date: national_tax["paymentDueBy"] || "2020-08-31",
-            payment_account_numbers: national_tax["paymentAccounts"]&.map {
+            payment_due_date: local_tax["paymentDueBy"] || "2020-08-31",
+            payment_account_numbers: local_tax["paymentAccounts"]&.map {
               |n| {
                     "bank_name": n["bankName"],
                     "account_number": n["accountNumber"]
@@ -75,6 +81,6 @@ class RequestPaymentAccount < Service::Base
       end
       return individual_income_tax_return
     end
-    nil
+    {}
   end
 end

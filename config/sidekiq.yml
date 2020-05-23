@@ -1,3 +1,6 @@
 :concurrency: 30
 :queues:
   - default
+  - [send_slack_message, 2]
+  - calculate_income_tax
+  - estimate_income_tax

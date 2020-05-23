@@ -23,9 +23,10 @@ class UploadElectronicFile < Service::Base
     results = response.dig("data", "uploadIndividualIncomeTaxReturnElectronicFile")
     if results.dig("result", "message").present?
       Rails.logger.info("error_message : #{results.dig("result", "message")}")
-      default_message = "⚠️*세금신고오류*"
-      default_message = "[테스트] #{default_message}" if Rails.env.development?
-      SlackBot.ping("#{default_message} : user_id: #{owner_id}, #{results.dig("result", "message")}", channel: "#tax-ops")
+      SendSlackMessageJob.perform_later(
+        "⚠️⚠️⚠️*세금신고오류* owner_id: #{owner_id}, #{results.dig("result", "message")}",
+        "#tax-ops"
+      )
       return nil
     end    
   end
