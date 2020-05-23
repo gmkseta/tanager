@@ -265,6 +265,7 @@ class DeclareUser < ApplicationRecord
   end
 
   def available_quick_path
-    (estimated_income_tax || 0) <= 1000000
+    return false if estimated_income_tax.nil?
+    estimated_income_tax <= 1000000
   end
 end
