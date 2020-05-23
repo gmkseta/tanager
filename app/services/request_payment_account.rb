@@ -39,6 +39,9 @@ class RequestPaymentAccount < Service::Base
     account = response.dig("data", "account")
     status = account&.dig("individualIncomeTaxReturn", "status")
     if ["PAID", "FINISHED"].any?(status)
+      individual_income_tax_return.merge!{
+        declared_date: account&.dig("individualIncomeTaxReturn", "finishedAt") || "#{Date.today.strftime}"
+      }
       national_tax = account&.dig("individualIncomeTaxReturn","nationalTaxPayment")
       if national_tax
         individual_income_tax_return.merge!(
