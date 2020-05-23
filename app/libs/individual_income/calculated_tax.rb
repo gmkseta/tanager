@@ -10,7 +10,7 @@ module IndividualIncome
     option :prepaid_tax
 
     def total_income
-      @total_income ||= [business_incomes - expenses, 0].max
+      @total_income ||= business_incomes - expenses
     end
 
     def base_taxation

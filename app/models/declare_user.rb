@@ -57,7 +57,7 @@ class DeclareUser < ApplicationRecord
   end
 
   def woman_deduction?
-    return false if single_parent? || (woman_deduction == false) || (total_income_amount > 30000000)
+    return false if single_parent? || (woman_deduction == false) || (abs_income_amount > 30000000)
     (woman_deduction == true || woman_deduction.nil?) && (applicable_woman_deduction_with_husband? || applicable_woman_deduction_without_husband?)
   end
 
@@ -66,11 +66,11 @@ class DeclareUser < ApplicationRecord
   end
 
   def applicable_woman_deduction_with_husband?
-    female? && married && total_income_amount <= 30000000
+    female? && married && abs_income_amount <= 30000000
   end
 
   def applicable_woman_deduction_without_husband?
-    female? && !married && deductible_persons.has_dependant? && total_income_amount <= 30000000
+    female? && !married && deductible_persons.has_dependant? && abs_income_amount <= 30000000
   end
 
   def deductible_persons_sum
@@ -86,9 +86,9 @@ class DeclareUser < ApplicationRecord
   end
 
   def merchant_pension_deduction
-    if total_income_amount > 100000000
+    if abs_income_amount > 100000000
       return [2000000, hometax_individual_income.merchant_pension].min
-    elsif total_income_amount > 40000000
+    elsif abs_income_amount > 40000000
       return [3000000, hometax_individual_income.merchant_pension].min
     else
       return [5000000, hometax_individual_income.merchant_pension].min
@@ -109,12 +109,16 @@ class DeclareUser < ApplicationRecord
     simplified_bookkeepings_sum + business_expenses_sum
   end
 
-  def expenses_sum
-    [simplified_bookkeeping_base_expenses, hometax_individual_income.expenses_sum_by_ratio].max
+  def abs_income_amount
+    a = business_incomes_sum - simplified_bookkeeping_base_expenses
+    b = business_incomes_sum - hometax_individual_income.expenses_sum_by_ratio
+    [[a, b].min, 0].max
   end
 
   def total_income_amount
-    business_incomes_sum - expenses_sum
+    return business_incomes_sum -
+            simplified_bookkeeping_base_expenses if apply_bookkeeping?
+    business_incomes_sum - hometax_individual_income.expenses_sum_by_ratio
   end
 
   def income_deduction
@@ -261,6 +265,7 @@ class DeclareUser < ApplicationRecord
   end
 
   def available_quick_path
-    (estimated_income_tax || 0) <= 1000000
+    return false if estimated_income_tax.nil?
+    estimated_income_tax <= 1000000
   end
 end
