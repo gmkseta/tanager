@@ -49,7 +49,7 @@ class BusinessExpensesController < ApplicationController
     @business_expense = BusinessExpense.new(business_expense_params)
     @business_expense.declare_user_id = @declare_user.id
     if @business_expense.save
-      render json: { business_expense: @business_expense }, status: :created
+      render json: { business_expense: @business_expense.as_json(methods: [:expense_classification_name, :account_classification_name]) }, status: :created
     else
       render json: { errors: errors_json(@business_expense.errors) }, status: :unprocessable_entity
     end
