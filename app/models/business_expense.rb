@@ -42,14 +42,17 @@ class BusinessExpense < ApplicationRecord
     ).sum(:amount)
   end
 
-  def self.create_insurances(declare_user_id)
+  def self.create_insurances(declare_user_id, registration_number)
     local_insurances_sum = DeclareUser.find(declare_user_id).hometax_social_insurances.local_insurances_sum
     BusinessExpense.create(
       declare_user_id: declare_user_id,
       expense_classification_id: Classification::LOCAL_INSURANCE_CLASSIFICATION_ID,
       amount: local_insurances_sum,
     )
-    businesses_insurances_sum = DeclareUser.find(declare_user_id).hometax_social_insurances.businesses_insurances_sum
+    businesses_insurances_sum = DeclareUser.find(declare_user_id)
+      .hometax_social_insurances
+      .where(hometax_social_insurances: { registration_number: registration_number })
+      .businesses_insurances_sum
     BusinessExpense.create(
       declare_user_id: declare_user_id,
       expense_classification_id: Classification::BUSINESS_INSURANCE_CLASSIFICATION_ID,
