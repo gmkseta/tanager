@@ -5,7 +5,7 @@ module Foodtax
     after_initialize :initialize_local_taxes
     after_initialize :initialize_rural_taxes
 
-    def declare_file      
+    def declare_file_plain_text
       results = Foodtax::IcHead.execute_procedure :sp_ic_head_file_gen_only_hometax,
         cmpy_cd: cmpy_cd,
         person_cd: person_cd,
@@ -14,7 +14,11 @@ module Foodtax
         form_cd: '',
         login_user_id: 'KCD',
         return_val1: ''
-      Base64.encode64(results.flatten.first["result"].force_encoding("UTF-8").encode("EUC-KR"))
+      results.flatten.first["result"]
+    end
+
+    def declare_file
+      Base64.encode64(declare_file_plain_text.force_encoding("UTF-8").encode("EUC-KR"))
     end
 
     def self.find_or_initialize_by_declare_user(declare_user)
@@ -52,7 +56,7 @@ module Foodtax
       self.pre_term_end_dt = 2.year.ago.end_of_year.strftime("%Y%m%d")
       self.write_dt = "20200601"
       self.declare_due_dt = "20200601"
-      self.simple_rate_yn = "N"
+      self.simple_rate_yn = declare_user.hometax_individual_income.is_simple_ratio? ? "Y" : "N"
       self.addr_tel_no = ic_person.tel_no
       self.biz_tel_no = ic_person.tel_no
       self.cp_no = ic_person.tel_no
@@ -77,7 +81,12 @@ module Foodtax
       self.total_sale_amt = declare_user.business_incomes_sum
       self.income_amt = [declare_user.total_income_amount, 0].max
 
-      self.deduct_amt = [declare_user.total_deduction_amount, self.income_amt].min
+      base_deduction = declare_user.total_deduction_amount - declare_user.total_income_amount
+      if base_deduction <= 0
+        self.deduct_amt = declare_user.total_deduction_amount
+      elsif
+        self.deduct_amt = [declare_user.total_income_amount, declare_user.minimum_deduction_amount].max
+      end
       self.income_standard_amt = calculated_tax.base_taxation
       self.income_rate = calculated_tax.tax_rate
       self.income_yieldtax_amt = calculated_tax.calculated_tax
