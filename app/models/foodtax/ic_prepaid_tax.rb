@@ -21,7 +21,6 @@ module Foodtax
       prepaid_tax = self.find_or_initialize_by_declare_user(
         declare_user
       )
-      return if declare_user.prepaid_tax_sum <= 0
       prepaid_tax.C0010 = declare_user.prepaid_tax_sum
       prepaid_tax.C0020 = 0
       prepaid_tax.C0030 = 0
