@@ -111,9 +111,9 @@ module Foodtax
       national_pension_deduction_amount = declare_user
                                             .hometax_individual_income
                                             .national_pension
-      base_balanced_amount = total_income_amount
+      base_balanced_amount = total_income_amount - deductible_persons_sum
       balanced_national_pension = [
-        [total_income_amount, 0].max,
+        [base_balanced_amount, 0].max,
         national_pension_deduction_amount
       ].min
 
@@ -124,6 +124,7 @@ module Foodtax
         )
         national_pension.create_deduction(balanced_national_pension, 0, 0)
       end
+
 
       base_balanced_amount = [
         total_income_amount -

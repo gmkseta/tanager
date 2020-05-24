@@ -8,7 +8,7 @@ module Foodtax
     belongs_to :cm_member, foreign_key: :member_cd, primary_key: :member_cd
     belongs_to :ic_person, foreign_key: :person_cd, primary_key: :person_cd
 
-    def self.find_or_initialize_by_declare_user(declare_user, cm_member)
+    def self.find_or_initialize_by_declare_user(declare_user, cm_member, calculated_tax)
       ic_income = self.find_or_initialize_by(
         cmpy_cd: "00025",
         person_cd: declare_user.person_cd,
@@ -35,7 +35,7 @@ module Foodtax
       ic_income.gijang_duty_type = FoodtaxHelper.gijang_duty_type(declare_user)
       ic_income.upjong_cd = cm_member.upjong_cd
       ic_income.total_sale_amt = declare_user.business_incomes_sum
-      ic_income.total_cost_amt = declare_user.expenses_sum
+      ic_income.total_cost_amt = calculated_tax.expenses
       ic_income.income_amt = declare_user.total_income_amount
       ic_income.combiz_yn = cm_member.combiz_yn
       ic_income.comboss_yn = "N"

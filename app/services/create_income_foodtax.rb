@@ -2,7 +2,7 @@ class CreateIncomeFoodtax < Service::Base
   param :declare_user_id
   
   def run
-    declare_user = DeclareUser.find(declare_user_id)    
+    declare_user = DeclareUser.find(declare_user_id)
     ActiveRecord::Base.transaction do
       cm_member = Foodtax::CmMember.find_or_initialize_by_declare_user(declare_user)
       cm_member.save!
@@ -12,21 +12,21 @@ class CreateIncomeFoodtax < Service::Base
       ic_family = Foodtax::IcFamily.import(declare_user)
       calculated_tax = declare_user.calculated_tax
       ic_head = Foodtax::IcHead.find_or_initialize_by_declare_user(
-        ic_person,
-        declare_user,
-        calculated_tax
+        declare_user
       )
+      ic_head.import_by(declare_user, ic_person, calculated_tax)
       ic_head.save!
       ic_income = Foodtax::IcIncome.find_or_initialize_by_declare_user(
         declare_user,
-        cm_member
+        cm_member,
+        calculated_tax
       )
       ic_income.save!
 
       ic_income_deduction = 
         Foodtax::IcIncomeDeduction.import_deductions(
           declare_user,
-          declare_user.total_income_amount
+          calculated_tax.total_income
         )
 
       ic_income_details_sum = Foodtax::IcIncomeDetailsSum
