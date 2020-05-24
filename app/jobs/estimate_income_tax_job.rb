@@ -16,10 +16,15 @@ class EstimateIncomeTaxJob < ApplicationJob
             |c| c[:amount]
           }.sum
         amount += calculated_expenses
+        amount += h_b.business.wage
+        amount += HometaxSocialInsurance.where(owner_id: u.id)
+                    .where(registration_number: h_b.business.registration_number)
+                    .businesses.last_year.sum(:amount)
+        amount += HometaxSocialInsurance.where(owner_id: u.id).local_insurances_sum
       end
       expenses = amount
     end
-    income_deduction = 1500000 + h.personal_pension_deduction + h_b.national_pension
+    income_deduction = 1500000 + h.personal_pension_deduction + h.national_pension
     calculated_tax_by_ratio = IndividualIncome::CalculatedTax.new(
       business_incomes: h.business_income_sum,
       expenses: expenses,
