@@ -24,8 +24,9 @@ class EstimateIncomeTaxJob < ApplicationJob
       end
       expenses = amount
     end
-    income_deduction = 1500000 + h.personal_pension_deduction + h.national_pension
-    calculated_tax_by_ratio = IndividualIncome::CalculatedTax.new(
+    personal_deduction = 1500000
+    income_deduction = personal_deduction + h.personal_pension_deduction + h.national_pension
+    calculated_tax = IndividualIncome::CalculatedTax.new(
       business_incomes: h.business_income_sum,
       expenses: expenses,
       income_deduction: income_deduction,
@@ -34,18 +35,18 @@ class EstimateIncomeTaxJob < ApplicationJob
       penalty_tax: 0,
       prepaid_tax: 0,
     )
-    e = EstimatedCalulatedIncomeTax.create!(
-      calculated_tax_by_ratio.as_json.merge({
-        account_type: h.account_type,
-        base_expense_rate: h.base_expense_rate,
-        base_ratio: h.base_ratio_basic,
-        simple_ratio: h.simple_ratio_basic,
-        owner_id: h.owner_id,
-        year: 2019,
-        income_deduction: 1500000,
-        personal_deduction: 1500000,
-        online_declare_credit_amount: 20000,
-      })
+    e = EstimatedCalulatedIncomeTax.find_or_initialize_by(
+      owner_id: owner_id,
+      year: 2019,
     )
+    e.assign_attributes(calculated_tax.as_json.merge({
+      account_type: h.account_type,
+      base_expense_rate: h.base_expense_rate,
+      base_ratio: h.base_ratio_basic,
+      simple_ratio: h.simple_ratio_basic,
+      personal_deduction: personal_deduction,
+      online_declare_credit_amount: 20000,
+    }))
+    e.save!
   end
 end
