@@ -35,6 +35,7 @@ class HometaxController < ApplicationController
           "#tax-ops"
         )
       end
+      EstimateIncomeTaxJob.perform_later(owner_id) if available
       head :ok
     else
       head :unprocessable_entity

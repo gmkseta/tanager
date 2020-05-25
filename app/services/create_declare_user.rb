@@ -30,7 +30,6 @@ class CreateDeclareUser < Service::Base
       declare_user.status = status || DeclareUser.statuses["user"]
       declare_user.married = married
       declare_user.save!(validate: validate)
-
       if is_new_record
         hometax_individual_incomes = HometaxIndividualIncome.where(owner_id: user.owner_id)
         hometax_individual_incomes.update(declare_user_id: declare_user.id)
@@ -41,7 +40,10 @@ class CreateDeclareUser < Service::Base
           simplified_bookkeepings = b.calculate(declare_user.id)
           SimplifiedBookkeeping.upsert(rows: simplified_bookkeepings)
         end
-        BusinessExpense.create_insurances(declare_user.id)
+        BusinessExpense.create_insurances(
+          declare_user.id,
+          businesses.first.registration_number
+        )
         BusinessExpense.create_wage(declare_user.id)
       end
       SendSlackMessageJob.perform_later(

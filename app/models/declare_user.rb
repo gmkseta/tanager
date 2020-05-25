@@ -115,6 +115,10 @@ class DeclareUser < ApplicationRecord
     [[a, b].min, 0].max
   end
 
+  def minimum_deduction_amount
+    deductible_persons_sum + merchant_pension_deduction
+  end
+
   def total_income_amount
     return business_incomes_sum -
             simplified_bookkeeping_base_expenses if apply_bookkeeping?

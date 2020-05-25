@@ -13,6 +13,7 @@ module Foodtax
         .deductible_persons
         .to_a
         .each_with_index{ | p, i |
+          start_index = start_index + 1
           self.find_or_initialize_by_deductible_person(
             p,
             declare_user.person_cd,
@@ -21,7 +22,6 @@ module Foodtax
             "#{i + 2}",
             p.new_born? ? start_index.to_s : "0"
           ).save!
-          start_index = start_index + 1
       }
     end
 
@@ -78,7 +78,7 @@ module Foodtax
       ic_family.child6_yn = "N"
       ic_family.oneparent_yn = deductible_person.single_parent? ? "Y" : "N"
       ic_family.native_cd = "1"
-      ic_family.basic_yn = "Y"
+      ic_family.basic_yn = (deductible_person.dependant? || deductible_person.spouse?) ? "Y" : "N"
       ic_family.delivery_yn = delivery_seq
       ic_family.partner_yn = deductible_person.spouse? ? "Y" : "N"
       ic_family.resident_yn = "1"
