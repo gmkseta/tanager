@@ -6,6 +6,7 @@ class RequestPaymentAccount < Service::Base
       account {
         individualIncomeTaxReturn(year: #{2019}) {
           status
+          finishedAt
           nationalTaxPayment {
             amount
             paymentDueBy
