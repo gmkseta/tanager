@@ -9,6 +9,20 @@ class HometaxController < ApplicationController
         declare_year: "#{Date.today.last_year.year}01"
       )
       available = hometax_individual_income.present? && hometax_individual_income.declarable?
+      hometax_businesses = Snowdon::User.find(owner_id).hometax_businesses
+
+      if available && hometax_businesses.count == 1
+        hometax_business = hometax_businesses.first
+        opened_at = hometax_business.opened_at || "20190101"
+        available = opened_at.to_date.year != Date.today.year
+
+        available = available && hometax_individual_income.hometax_business_incomes
+          .where.not(registration_number: hometax_business.business.registration_number)
+          .none?
+      else
+        availalbe = false
+      end
+
       year = 1.year.ago.year
       query = <<~QUERY
         mutation {
