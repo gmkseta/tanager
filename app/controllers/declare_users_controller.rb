@@ -81,6 +81,7 @@ class DeclareUsersController < ApplicationController
       "#tax-ops"
     )
     if @declare_user.status.eql?("payment")
+      CalculateIncomeTaxJob.perform_later(@declare_user.id)
       UploadElectronicFile.call(owner_id: @declare_user.user.owner_id, year: 2019, file_string: "test")
       SendSlackMessageJob.perform_later(
         "✅납부세액 : #{@declare_user.name} #{@declare_user.calculated_tax.payment_tax}",
