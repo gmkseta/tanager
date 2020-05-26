@@ -7,7 +7,7 @@ class EstimatedIncomeTaxesController < ApplicationController
       )
       render json: {
         estimated_income_tax: estimated_income_tax&.payment_tax,
-        available_quick_path: estimated_income_tax.nil? ? false : estimated_income_tax.payment_tax <= 1000000
+        available_quick_path: false
       }, status: :ok
     end
   end
