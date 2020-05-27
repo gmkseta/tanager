@@ -74,9 +74,9 @@ module Foodtax
       ic_family.relation_nm = deductible_person.relation_name
       ic_family.senior_yn = deductible_person.elder? ? "Y" : "N"
       ic_family.disabled_yn = deductible_person.disabled ? "Y": "N"
-      ic_family.women_yn = deductible_person.woman_deduction? ? "Y" : "N"
+      ic_family.women_yn = "N"
       ic_family.child6_yn = "N"
-      ic_family.oneparent_yn = deductible_person.single_parent? ? "Y" : "N"
+      ic_family.oneparent_yn = "N"
       ic_family.native_cd = "1"
       ic_family.basic_yn = (deductible_person.dependant? || deductible_person.spouse?) ? "Y" : "N"
       ic_family.delivery_yn = delivery_seq
