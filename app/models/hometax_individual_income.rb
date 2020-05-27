@@ -38,6 +38,7 @@ class HometaxIndividualIncome < ApplicationRecord
   end
 
   def real_estate_rental?
+    return true if declare_type.include?("주택임대소득")
     hometax_business_incomes.map { |b| %{701101 701102 701103 701104 701301}.include?(b.classficaition_code) }.any?
   end
 
