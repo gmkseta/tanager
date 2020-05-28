@@ -31,7 +31,12 @@ module Foodtax
       cm_member.tax_type = FoodtaxHelper.foodtax_tax_type(business.taxation_type)
       cm_member.corp_yn = (business.taxation_type == "법인사업자") ? "Y" : "N"
       cm_member.biz_reg_no = business.registration_number
-      cm_member.trade_nm = business.name
+      begin
+        business.name.encode("EUC-KR")
+        cm_member.trade_nm = business.name
+      rescue Encoding::UndefinedConversionError => e
+        cm_member.trade_nm = declare_user.name
+      end
       cm_member.boss_nm = declare_user.name
       cm_member.open_dt = business.opened_at&.strftime("%Y%m%d") || Date.today.last_year.strftime("%Y%m%d")
       cm_member.closure_dt = business.closed_at || ""
