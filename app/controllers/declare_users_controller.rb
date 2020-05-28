@@ -53,6 +53,11 @@ class DeclareUsersController < ApplicationController
   end
 
   def status
+    update_available =
+      DeclareUser.statuses[@declare_user.status] < DeclareUser.statuses[params[:status] || "empty"]
+    return render json: {
+        declare_user: json_object
+      }, status: :ok unless update_available
     if @declare_user.update(status: params[:status])
       check_user_status
       render json: { declare_user: json_object }, status: :ok
