@@ -1,6 +1,6 @@
 module PersonalDeduction
   def valid_residence_number?
-    unless (birthday.present? rescue false) && birthday <= Date.today
+    unless (birthday.present? rescue false) && birthday < Date.today.beginning_of_year
       errors.add(:residence_number, :invalid)
     end
   end
