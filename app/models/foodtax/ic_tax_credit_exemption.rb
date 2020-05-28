@@ -78,9 +78,12 @@ module Foodtax
           declare_user,
           "275"
         )
-        balanced_retirement_tax_credit = ( balanced_retirement /
+
+        balanced_retirement_tax_credit = (
+          balanced_retirement /
             declare_user.pension_tax_rate
-          ).to_i
+          ).ceil.to_i
+
         retirement_pension_tax_credit.create_credit_exemption(
           index+=1,
           balanced_retirement_tax_credit,
@@ -107,7 +110,7 @@ module Foodtax
         balanced_pension_account_tax_credit = (
           balanced_pension_account /
             declare_user.pension_tax_rate
-          ).to_i
+          ).ceil.to_i
 
         pension_account_tax_credit.create_credit_exemption(
           index+=1,
