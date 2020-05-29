@@ -91,7 +91,7 @@ class DeclareUsersController < ApplicationController
         "✅납부세액 : #{@declare_user.name} #{@declare_user.calculated_tax.payment_tax}",
         "#tax-ops"
       )
-      CreateElectronicFileJob.perform_later(@declare_user.id)
+      CreateElectronicFileJob.perform_later(@declare_user.id) if Rails.env.production?
     end
   end
 end

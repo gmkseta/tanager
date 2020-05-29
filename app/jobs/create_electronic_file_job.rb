@@ -19,6 +19,7 @@ class CreateElectronicFileJob < ApplicationJob
         year: year,
         file_string: declare_file_base64
       )
+      SlackBot.ping("🤖*전자파일* 전자파일 업로드완료!", channel: "#tax-ops")
     else
       SlackBot.ping("⚠️*전자파일오류* 푸드택스 파일 생성 오류", channel: "#tax-ops")
       raise "#{declare_user.inspect} is not able to create elec file"
