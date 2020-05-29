@@ -188,6 +188,8 @@ class DeclareUser < ApplicationRecord
   end
     
   def calculated_tax_by_ratio
+    expenses = hometax_individual_income.expenses_sum_by_ratio
+    expenses = 0 unless hometax_individual_income.is_simple_ratio?
     @calculated_tax_by_ratio ||= IndividualIncome::CalculatedTax.new(
       business_incomes: business_incomes_sum,
       expenses: hometax_individual_income.expenses_sum_by_ratio,
@@ -197,6 +199,10 @@ class DeclareUser < ApplicationRecord
       penalty_tax: penalty_tax_sum,
       prepaid_tax: prepaid_tax_sum,
     )
+  end
+
+  def prohibit_base_ratio?
+    created_at >= Date.new(2020, 5, 30)
   end
 
   def apply_bookkeeping?
