@@ -24,7 +24,7 @@ class UploadElectronicFile < Service::Base
     if results.dig("result", "message").present?
       Rails.logger.info("error_message : #{results.dig("result", "message")}")
       SendSlackMessageJob.perform_later(
-        "⚠️⚠️⚠️*세금신고오류* owner_id: #{owner_id}, #{results.dig("result", "message")}",
+        "⚠️⚠️⚠️*파일업로드 오류* owner_id: #{owner_id}, #{results.dig("result", "message")}",
         "#tax-ops"
       )
       return nil
