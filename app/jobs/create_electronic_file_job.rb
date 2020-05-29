@@ -5,7 +5,7 @@ class CreateElectronicFileJob < ApplicationJob
     declare_user = DeclareUser.find(declare_user_id)
     year = 1.year.ago.year
     CreateIncomeFoodtax.call(declare_user_id)
-    ic_head = Foodtax::IcHead.find_or_initialize_by(
+    ic_head = Foodtax::IcHead.find_by(
       cmpy_cd: "00025",
       person_cd: declare_user.person_cd,
       term_cd: "#{year}",
