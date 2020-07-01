@@ -1,6 +1,6 @@
 class DeductiblePerson < ApplicationRecord
   self.table_name = "deductible_persons"
-  self.ignored_columns = ["basic_livelihood"]
+  extend AttrEncrypted
   include PersonalDeduction
 
   belongs_to :declare_user
@@ -10,7 +10,16 @@ class DeductiblePerson < ApplicationRecord
   validates :residence_number, presence: true, format: { with: /\A\d{13}\z/ }
   validates :classification_id, presence: true, inclusion: { in: Classification.relations.ids, message: :invalid_type }
   validates :name, presence: true
-  validates :residence_number, uniqueness: {scope: [:declare_user_id], message: :taken}
+
+  attr_encrypted :residence_number,
+                 key: :encryption_key,
+                 encode: true,
+                 encode_iv: true,
+                 encode_salt: true
+
+  def encryption_key
+    Rails.application.credentials.attr_encrypted[:encryption_key]
+  end
 
   def spouse?
     classification_id == 1
