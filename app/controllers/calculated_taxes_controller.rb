@@ -19,6 +19,21 @@ class CalculatedTaxesController < ApplicationController
     }, status: :ok
   end
 
+  def declared
+    render json: {
+      base_expense_rate: @declare_user.hometax_individual_income.base_expense_rate,
+      expense_ratio: @declare_user.hometax_individual_income.expenses_ratio,
+      declare_from: Date.today.last_year.beginning_of_year.strftime,
+      declare_to: Date.today.last_year.end_of_year.strftime,
+      declare_user: @declare_user.as_json(except: DeclareUser::EXCEPT_JSON_FIELD),
+      calculated_taxes: {
+        calculated_tax_by_bookkeeping: nil,
+        calculated_tax_by_ratio: nil,
+      },
+      individual_income_tax_return: RequestPaymentAccount.call(token: @declare_user.user.token),
+    }, status: :ok
+  end
+
   def deductions
     render json: {
       total_amount: @declare_user.income_deduction,

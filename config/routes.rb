@@ -32,6 +32,7 @@ Rails.application.routes.draw do
     end
   end
   get "calculated_taxes", to: "calculated_taxes#index"
+  get "calculated_taxes/declared", to: "calculated_taxes#declared"
   get "calculated_taxes/deductions", to: "calculated_taxes#deductions"
   get "calculated_taxes/tax_credits", to: "calculated_taxes#tax_credits"
   get "calculated_taxes/tax_exemptions", to: "calculated_taxes#tax_exemptions"
