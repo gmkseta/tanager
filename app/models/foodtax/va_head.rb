@@ -5,9 +5,24 @@ module Foodtax
     after_initialize :default_values
 
     belongs_to :cm_member, foreign_key: :member_cd, primary_key: :member_cd
-    has_one :va_elec_file_content, foreign_key: :member_cd, primary_key: :member_cd
 
-    def initialize_with_business(business) # rubocop:disable Metrics/MethodLength
+    def declare_file_plain_text
+      result = Foodtax::VaHead.execute_procedure :sp_va_head_file_gen_cashnote,
+        cmpy_cd: cmpy_cd,
+        member_cd: member_cd,
+        term_cd: term_cd,
+        declare_seq: declare_seq,
+        form_cd: '',
+        login_user_id: 'KCD',
+        return_val: ''
+      result.flatten.first["result"]
+    end
+
+    def declare_file
+      Base64.encode64(declare_file_plain_text.encode("EUC-KR"))
+    end
+
+    def initialize_with_business(business)
       return if business.hometax_business.blank?
       self.biz_addr1 = business.hometax_business.address.split&.first
       self.biz_addr2 = business.hometax_business.address.split&.second
