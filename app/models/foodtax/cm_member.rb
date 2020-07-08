@@ -9,8 +9,15 @@ module Foodtax
     has_many :va_card_slips, foreign_key: :member_cd, primary_key: :member_cd
     has_one :va_card_sum, foreign_key: :member_cd, primary_key: :member_cd
     has_one :va_head, foreign_key: :member_cd, primary_key: :member_cd
-    has_one :va_elec_file_content, foreign_key: :member_cd, primary_key: :member_cd
+    has_one :va_penalty, foreign_key: :member_cd, primary_key: :member_cd
     has_one :va_pseudo_sum, foreign_key: :member_cd, primary_key: :member_cd
+
+    def self.find_or_initialize_by_vat_return(vat_return)
+      self.find_or_initialize_by(
+        cmpy_cd: "00025",
+        member_cd: vat_return.member_cd
+      )
+    end
 
     def self.find_or_initialize_by_declare_user(declare_user)
       cm_member = self.find_or_initialize_by(
