@@ -10,7 +10,8 @@ module Foodtax
     NON_VALIDATABLE_ATTRIBUTES = %w(REG_DATE UPDT_DATE REG_USER_ID UPDT_USER_ID)
     validates_presence_of Foodtax::VaBusinessStatusForm.attribute_names.reject{ |attr| NON_VALIDATABLE_ATTRIBUTES.include?(attr)}
 
-    validate :C0160, :validate_rental_deposit?, on: :create
+    validates :C0010, inclusion: { in: %w(01 02) }
+    validate :C0160, :validate_rental_deposit?
 
     def import_form(form)
       self.C0010 = form.self_rental ? "01" : "02"
@@ -39,8 +40,7 @@ module Foodtax
     end
 
     def validate_rental_deposit?
-      true if self_rental?
-      self.C0160 + self.C0170 > 0
+      errors.add(:C0160, :invalid_rental) if !self_rental? && (self.C0160 + self.C0170 <= 0)
     end
 
     def self_rental?

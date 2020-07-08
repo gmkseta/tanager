@@ -9,6 +9,10 @@ ko:
         residence_number: 주민등록번호
     errors:
       models:
+        foodtax/va_business_status_form:
+          attributes:
+            C0160:
+              invalid_rental: 타가인 경우 보증금과 월세가 0보다 커야 합니다.
         deductible_person:
           attributes:
             residence_number:
