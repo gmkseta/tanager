@@ -7,6 +7,9 @@ module Foodtax
 
     belongs_to :cm_member, foreign_key: :member_cd, primary_key: :member_cd
 
+    NON_VALIDATABLE_ATTRIBUTES = %w(REG_DATE UPDT_DATE REG_USER_ID UPDT_USER_ID)
+    validates_presence_of Foodtax::VaPenalty.attribute_names.reject{ |attr| NON_VALIDATABLE_ATTRIBUTES.include?(attr)}
+
     def self.find_or_initialize_by_vat_form(form)
       self.find_or_initialize_by(
         cmpy_cd: "00025",
