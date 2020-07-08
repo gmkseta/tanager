@@ -7,11 +7,10 @@ module Foodtax
 
     belongs_to :cm_member, foreign_key: :member_cd, primary_key: :member_cd
 
-    NON_VALIDATABLE_ATTRIBUTES = %w(REG_DATE UPDT_DATE REG_USER_ID UPDT_USER_ID)
+    NON_VALIDATABLE_ATTRIBUTES = %w(C0100 REG_DATE UPDT_DATE REG_USER_ID UPDT_USER_ID)
     validates_presence_of Foodtax::VaBusinessStatusForm.attribute_names.reject{ |attr| NON_VALIDATABLE_ATTRIBUTES.include?(attr)}
 
     validates :C0010, inclusion: { in: %w(01 02) }
-    validate :C0160, :validate_rental_deposit?
 
     def import_form(form)
       self.C0010 = form.self_rental ? "01" : "02"
