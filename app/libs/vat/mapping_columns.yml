@@ -1,0 +1,323 @@
+
+va_head:
+  "1":
+    price: o_s010
+    vat: o_v010
+    desc: 과세매출_세금계산서_금액/세액
+  "2":
+    price: o_s020
+    vat: o_v020
+    desc: 과세매출_매입자_금액/세액
+  "3":
+    price: o_s030
+    vat: o_v030
+    desc: 과세매출_신용카드등_금액/세액
+  "4":
+    price: o_s040
+    vat: o_v040
+    desc: 과세매출_기타_금액/세액
+  "5":
+    price: o_s050
+    desc: 영세매출_세금계산서금액
+  "6":
+    price: o_s060
+    desc: 영세매출_기타_금액
+  "7":
+    price: o_s070
+    vat: o_v070
+    desc: 매출_예정신고누락_세액
+  "8":
+    vat: o_v080
+    desc: 매출_대손세액가감_세액
+  "9":
+    price: o_s090
+    vat: o_v090
+    desc: 매출_합계_금액(과세표준금액)/세액(산출세액)
+  "10":
+    price: i_s010
+    vat: i_v010
+    desc: 과세매입_세금계산서_일반_금액/세액
+  "11":
+    price: i_s020
+    vat: i_v020
+    desc: 과세매입_세금계산서_고정_금액/세액
+  "12":
+    price: i_s030
+    vat: i_v030
+    desc: 과세매입_예정신고누락_금액/세액
+  "13":
+    price: i_s040
+    vat: i_v040
+    desc: 과세매입_매입자_금액/세액
+  "14":
+    price: i_s050
+    vat: i_v050
+    desc: 과세매입_기타공제_금액/세액
+  "15":
+    price: i_s060
+    vat: i_v060
+    desc: 과세매입_합계_금액/세액
+  "16":
+    price: i_s070
+    vat: i_v070
+    desc: 과세매입_공제받지못할_금액/세액
+  "17":
+    price: i_s080
+    vat: i_v080
+    desc: 과세매입_차가감계_금액/세액
+  "100":
+    vat: v_v010
+    desc: 납부환급세액
+  "18":
+    vat: v_v020
+    desc: 경감공제세액_기타경감_세액
+  "19":
+    price: v_s030
+    vat: v_v030
+    desc: 경감공제세액_신용카드매출전표발행공제_금액/세액
+  "20":    
+    vat: v_v040
+    desc: 경감공제세액_합계_세액
+  "20-1":
+    price:
+    vat:
+    desc: 소규모 개인사업자 부가가치세 감면세액
+  "21":
+    vat: pre_notreturn_amt
+    desc: 예정신고미환급세액
+  "22":
+    vat: pre_notice_amt
+    desc: 예정고지세액
+  "23":
+    desc: "사업양수자의 대리납부 기납부세액"
+  "24":
+    vat: v_v050
+    desc: 매입자 납부특례 기납부세액
+  "25":
+    vat: cardcmpy_pay_amt
+    desc: 신용카드업자의 대리납부 기납부세액
+  "26":
+    vat: v_v060
+    desc: 가산세액계
+  "27":
+    vat: real_paytax_amt
+    desc: 차감가감하여 납부할 세액(환급받을 세액)
+  "33":
+    price:
+    vat:
+    desc: 예정누락매출세금계산서금액/세액
+  "34":
+    price:
+    vat:
+    desc: 예정누락매출과세기타금액/세액
+  "35":
+    price:
+    desc: 예정누락매출영세율세금계산서금액
+  "36":
+    price:
+    desc: 예정누락매출영세율기타금액
+  "37":
+    price:
+    vat:
+    desc: 예정누락매출명세합계금액/세액
+  "38":
+    price:
+    vat:
+    desc: 예정누락매입신고세금계산서금액/세액
+  "39":
+    price:
+    vat:
+    desc: 예정누락매입기타공제금액/세액
+  "40":
+    price:
+    vat:
+    desc: 예정누락매입명세합계금액/세액
+  "41":
+    price:
+    vat:
+    desc: 신용카드매출전표등 수령명세서 제출분 > 일반매입
+  "42":
+    price:
+    vat:
+    desc: 신용카드매출전표등 수령명세서 제출분 > 고정자산매입
+  "43":
+    vat:
+    desc: 의제매입세액
+  "44":
+    vat:
+    desc: 제활용폐자원등 매입세액
+  "45":
+    vat:
+    desc: 과세사업전환 매입세액
+  "46":
+    vat: stock_in_vat_amt
+    desc: 재고매입세액
+  "47":
+    vat: debt_pay_vat_amt
+    desc: 변제대손세액
+  "48":
+    vat:
+    desc: 외국인 관광객에 대한 환급세액
+  "49":
+    price:
+    vat:
+    desc: 합계
+  "50":
+    price:
+    vat:
+    desc: 공제받지 못할 매입세액
+  "51":
+    price:
+    vat:
+    desc: 공통매입세액 면세사업등분
+  "52":
+    price:
+    vat:
+    desc: 대손처분받은세액
+  "53":
+    price:
+    vat:
+    desc: 합계
+  "54":
+    vat: elec_ti_deduct_amt
+    desc: 전자신고세액공제
+  "55":
+    vat: elec_ti_deduct_amt
+    desc: 전자세금계산서발행세액공제
+  "56":
+    vat:
+    desc: 택시운송사업자 경감세액
+  "57":
+    vat:
+    desc: 대리납부 세액공제
+  "58":
+    vat:
+    desc: 현금영수증사업자 세액공제
+  "59":
+    vat:
+    desc: 기타
+  "60":
+    vat:
+    desc: 합계
+  "80":
+    price:
+    vat:
+    desc: 면세사업수입금액 > 업태/종목/코드번호/금액
+  "81":
+    price:
+    vat:
+    desc: 면세사업수입금액 > 업태/종목/코드번호/금액
+  "82":
+    price:
+    vat:
+    desc: 면세사업수입금액 > 수입금액제외
+  "83":
+    vat:
+    desc: 면세사업수입금액 > 합계
+  "84":
+    price:
+    desc: 계산서 발급 및 수취 명세 > 계산서 발급금액
+  "85":
+    price:
+    desc: 계산서 발급 및 수취 명세 > 계산서 수취금액
+va_income:
+  "28":
+    name: uptae
+    item: jongmok
+    code: upjong_cd
+    amount: income_amt
+    desc: 과세표준명세 업태/종목/업종코드/금액
+  "29":
+    name: uptae
+    item: jongmok
+    code: upjong_cd
+    amount: income_amt
+    desc: 과세표준명세 업태/종목/업종코드/금액
+  "30":
+    name: uptae
+    item: jongmok
+    code: upjong_cd
+    amount: income_amt
+    desc: 과세표준명세 업태/종목/업종코드/금액
+  "31":
+    amount: 
+    desc: 수입금액 제외
+  "32":
+    amount: 
+    desc: 합계
+va_addtax:
+  "61":
+    price: supply1_amt
+    vat: add1_amt
+    desc: 사업자미등록금액/세액
+  "62":
+    price:
+    vat:
+    desc: 세금계산서 지연발급
+  "63":
+    price:
+    vat:
+    desc: 세금계산서 지연수취
+  "64":
+    price:
+    vat:
+    desc: 세금계산서 미발급
+  "65":
+    price:
+    vat:
+    desc: 전자세금계산서 발급명세 전송 지연전송
+  "66":
+    price:
+    vat:
+    desc: 전자세금계산서 발급명세 전송 미전송
+  "67":
+    price: supply2_amt
+    vat: add2_amt
+    desc: 합계표제출불성실금액/세액
+  "68":
+    price:
+    vat:
+    desc: 세금계산서합계표제출 지연제출 금액/세액
+  "69":
+    price:
+    vat:
+    desc: 신고 불성실 무신고(일반) 금액/세액
+  "70":
+    price:
+    vat:
+    desc: 신고 불성실 무신고(부당) 금액/세액
+  "71":
+    price:
+    vat:
+    desc: 신고 불성실 과소 초과환급신고(일반) 금액/세액
+  "72":
+    price:
+    vat:
+    desc: 신고 불성실 과소 초과환급신고(부당) 금액/세액
+  "73":
+    price: supply4_amt
+    vat: add4_amt
+    desc: 납부불성실금액/세액
+  "74":
+    price: supply5_amt
+    vat: add5_amt
+    desc: 영세율불성실금액/세액
+  "75":
+    price:
+    vat:
+    desc: 현금매출 명세서 불성실 금액/세액
+  "76":
+    price:
+    vat:
+    desc: 부동산임대공급가액며엣서 불성실 금액/세액
+  "77":
+    price:
+    vat:
+    desc: 매입자 납부 특례 거래계좌 미사용 금액/세액
+  "78":
+    price:
+    vat:
+    desc: 매입자 납부 특례 거래계좌 지연입금 금액/세액
+  "79":
+    vat: add_sum_amt
+    desc: 가산세계

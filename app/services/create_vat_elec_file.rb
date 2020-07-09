@@ -4,18 +4,19 @@ class CreateVatElecFile < Service::Base
   def run
     vat_return = Snowdon::VatReturn.find(vat_return_id)
     ActiveRecord::Base.transaction do
-      Foodtax::CmCharge.create!(member_cd: vat_return.member_cd)
+      cm_member = Foodtax::CmMember.find_or_initialize_by_vat_return(vat_return)
+      cm_member.import_general_form(vat_return.form)
 
-      cm_member = Foodtax::CmMember.new(member_cd: vat_return.member_cd)
-      cm_member.initialize_with_business(vat_return.business)
-      cm_member.save!
-
-      va_head = Foodtax::VaHead.new(
-        member_cd: vat_return.business.member_cd,
-        declare_type: "1",
-        declare_due_dt: tax_declare_due_date,
-        declare_dt: Date.current.strftime("%Y%m%d")
+      cm_charge = Foodtax::CmCharge.create!(
+        cmpy_cd: "00025",
+        member_cd: vat_return.member_cd
       )
+
+      va_penalty = Foodtax::VaPenalty.find_or_initialize_by_vat_form(vat_return.form)
+      va_penalty.import_general_form(vat_return.form)
+
+      va_head = Foodtax::VaHead.find_or_initialize_by_vat_return(vat_return)      
+      va_head.import_general_form(vat_return.form)
       va_head.declare_file
     end
   end
