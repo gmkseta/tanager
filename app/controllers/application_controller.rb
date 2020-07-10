@@ -32,6 +32,7 @@ class ApplicationController < ActionController::API
   def authorize_cashnote_request
     if request.headers["X-Tanager-Api-Key"] == Rails.application.credentials[Rails.env.to_sym].dig(:client_api_key, :cashnote)
       @owner_id = params[:owner_id]
+      @vat_return_id = params[:vat_return_id]
     else
       render json: { errors: "unauthorized" }, status: :unauthorized
     end
