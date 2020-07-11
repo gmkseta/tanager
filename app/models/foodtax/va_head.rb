@@ -51,6 +51,8 @@ module Foodtax
 
       self.return_yn = self.real_paytax_amt < 0 ? "Y" : "N"
 
+      self.declare_due_dt = vat_return_due_date(form.period_end_date).strftime("%Y%m%d")
+
       self.tax_cash_sale_amt = 0
       self.tax_cash_vat_amt = 0
       self.free_cash_sale_amt = 0
@@ -100,7 +102,6 @@ module Foodtax
       self.tax_type = "1"
       self.self_declare_yn = "Y"
 
-      self.declare_due_dt = "20200727"
       self.declare_dt = Date.current.strftime("%Y%m%d") if declare_dt.blank?
 
       DEFAULT_EMPTY_STRING.each do |column|

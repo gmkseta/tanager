@@ -26,6 +26,9 @@ class Snowdon::HometaxPurchasesInvoice < Snowdon::ApplicationRecord
   scope :invalid_tax, -> { where(tax_invoice: true, invoice_type: %w(일반 위수탁), tax: 0).where("ABS(price) >= 10") }
   scope :last_year, -> {where(written_at: 1.year.ago.all_year)}
 
+  scope :tax_free, -> { where(tax_invoice: false) }
+  scope :taxation, -> { where(tax_invoice: true) }
+
   class << self
     def communications
       where(<<-SQL.squish)

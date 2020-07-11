@@ -6,7 +6,7 @@ module Foodtax
 
     belongs_to :cm_member, foreign_key: :member_cd, primary_key: :member_cd
 
-    def with_purchases_invoice(purchases_invoice) # rubocop:disable Metrics/MethodLength
+    def with_purchases_invoice(purchases_invoice)
       self.slip_type = purchases_invoice.tax_invoice ? 1 : 2
       self.slip_cnt = 1
 
