@@ -6,6 +6,18 @@ class CreateVatElecFile < Service::Base
     ActiveRecord::Base.transaction do
       cm_member = Foodtax::CmMember.find_or_initialize_by_vat_return(vat_return)
       cm_member.import_general_form(vat_return.form)
+      
+      sales_bills_sum = Foodtax::VaOutBillSum.find_or_initialize_by_vat_form(form)
+      sales_bills_sum.import_form(form)
+      sales_invoices_sum = Foodtax::VaOutTiSum.find_or_initialize_by_vat_form(form)
+      sales_invoices_sum.import_form(form)
+
+      purchases_bills_sum = Foodtax::VaInBillSum.find_or_initialize_by_vat_form(form)
+      purchases_bills_sum.import_form(form)
+      purchases_invoices_sum = Foodtax::VaInTiSum.find_or_initialize_by_vat_form(form)
+      purchases_invoices_sum.import_form(form)
+
+      Foodtax::VaNoDeductiblePurchase.import_form!(form)
 
       cm_charge = Foodtax::CmCharge.create!(
         cmpy_cd: "00025",
