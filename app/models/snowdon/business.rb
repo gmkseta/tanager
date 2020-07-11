@@ -10,6 +10,7 @@ class Snowdon::Business < Snowdon::ApplicationRecord
   has_many :hometax_card_purchases
   has_many :hometax_purchases_cash_receipts
   has_many :hometax_purchases_invoices
+  has_many :hometax_sales_invoices
   has_many :hometax_wht_declarations
 
   def included_cards

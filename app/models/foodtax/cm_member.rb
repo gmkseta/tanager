@@ -23,7 +23,7 @@ module Foodtax
       )
     end
 
-    def import_general_form(form)
+    def import_general_form!(form)
       self.tax_type = "1"
       self.biz_reg_no = form["tax_payer"]&.fetch("registration_number") || ""
       self.trade_nm = form["tax_payer"]&.fetch("business_name") || ""

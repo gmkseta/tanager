@@ -1,6 +1,5 @@
 module Foodtax
-  class VaNoDeductiblePurchase < Foodtax::ApplicationRecord
-    include FoodtaxHelper
+  class VaNoDeductiblePurchase < Foodtax::ApplicationRecord    
     self.table_name = "VA_V153_D1"
     self.primary_keys = :member_cd, :cmpy_cd, :term_cd, :declare_seq, :nodeduct_type
     after_initialize :default_dates, :default_user_id, :default_values
@@ -18,16 +17,12 @@ module Foodtax
       )
     end
 
-    def self.import_form!(form)
-      period = vat_return_period_datetime_range(
-        taxation_type: form.vat_return.business.taxation_type,
-        year: form.vat_return.year,
-        period: form.vat_return.period,
-      )
-      no_deductions = Snowdon::VatReturnDeductiblePurchase.no_deductions.where(vat_return_id: form.vat_return_id)
+    def self.import_general_form!(form)
+      no_deductions = form.vat_return.deductible_purchases.no_deductions
       vendor_registration_numbers = no_deductions.index_by(&:vendor_registration_number)
       invoices = begin
-        Snowdon::HometaxPurchasesInvoice.where(written_at: period)
+        form.vat_return.business.hometax_purchases_invoices
+          .where(written_at: form.date_range)
           .where(vendor_registration_number: vendor_registration_numbers.keys)
           .group(:vendor_registration_number)
           .pluck(Arel.sql(<<~QUERY))

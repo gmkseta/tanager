@@ -44,14 +44,14 @@ module Foodtax
       end
 
       self.term_str_dt = form.period_start_date
-      self.term_end_dt = form.period_end_date      
+      self.term_end_dt = form.period_end_date
 
       self.yieldtax_amt = self.o_v090
       self.paytax_amt = self.v_v010
 
       self.return_yn = self.real_paytax_amt < 0 ? "Y" : "N"
 
-      self.declare_due_dt = vat_return_due_date(form.period_end_date).strftime("%Y%m%d")
+      self.declare_due_dt = vat_return_due_date(form.period_end_date.to_date).strftime("%Y%m%d")
 
       self.tax_cash_sale_amt = 0
       self.tax_cash_vat_amt = 0

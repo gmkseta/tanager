@@ -11,7 +11,7 @@ module FoodtaxHelper
   end
 
   def vat_return_period_datetime_range(taxation_type:, year:, period:)
-    period = vat_return_period_range(
+    period = vat_return_period_date_range(
       taxation_type: taxation_type,
       year: year,
       period: period,

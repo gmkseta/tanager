@@ -1,6 +1,5 @@
 module Foodtax
   class VaInTiSum < Foodtax::ApplicationRecord
-    include FoodtaxHelper
     self.primary_keys = :member_cd, :cmpy_cd, :term_cd, :declare_seq
     after_initialize :default_dates, :default_user_id, :default_values
 
@@ -17,23 +16,9 @@ module Foodtax
       )
     end
 
-    def import_form(form)
-      period = vat_return_period_datetime_range(
-        taxation_type: form.vat_return.business.taxation_type,
-        year: form.vat_return.year,
-        period: form.vat_return.period,
-      )
-
-      paper_invoices = begin
-        Snowdon::VatReturnPaperInvoice.purchases.taxation
-          .where(vat_return_id: form.vat_return_id)
-      end
-
-      hometax_invoices = begin
-        Snowdon::HometaxPurchasesInvoice.taxation
-          .where(written_at: period)
-          .where(business_id: form.vat_return.business_id)
-      end
+    def import_general_form!(form)
+      paper_invoices = form.vat_return.paper_invoices.purchases.taxation
+      hometax_invoices = form.vat_return.business.hometax_purchases_invoices.taxation.where(written_at: form.date_range)
 
       self.biz_pti_vend_cnt = paper_invoices.group_by(&:trader_registration_number).length
       self.biz_pti_slip_cnt = paper_invoices.length
