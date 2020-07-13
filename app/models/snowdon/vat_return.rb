@@ -35,4 +35,77 @@ class Snowdon::VatReturn < Snowdon::ApplicationRecord
   def term_cd
    "#{year}#{period}"
   end
+
+  def grouped_hometax_card_purchases(date_range)
+    @grouped_hometax_card_purchases ||= begin
+      business.hometax_card_purchases
+        .where(purchased_at: date_range)
+        .group(:vendor_registration_number)
+        .select(Arel.sql(<<~QUERY))
+          vendor_registration_number,
+          MAX(vendor_business_name),
+          SUM(amount)
+          SUM(vat),
+          SUM(price),
+          COUNT(*),
+          MIN(deductible::integer)::boolean as deducible
+        QUERY
+    end
+  end
+
+  def grouped_hometax_sales_invoices(date_range)
+    @grouped_hometax_sales_invoices ||= begin
+      business.hometax_sales_invoices
+        .where(written_at: date_range)
+        .group(:customer_registration_number)
+        .pluck(Arel.sql(<<~QUERY))
+          customer_registration_number,
+          MAX(customer_business_name) as business_name,
+          MAX(written_at),
+          SUM(amount),
+          SUM(tax),
+          SUM(price),
+          COUNT(*),
+          FALSE as paper_invoice
+        QUERY
+    end
+  end
+
+  def grouped_hometax_purchases_invoices(date_range)
+    @grouped_hometax_purchases_invoices ||= begin
+      business.hometax_purchases_invoices
+        .where(written_at: date_range)
+        .group(:vendor_registration_number)
+        .pluck(Arel.sql(<<~QUERY))
+          vendor_registration_number,
+          MAX(vendor_business_name) as business_name,
+          MAX(written_at),
+          SUM(amount),
+          SUM(tax),
+          SUM(price),
+          COUNT(*),
+          TRUE as deducible,
+          FALSE as paper
+        QUERY
+    end
+  end
+
+  def grouped_paper_invoices(is_sales: nil, is_tax_free: nil)
+    @grouped_paper_invoices ||= begin
+      invoices = paper_invoices.group(:trader_registration_number)
+      invoices = is_sales ? invoices.sales : invoices.purchases if is_sales.present?
+      invoices = is_tax_free ? invoices.tax_free : invoices.taxation if is_tax_free.present?
+      invoices.pluck(Arel.sql(<<~QUERY))
+        trader_registration_number,
+        MAX(trader_business_name) as business_name,
+        MAX(written_at),
+        SUM(amount),
+        SUM(vat),
+        SUM(price),
+        COUNT(*),
+        TRUE as deducible,
+        TRUE as paper
+      QUERY
+    end
+  end
 end

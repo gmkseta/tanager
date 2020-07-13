@@ -8,6 +8,7 @@ class Snowdon::VatReturnDeductiblePurchase < Snowdon::ApplicationRecord
 
   validate :non_deductible_invoice_should_have_reason
 
+  scope :purchases_invoices, -> { where(purchase_type: "HometaxPurchasesInvoice") }
   scope :no_deductions, -> { where.not(nodeduct_reason_id: nil) }
 
   private

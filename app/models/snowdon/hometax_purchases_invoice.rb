@@ -6,6 +6,8 @@ class Snowdon::HometaxPurchasesInvoice < Snowdon::ApplicationRecord
   belongs_to :business
   belongs_to :hometax_business
 
+  has_one :deductible_purchase, foreign_key: :vendor_registration_number, primary_key: :vendor_registration_number, class_name: 'VatReturnDeductiblePurchase'
+
   validates :tax_invoice, inclusion: { in: [true, false] }
   validates :invoice_type, presence: true
   validates :issue_type, presence: true
