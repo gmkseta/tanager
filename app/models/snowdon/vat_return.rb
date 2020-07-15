@@ -35,4 +35,128 @@ class Snowdon::VatReturn < Snowdon::ApplicationRecord
   def term_cd
    "#{year}#{period}"
   end
+
+  def grouped_hometax_card_purchases(date_range = form.date_range)
+    @grouped_hometax_card_purchases ||= begin
+      business.hometax_card_purchases
+        .where(purchased_at: date_range)
+        .group(:vendor_registration_number)      
+        .select(Arel.sql(<<~QUERY))
+          vendor_registration_number,
+          MAX(vendor_business_name),
+          MAX(purchased_at)
+          SUM(amount)
+          SUM(vat),
+          SUM(price),
+          COUNT(*),
+          MIN(deductible::integer)::boolean as deducible
+        QUERY
+    end
+  end
+
+  def grouped_purchases_cash_receipts(date_range = form.date_range)
+    @grouped_purchases_cash_receipts ||= begin
+      business.hometax_purchases_cash_receipts
+        .where(purchased_at: date_range)
+        .group(:vendor_registration_number)
+        .pluck(Arel.sql("
+          vendor_registration_number,
+          MAX(vendor_business_name),
+          MAX(purchased_at)
+          SUM(CASE WHEN receipt_type = 0 THEN amount ELSE -amount END),
+          SUM(CASE WHEN receipt_type = 0 THEN vat ELSE -vat END),
+          SUM(CASE WHEN receipt_type = 0 THEN price ELSE -price END),
+          COUNT(*),
+          MIN(tax_deductible::integer)::boolean
+        "))
+    end
+  end
+
+  def grouped_hometax_purchases_invoices(date_range = form.date_range)
+    @grouped_hometax_purchases_invoices ||= begin
+      business.hometax_purchases_invoices
+        .where(written_at: date_range)
+        .group(:vendor_registration_number)
+        .pluck(Arel.sql(<<~QUERY))
+          vendor_registration_number,
+          MAX(vendor_business_name) as business_name,
+          MAX(written_at),
+          SUM(amount),
+          SUM(tax),
+          SUM(price),
+          COUNT(*),
+          TRUE as deducible,
+          FALSE as paper_invoice
+        QUERY
+    end
+  end
+
+  def grouped_personal_cards
+    @grouped_personal_cards ||= begin
+      personal_card_purchases.group(:vendor_registration_number, :card_number)
+        .pluck(Arel.sql(<<~QUERY))
+          vendor_registration_number,
+          card_number
+          NULL as purchased_at,
+          SUM(amount),
+          SUM(vat),
+          SUM(price),
+          COUNT(*)
+          TRUE as deductible
+        QUERY
+    end
+  end
+
+  def grouped_hometax_sales_invoices(date_range = form.date_range)
+    @grouped_hometax_sales_invoices ||= begin
+      business.hometax_sales_invoices
+        .where(written_at: date_range)
+        .group(:customer_registration_number)
+        .pluck(Arel.sql(<<~QUERY))
+          customer_registration_number,
+          MAX(customer_business_name) as business_name,
+          MAX(written_at),
+          SUM(amount),
+          SUM(tax),
+          SUM(price),
+          COUNT(*),
+          FALSE as paper_invoice
+        QUERY
+    end
+  end
+
+  def grouped_paper_invoices(is_sales: nil, is_tax_free: nil)
+    @grouped_paper_invoices ||= begin
+      invoices = paper_invoices.group(:trader_registration_number)
+      invoices = is_sales ? invoices.sales : invoices.purchases if is_sales.present?
+      invoices = is_tax_free ? invoices.tax_free : invoices.taxation if is_tax_free.present?
+      invoices.pluck(Arel.sql(<<~QUERY))
+        trader_registration_number,
+        MAX(trader_business_name) as business_name,
+        MAX(written_at),
+        SUM(amount),
+        SUM(vat),
+        SUM(price),
+        COUNT(*),
+        TRUE as deducible,
+        TRUE as paper_invoice
+      QUERY
+    end
+  end
+  
+  def deemed_purchases_deductibles
+    @deemed_purchases_deductibles ||= begin
+      deemed_purchases.group_by do |purchase|
+        [purchase.vendor_registration_number, purchase.purchase_type]
+      end
+    end
+  end
+
+  def grouped_deductible_purchases
+    @grouped_deductible_purchases ||= begin
+      deductible_purchases.group_by do |purchase|
+        [purchase.vendor_registration_number, purchase.purchase_type]
+      end
+    end
+  end
 end

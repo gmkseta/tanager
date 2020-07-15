@@ -6,7 +6,78 @@ module Foodtax
 
     belongs_to :cm_member, foreign_key: :member_cd, primary_key: :member_cd
 
-    def with_purchases_invoice(purchases_invoice) # rubocop:disable Metrics/MethodLength
+    def self.import_vat_return!(vat_return)
+      deemed_invoices = vat_return.deemed_purchases.invoices.index_by(&:vendeor_registration_number)
+      deemed_paper_invoices = vat_return.deemed_purchases.paper_invoices.index_by(&:vendeor_registration_number)
+
+      deductible_purchases = vat_return.deductible_purchases.purchases_invoices.index_by(&:vendor_registration_number)
+
+      purchases_invoices = vat_return.grouped_hometax_purchases_invoices(vat_return.form.date_range) + vat_return.grouped_paper_invoices(is_sales: false)
+      purchases = []
+      index = 0
+      purchases_invoices.each do |registration_number, business_name, wrriten_at, amount, vat, price, count, deductible, paper_invoice|
+        ti_slip = self.new(
+          member_cd: vat_return.member_cd,
+          cmpy_cd: "00025",
+          term_cd: vat_return.term_cd,
+          declare_seq: "1"
+        )
+        index = index + 1
+        ti_slip.slip_seq = index
+        ti_slip.slip_type = vat.zero? ? 2 : 1
+        ti_slip.slip_cnt = count
+        ti_slip.vend_biz_reg_no = registration_number
+        ti_slip.vend_trade_nm = business_name&.truncate(50) || ""
+        ti_slip.supply_amt = price
+        ti_slip.vat_amt = vat
+        ti_slip.total_amt = amount
+
+        if paper_invoice
+          ti_slip.nodeduct_type = 0
+          ti_slip.pseudo_buy_yn = deemed_paper_invoices[registration_number]&.deductible ? "Y" : "N"
+          ti_slip.deduct_yn = "Y"
+          ti_slip.eti_yn = "N"
+        else
+          ti_slip.nodeduct_type = deductible_purchases[registration_number]&.nodeduct_reason_id || 0
+          ti_slip.pseudo_buy_yn = deemed_invoices[registration_number]&.deductible ? "Y" : "N"
+          ti_slip.deduct_yn = ti_slip.nodeduct_type.present? ? "N" : deductible_purchases[registration_number]&.deductible ? "Y" : "N"
+          ti_slip.eti_yn = "Y"
+        end
+        ti_slip.approve_dt = wrriten_at.strftime("%Y%m%d")
+        ti_slip.slip_each_yn = "N"
+        purchases << ti_slip
+      end
+      Foodtax::VaTiSlip.import! purchases
+
+      sales_invoices = vat_return.grouped_hometax_sales_invoices + vat_return.grouped_paper_invoices(is_sales: true)
+      sales = sales_invoices.map do |registration_number, business_name, wrriten_at, amount, vat, price, count, paper_invoice|
+        ti_slip = self.new(
+          member_cd: vat_return.member_cd,
+          cmpy_cd: "00025",
+          term_cd: vat_return.term_cd,
+          declare_seq: "1"
+        )
+        index = index + 1
+        ti_slip.slip_seq = index
+        ti_slip.slip_type = vat.zero? ? 4 :3
+        ti_slip.pseudo_buy_yn = vat.zero? ? "Y" : "N"
+        ti_slip.deduct_yn = "Y"
+        ti_slip.slip_cnt = count
+        ti_slip.vend_biz_reg_no = registration_number
+        ti_slip.vend_trade_nm = business_name&.truncate(50) || ""
+        ti_slip.supply_amt = price
+        ti_slip.vat_amt = vat
+        ti_slip.total_amt = amount
+        ti_slip.nodeduct_type = 0
+        ti_slip.eti_yn = paper_invoice ? "N" : "Y"
+        ti_slip.approve_dt = wrriten_at.strftime("%Y%m%d")
+        ti_slip.slip_each_yn = "N"
+        ti_slip
+      end
+      Foodtax::VaTiSlip.import sales
+    end
+
+    def with_purchases_invoice(purchases_invoice)
       self.slip_type = purchases_invoice.tax_invoice ? 1 : 2
       self.slip_cnt = 1
 
@@ -101,13 +172,20 @@ module Foodtax
 
     def default_values
       self.cmpy_cd ||= "00025"
-      self.term_cd ||= "#{tax_declare_year}#{tax_declare_term}"
       self.declare_seq ||= "1"
-
-      self.deduct_yn = "Y" if deduct_yn.blank?
-      self.asset_type = "0" if asset_type.blank?
       self.approve_no = "XXXX" if approve_no.blank?
-      self.nodeduct_type = "0" if nodeduct_type.blank?
+
+      self.recycle_yn = "N"
+
+      self.dup_yn = "N"
+      self.dup_amt = "N"
+
+      self.person_yn = "N"
+      self.person_jumin_no = ""
+      self.nodeduct_type = 0 if nodeduct_type.blank?
+
+      self.asset_yn = "N"
+      self.asset_type = 0 if asset_type.blank?
     end
   end
 end

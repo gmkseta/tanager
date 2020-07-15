@@ -10,7 +10,14 @@ class Snowdon::Business < Snowdon::ApplicationRecord
   has_many :hometax_card_purchases
   has_many :hometax_purchases_cash_receipts
   has_many :hometax_purchases_invoices
+
+  has_many :hometax_card_sales
+  has_many :hometax_sales_invoices
+  has_many :hometax_sales_cash_receipts
   has_many :hometax_wht_declarations
+
+  has_many :vat_returns, dependent: :destroy
+  has_many :status_forms, class_name: "BusinessStatusForm", dependent: :destroy
 
   def included_cards
     exclude = hometax_cards

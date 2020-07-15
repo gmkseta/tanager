@@ -1,6 +1,5 @@
 module Foodtax
   class CmCharge < Foodtax::ApplicationRecord
-    include FoodtaxHelper
     self.primary_keys = :member_cd, :cmpy_cd, :user_id
     after_initialize :default_values
 

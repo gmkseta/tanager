@@ -1,26 +1,30 @@
 module FoodtaxHelper
-  def tax_period_start_date(business: nil, date: Date.current)
-    case business.taxation_type
+  def vat_return_period_date_range(taxation_type:, year:, period:)
+    case taxation_type
     when "간이과세자"
-      date.beginning_of_year
+      Date.new(year)..Date.new(year).end_of_year
     when "법인사업자"
-      date.beginning_of_quarter
+      Date.new(year, period * 3).beginning_of_quarter..Date.new(year, period * 3).end_of_quarter
     else
-      return date.change(month: 1, day: 1) if date.month < 7
-      date.change(month: 7, day: 1)
+      Date.new(year, period == 1 ? 1 : 7)..Date.new(year, period == 1 ? 6 : 12).end_of_month
     end
   end
 
-  def tax_period_end_date(business: nil, date: Date.current)
-    case business.taxation_type
-    when "간이과세자"
-      date.end_of_year
-    when "법인사업자"
-      date.end_of_quarter
-    else
-      return date.change(month: 6, day: 30) if date.month < 7
-      date.change(month: 12, day: 31)
-    end
+  def vat_return_period_datetime_range(taxation_type:, year:, period:)
+    period = vat_return_period_date_range(
+      taxation_type: taxation_type,
+      year: year,
+      period: period,
+    )
+    period.first..period.last.end_of_day
+  end
+
+  def vat_return_due_date(end_of_period_date)
+    date = end_of_period_date + 1.month
+    date = Date.new(date.year, date.month, 25)
+    return date + 2.days if date.saturday?
+    return date + 1.day if date.sunday?
+    date
   end
 
   def self.foodtax_tax_type(taxation_type)

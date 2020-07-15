@@ -6,6 +6,8 @@ class Snowdon::HometaxPurchasesInvoice < Snowdon::ApplicationRecord
   belongs_to :business
   belongs_to :hometax_business
 
+  has_one :deductible_purchase, foreign_key: :vendor_registration_number, primary_key: :vendor_registration_number, class_name: 'VatReturnDeductiblePurchase'
+
   validates :tax_invoice, inclusion: { in: [true, false] }
   validates :invoice_type, presence: true
   validates :issue_type, presence: true
@@ -25,6 +27,9 @@ class Snowdon::HometaxPurchasesInvoice < Snowdon::ApplicationRecord
   scope :not_revised, -> { where.not(invoice_type: REVISED_INVOICE_TYPES) }
   scope :invalid_tax, -> { where(tax_invoice: true, invoice_type: %w(일반 위수탁), tax: 0).where("ABS(price) >= 10") }
   scope :last_year, -> {where(written_at: 1.year.ago.all_year)}
+
+  scope :tax_free, -> { where(tax_invoice: false) }
+  scope :taxation, -> { where(tax_invoice: true) }
 
   class << self
     def communications

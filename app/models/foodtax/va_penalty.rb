@@ -18,7 +18,7 @@ module Foodtax
       )
     end
 
-    def import_general_form(form)
+    def import_general_form!(form)
       self.supply1_amt = form.value_price("61")
       self.add1_amt = form.value_vat("61")
 

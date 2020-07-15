@@ -1,18 +1,36 @@
 class Snowdon::GeneralVatReturnForm < Snowdon::ApplicationRecord
+  include FoodtaxHelper
+
+  enum status: {
+    declarable: 0,
+    supplementary_data: 1,
+    not_declarable: 2,
+  }
+
   belongs_to :vat_return
+
+  validates :status, presence: true
+
+  def to_h(field_name)
+    self[field_name].map { |s| { s["order_number"] => s } }.inject(:merge)
+  end
+
+  def declarable?
+    status.eql?(:declarable)
+  end
 
   def converted_hash_by_order_number
     @converted_hash_by_order_number ||= begin
       converted_hash = {}
-      (accessed_fields - %w{id tax_payer created_at updated_at vat_return_id status}).each do |field|
-        converted_hash.merge!(self[field].map{ |s| {s["order_number"].to_s => s }  }.inject(:merge))
+      (attributes.keys - %w{id tax_payer etc_summaries created_at updated_at vat_return_id status}).each do |field|
+        converted_hash.merge!(to_h(field))
       end
       converted_hash
     end
   end
 
   def value_price(order_number)
-    converted_hash_by_order_number[order_number]&.dig("value", "amount") || 0
+    converted_hash_by_order_number[order_number]&.dig("value", "price") || 0
   end
 
   def value_vat(order_number)
@@ -29,5 +47,13 @@ class Snowdon::GeneralVatReturnForm < Snowdon::ApplicationRecord
 
   def primary_classification
     converted_hash_by_order_number["28"]
+  end
+
+  def date_range
+    vat_return_period_datetime_range(
+      taxation_type: vat_return.business.taxation_type,
+      year: vat_return.year,
+      period: vat_return.period,
+    )
   end
 end
