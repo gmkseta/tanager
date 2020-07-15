@@ -28,7 +28,8 @@ module Foodtax
       self.biz_reg_no = form["tax_payer"]&.fetch("registration_number") || ""
       self.trade_nm = form["tax_payer"]&.fetch("business_name") || ""
       self.boss_nm = form["tax_payer"]&.fetch("owner_name")
-      self.boss_jumin_no = "#{form["tax_payer"]&.fetch("birthday")}0000001"
+      date = form["tax_payer"]&.fetch("owner_birthday").to_date
+      self.boss_jumin_no = "#{date.strftime("%y%m%d")}0000001"
 
       business_address = form["tax_payer"]&.fetch("business_address")
       self.biz_addr4 = business_address.split[3..]&.join(" ")
@@ -48,8 +49,8 @@ module Foodtax
       self.upjong_cd = form.primary_classification["code"]
       self.email = form["tax_payer"]&.fetch("email")
 
-      self.open_dt = form.vat_return.business.opened_at || ""
-      self.closure_dt = form["tax_payer"]&.fetch("business_closed_at")&.stftime("%Y%m%d") || ""
+      self.open_dt = form.vat_return.business.opened_at&.strftime("%Y%m%d") || form.vat_return.business.card_merchant_signed_up_at&.strftime("%Y%m%d") || ""
+      self.closure_dt = form["tax_payer"]&.fetch("business_closed_at")&.strftime("%Y%m%d") || ""
 
       cellphone_number = form["tax_payer"]&.fetch("cellphone_number")
       if cellphone_number

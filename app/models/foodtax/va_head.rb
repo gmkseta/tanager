@@ -53,10 +53,9 @@ module Foodtax
 
       self.declare_due_dt = vat_return_due_date(form.period_end_date.to_date).strftime("%Y%m%d")
 
-      self.tax_cash_sale_amt = 0
-      self.tax_cash_vat_amt = 0
-      self.free_cash_sale_amt = 0
-      self.zero_cash_sale_amt = 0
+      form.etc_summaries["header"].each do |k, v|
+        self[k] = v
+      end
 
       set_tax_payer(form)
 
@@ -73,8 +72,8 @@ module Foodtax
         self["biz_addr#{index + 1}"] = address
       end
 
-      self.return_bank = form["tax_payer"]&.fetch("bank_name")
-      self.return_acct_no = form["tax_payer"]&.fetch("bank_account")
+      self.return_bank = form["tax_payer"]&.fetch("refund_bank_name") || ""
+      self.return_acct_no = form["tax_payer"]&.fetch("refund_bank_account") || ""
 
       h = form.vat_return.business.hometax_business
       tax_office = Foodtax::CmTaxOffice.find_by(tax_office_cd: h.official_code)
@@ -83,7 +82,7 @@ module Foodtax
       self.self_hometax_id = h.login
       self.upjong_cd = form.primary_classification["code"]
 
-      self.closure_dt = form["tax_payer"]&.fetch("business_closed_at")&.stftime("%Y%m%d") || ""
+      self.closure_dt = form["tax_payer"]&.fetch("business_closed_at")&.strftime("%Y%m%d") || ""
       self.closure_yn = self.closure_dt.blank? ? "N" : "Y"
       self.closure_reason_type = ""
       self.closure_reason_type_nm = ""
@@ -117,7 +116,10 @@ module Foodtax
       self.file_make_cnt = 0
       self.file_make_user_id = "KCD"
 
-      self.cta_cmpy_cd = "9000"
+      self.free_cash_sale_amt = 0
+      self.zero_cash_sale_amt = 0
+
+      self.cta_cmpy_cd = "40000"
     end
   end
 end
