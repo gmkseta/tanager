@@ -2,6 +2,7 @@ class VatReturnFilesController < ApplicationController
   before_action :authorize_cashnote_request
 
   def create
-    head :ok    
+    CreateVatReturnElecFileJob.perform_later(@vat_return_id)
+    head :ok
   end
 end

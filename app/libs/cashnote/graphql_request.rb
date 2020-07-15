@@ -1,6 +1,11 @@
 module Cashnote
   class GraphqlRequest
-    def self.http_query(query, token=nil)
+    extend Dry::Initializer
+
+    param :query
+    option :token
+
+    def http_query
       header = {
         "X-Bluebird-Api-Key": Rails.application.credentials[Rails.env.to_sym].dig(:snowdon_api, :key),
         "Content-Type": "application/json",
@@ -19,7 +24,6 @@ module Cashnote
       request.body = { query: query }.to_json
       response = http.request(request)
       json_body = JSON.parse(response.body)
-      Rails.logger.info("response json : #{json_body}")
       json_body
     end
   end

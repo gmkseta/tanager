@@ -3,7 +3,7 @@ class CreateVatElecFile < Service::Base
   
   def run
     vat_return = Snowdon::VatReturn.find(vat_return_id)
-    ActiveRecord::Base.transaction do
+    Foodtax::VaHead.transaction do
       cm_member = Foodtax::CmMember.find_or_initialize_by_vat_return(vat_return)
       cm_member.import_general_form!(vat_return.form)
 
@@ -31,7 +31,7 @@ class CreateVatElecFile < Service::Base
       Foodtax::VaTiSlip.import_vat_return!(vat_return)
 
       va_penalty = Foodtax::VaPenalty.find_or_initialize_by_vat_form(vat_return.form)
-      va_penalty.import_general_form(vat_return.form)
+      va_penalty.import_general_form!(vat_return.form)
 
       Foodtax::VaNoDeductiblePurchase.import_general_form!(vat_return.form)
       Foodtax::VaNoDeductiblePurchaseDetail.import_general_form!(vat_return.form)
@@ -43,8 +43,9 @@ class CreateVatElecFile < Service::Base
 
       business_status_form = Foodtax::VaBusinessStatusForm.find_or_initialize_by_vat_form(vat_return.form)
       business_status_form.import_general_form!(vat_return.business.status_forms.find_by(year: vat_return.year, period: vat_return.period))
-
-      va_head.declare_file
+      file = va_head.declare_file
+      raise ActiveRecord::Rollback if file.blank?
+      file
     end
   end
 end
