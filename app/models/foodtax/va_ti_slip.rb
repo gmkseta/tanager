@@ -47,7 +47,7 @@ module Foodtax
         ti_slip.slip_each_yn = "N"
         purchases << ti_slip
       end
-      Foodtax::VaTiSlip.import purchases
+      Foodtax::VaTiSlip.import! purchases
 
       sales_invoices = vat_return.grouped_hometax_sales_invoices + vat_return.grouped_paper_invoices(is_sales: true)
       sales = sales_invoices.map do |registration_number, business_name, wrriten_at, amount, vat, price, count, paper_invoice|
