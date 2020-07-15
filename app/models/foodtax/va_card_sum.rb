@@ -1,6 +1,5 @@
 module Foodtax
   class VaCardSum < Foodtax::ApplicationRecord
-    include FoodtaxHelper
     self.primary_keys = :member_cd, :cmpy_cd, :term_cd, :declare_seq
     after_initialize :default_values
 
@@ -14,57 +13,16 @@ module Foodtax
       )
     end
 
-    def import_form!(form)
-      begin
-                
-      end
-      self.tax_in_card_vend_cnt
-      self.tax_in_card_slip_cnt
-      self.tax_in_card_supply_amt
-      self.tax_in_card_vat_amt
+    def self.import_general_form!(form)
+      c = self.find_or_initialize_by_vat_form(form)
 
-      self.free_in_card_slip_cnt
-      self.free_in_card_supply_amt
+      form.etc_summaries["card_and_cash_summary"].collect { |k, v| c[k] = v }
 
-      self.tax_in_bizcard_vend_cnt
-      self.tax_in_bizcard_slip_cnt
-      self.tax_in_bizcard_supply_amt
-      self.tax_in_bizcard_vat_amt
+      c.deduct_target_amt = form.value_price("19")
+      c.deduct_rate_nm = form.value_vat("19") > 0 ? "1.3" : ""
+      c.deduct_target_amt = form.value_vat("19")
 
-      self.free_in_bizcard_slip_cnt
-      self.free_in_bizcard_supply_amt
-
-      self.tax_in_cashslip_vend_cnt
-      self.tax_in_cashslip_slip_cnt
-      self.tax_in_cashslip_supply_amt
-      self.tax_in_cashslip_vat_amt
-
-      self.free_in_cashslip_slip_cnt
-      self.free_in_cashslip_supply_amt
-
-      self.tax_card_sale_amt
-      self.tax_card_vat_amt
-      
-      self.tax_cashslip_sale_amt
-      self.tax_cashslip_vat_amt
-      self.zero_cashslip_sale_amt
-      self.free_cashslip_sale_amt
-
-      self.tax_elecpay_sale_amt
-      self.tax_elecpay_vat_amt
-      self.zero_elecpay_sale_amt
-      self.free_elecpay_sale_amt
-
-      
-      self.tax_out_miss_supply_amt
-      self.tax_out_miss_vat_amt
-      self.zero_out_miss_supply_amt
-      self.tax_in_miss_supply_amt
-      self.tax_in_miss_vat_amt
-
-      self.deduct_target_amt
-      self.deduct_rate_nm
-      self.deduct_amt
+      c.save!
     end
 
     private
@@ -88,6 +46,9 @@ module Foodtax
 
       self.zero_card_sale_amt = 0
       self.free_card_sale_amt = 0
+
+      self.zero_cashslip_sale_amt = 0
+      self.free_cashslip_sale_amt = 0
 
       self.ti_dup_sale_amt = 0
       self.bill_dup_sale_amt = 0

@@ -25,19 +25,10 @@ module Foodtax
       self.biz_pti_supply_amt = paper_invoices.sum(&:price)
       self.biz_pti_vat_amt = paper_invoices.sum(&:vat)
 
-      # TODO: 주민번호/사업자 구분 기준 체크
-      issued_by_business = hometax_invoices.select{ |h| h.vendor_registration_number.length <= 10 }
-      issued_by_owner = hometax_invoices.select{ |h| h.vendor_registration_number.length > 10 }
-
-      self.biz_eti_vend_cnt = issued_by_business.group_by(&:vendor_registration_number).length
-      self.biz_eti_slip_cnt = issued_by_business.length
-      self.biz_eti_supply_amt = issued_by_business.sum(&:price)
-      self.biz_eti_vat_amt = issued_by_business.sum(&:tax)
-
-      self.jumin_eti_vend_cnt = issued_by_owner.group_by(&:vendor_registration_number).length
-      self.jumin_eti_slip_cnt = issued_by_owner.length
-      self.jumin_eti_supply_amt = issued_by_owner.sum(&:price)
-      self.jumin_eti_vat_amt = issued_by_owner.sum(&:tax)
+      self.biz_eti_vend_cnt = hometax_invoices.group_by(&:vendor_registration_number).length
+      self.biz_eti_slip_cnt = hometax_invoices.length
+      self.biz_eti_supply_amt = hometax_invoices.sum(&:price)
+      self.biz_eti_vat_amt = hometax_invoices.sum(&:tax)
       save!
     end
 
@@ -51,6 +42,11 @@ module Foodtax
       self.jumin_pti_slip_cnt = 0
       self.jumin_pti_supply_amt = 0
       self.jumin_pti_vat_amt = 0
+
+      self.jumin_eti_vend_cnt = 0
+      self.jumin_eti_slip_cnt = 0
+      self.jumin_eti_supply_amt = 0
+      self.jumin_eti_vat_amt = 0
 
       self.asset_pti_slip_cnt = 0
       self.asset_pti_supply_amt = 0

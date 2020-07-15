@@ -1,8 +1,69 @@
 module Foodtax
   class VaCardSlip < Foodtax::ApplicationRecord
+    enum slip_type: {
+      personal_card: 1,
+      hometax_card: 2,
+      cash_receipt: 3,
+    }
     include FoodtaxHelper
-    self.primary_keys = :member_cd, :cmpy_cd, :term_cd, :declare_seq
+    self.primary_keys = :member_cd, :cmpy_cd, :term_cd, :declare_seq, :slip_seq, :slip_type
     after_initialize :default_values
+
+    VALIDATABLE_ATTRIBUTES = %w(vend_biz_reg_no vend_trade_nm slip_cnt supply_amt vat_amt total_amt deduct_yn pseudo_buy_yn approve_dt)
+    validates_presence_of Foodtax::VaCardSlip.attribute_names.select{ |attr| VALIDATABLE_ATTRIBUTES.include?(attr)}
+
+    def self.find_or_initialize_by_vat_form(form)
+      self.find_or_initialize_by(
+        cmpy_cd: "00025",
+        member_cd: form.vat_return.member_cd,
+        term_cd: form.vat_return.term_cd,
+      )
+    end
+
+    def self.import_vat_return!(vat_return)
+      sales = self.convert_card_slips(vat_return, vat_return.grouped_personal_cards, :personal_card)
+      sales += self.convert_card_slips(vat_return, vat_return.grouped_hometax_card_purchases, :hometax_card)
+      sales += self.convert_card_slips(vat_return, vat_return.grouped_purchases_cash_receipts, :cash_receipt)
+      self.import! sales
+    end
+
+    def self.convert_card_slips(vat_return, purchases, type)
+      index = 0      
+      purchases.map do |registration_number, name, purchased_at, amount, vat, price, count, deductible|
+        v = self.find_or_initialize_by_vat_form(vat_return.form)
+        index = index + 1
+        v.slip_seq = index
+        v.slip_type = type
+        case type
+        when :personal_card
+          v.card_type = 8
+          v.card_no = name
+          v.vend_trade_nm = ""
+          v.approve_dt = ""
+          v.deduct_yn = "Y"
+        when :hometax_card
+          v.card_type = 9
+          v.card_no = ""
+          v.vend_trade_nm = name
+          v.approve_dt = purchased_at.strftime("%Y%m%d")
+          v.deduct_yn = vat_return.grouped_deductible_purchases.dig([registration_number, "사업용카드"], 0)&.deductible ? "Y" : "N"
+        when :cash_receipt
+          v.card_type = ""
+          v.card_no = ""
+          v.vend_trade_nm = name
+          v.approve_dt = purchased_at.strftime("%Y%m%d")
+          v.deduct_yn = vat_return.grouped_deductible_purchases.dig([registration_number, "현금영수증"], 0)&.deductible ? "Y" : "N"
+        end
+        v.vend_biz_reg_no = vendor_registration_number
+        v.slip_cnt = count
+        v.supply_amt = price
+        v.vat_amt = vat
+        v.total_amt = amount
+        v.pseudo_buy_yn = vat_return.deemed_purchases_deductibles.dig([registration_number, type], 0)&.deemed ? "Y" : "N"
+        v
+      end
+    end
+    
 
     def with_card_purchase(card_purchase) # rubocop:disable Metrics/MethodLength
       self.slip_type = 2
@@ -65,8 +126,30 @@ module Foodtax
 
     def default_values
       self.cmpy_cd ||= "00025"
-      self.term_cd ||= "#{tax_declare_year}#{tax_declare_term}"
       self.declare_seq ||= "1"
+
+      self.slip_no = ""
+      self.approve_no = ""
+      self.vend_cd = ""
+      self.card_cd = ""
+      self.service_amt = 0
+      self.approve_dt = "" if self.approve_dt.nil?
+
+      self.middle_miss_yn = "N"
+      self.common_buy_yn = "N"
+      self.common_buy_amt = "N"
+      self.asset_yn = "N"
+      self.asset_type = "0"
+
+      self.recycle_yn = "N"
+
+      self.rmk = ""
+      self.uptae = ""
+      self.jongmok = ""
+      self.card_cmpy_nm = ""
+
+      self.vend_tax_type = ""
+      self.nts_vend_tax_type_nm = ""
     end
   end
 end

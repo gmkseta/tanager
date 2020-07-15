@@ -12,7 +12,7 @@ class Snowdon::GeneralVatReturnForm < Snowdon::ApplicationRecord
   validates :status, presence: true
 
   def to_h(field_name)
-    self[field_name].map { |s| { s["order_number"].to_s => s } }.inject(:merge)
+    self[field_name].map { |s| { s["order_number"] => s } }.inject(:merge)
   end
 
   def declarable?
@@ -22,7 +22,7 @@ class Snowdon::GeneralVatReturnForm < Snowdon::ApplicationRecord
   def converted_hash_by_order_number
     @converted_hash_by_order_number ||= begin
       converted_hash = {}
-      (attributes.keys - %w{id tax_payer created_at updated_at vat_return_id status}).each do |field|
+      (attributes.keys - %w{id tax_payer etc_summaries created_at updated_at vat_return_id status}).each do |field|
         converted_hash.merge!(to_h(field))
       end
       converted_hash

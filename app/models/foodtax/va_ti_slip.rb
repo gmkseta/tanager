@@ -15,7 +15,7 @@ module Foodtax
       purchases_invoices = vat_return.grouped_hometax_purchases_invoices(vat_return.form.date_range) + vat_return.grouped_paper_invoices(is_sales: false)
       purchases = []
       index = 0
-      purchases_invoices.each do |registration_number, business_name, wrriten_at, amount, vat, price, count, deductible, paper|
+      purchases_invoices.each do |registration_number, business_name, wrriten_at, amount, vat, price, count, deductible, paper_invoice|
         ti_slip = self.new(
           member_cd: vat_return.member_cd,
           cmpy_cd: "00025",
@@ -32,13 +32,13 @@ module Foodtax
         ti_slip.vat_amt = vat
         ti_slip.total_amt = amount
 
-        if paper
-          ti_slip.nodeduct_type = ""
+        if paper_invoice
+          ti_slip.nodeduct_type = 0
           ti_slip.pseudo_buy_yn = deemed_paper_invoices[registration_number]&.deductible ? "Y" : "N"
           ti_slip.deduct_yn = "Y"
           ti_slip.eti_yn = "N"
         else
-          ti_slip.nodeduct_type = deductible_purchases[registration_number]&.nodeduct_reason_id || ""
+          ti_slip.nodeduct_type = deductible_purchases[registration_number]&.nodeduct_reason_id || 0
           ti_slip.pseudo_buy_yn = deemed_invoices[registration_number]&.deductible ? "Y" : "N"
           ti_slip.deduct_yn = ti_slip.nodeduct_type.present? ? "N" : deductible_purchases[registration_number]&.deductible ? "Y" : "N"
           ti_slip.eti_yn = "Y"
@@ -49,9 +49,8 @@ module Foodtax
       end
       Foodtax::VaTiSlip.import purchases
 
-      sales = []
-      sales_invoices = vat_return.grouped_hometax_sales_invoices(vat_return.form.date_range) + vat_return.grouped_paper_invoices(is_sales: true)
-      sales_invoices.each do |registration_number, business_name, wrriten_at, amount, vat, price, count, paper|
+      sales_invoices = vat_return.grouped_hometax_sales_invoices + vat_return.grouped_paper_invoices(is_sales: true)
+      sales = sales_invoices.map do |registration_number, business_name, wrriten_at, amount, vat, price, count, paper_invoice|
         ti_slip = self.new(
           member_cd: vat_return.member_cd,
           cmpy_cd: "00025",
@@ -69,11 +68,11 @@ module Foodtax
         ti_slip.supply_amt = price
         ti_slip.vat_amt = vat
         ti_slip.total_amt = amount
-        ti_slip.nodeduct_type = ""
-        ti_slip.eti_yn = paper ? "N" : "Y"
+        ti_slip.nodeduct_type = 0
+        ti_slip.eti_yn = paper_invoice ? "N" : "Y"
         ti_slip.approve_dt = wrriten_at.strftime("%Y%m%d")
         ti_slip.slip_each_yn = "N"
-        sales << ti_slip
+        ti_slip
       end
       Foodtax::VaTiSlip.import sales
     end
@@ -183,9 +182,10 @@ module Foodtax
 
       self.person_yn = "N"
       self.person_jumin_no = ""
+      self.nodeduct_type = 0 if nodeduct_type.blank?
 
       self.asset_yn = "N"
-      self.asset_type = ""
+      self.asset_type = 0 if asset_type.blank?
     end
   end
 end

@@ -26,9 +26,8 @@ module Foodtax
       self.biz_pti_supply_amt = paper_invoices.sum(&:price)
       self.biz_pti_vat_amt = paper_invoices.sum(&:vat)
 
-      # TODO: 주민번호/사업자 구분 기준 체크
-      issued_by_business = hometax_invoices.select{ |h| h.customer_registration_number.length <= 10 }
-      issued_by_owner = hometax_invoices.select{ |h| h.customer_registration_number.length > 10 }
+      issued_by_business = hometax_invoices.select{ |h| h.customer_registration_number.present? }
+      issued_by_owner = hometax_invoices.select{ |h| h.customer_registration_number.nil? }
 
       self.biz_eti_vend_cnt = issued_by_business.group_by(&:customer_registration_number).length
       self.biz_eti_slip_cnt = issued_by_business.length
