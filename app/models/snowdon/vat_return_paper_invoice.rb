@@ -14,9 +14,6 @@ class Snowdon::VatReturnPaperInvoice < Snowdon::ApplicationRecord
     validates :amount
   end
 
-  scope :purchases, -> { where(invoice_type: :purchases) }
-  scope :sales, -> { where(invoice_type: :sales) }
-
   scope :tax_free, -> { where(vat: 0) }
   scope :taxation, -> { where.not(vat: 0) }
 
