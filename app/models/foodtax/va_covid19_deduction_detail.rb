@@ -23,7 +23,6 @@ module Foodtax
       form.summaries["covid19_deduction_details"].each_with_index do |s, i|
         d = self.find_or_initialize_by_vat_form(form, i)
         s.collect { |k, v| d[k] = v }
-        puts d.to_json
         d.save!
       end
     end

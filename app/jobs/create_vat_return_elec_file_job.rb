@@ -34,7 +34,6 @@ class CreateVatReturnElecFileJob < ApplicationJob
 
   def send_message(message)
     message = "[테스트] #{message}" if Rails.env.development?
-    # SlackBot.ping("#{message}", channel: "#cashnote-tax-ops")
-    puts message
+    SlackBot.ping("#{message}", channel: "#cashnote-tax-ops")
   end
 end
