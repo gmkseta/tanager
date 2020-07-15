@@ -53,7 +53,7 @@ module Foodtax
 
       self.declare_due_dt = vat_return_due_date(form.period_end_date.to_date).strftime("%Y%m%d")
 
-      form.etc_summaries["header"].each do |k, v|
+      form.summaries["header"].each do |k, v|
         self[k] = v
       end
 

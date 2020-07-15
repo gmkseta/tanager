@@ -6,6 +6,9 @@ module Foodtax
 
     belongs_to :va_head, foreign_key: :member_cd, primary_key: :member_cd
 
+    NON_VALIDATABLE_ATTRIBUTES = %w(REG_DATE UPDT_DATE REG_USER_ID UPDT_USER_ID)
+    validates_presence_of Foodtax::VaCovid19DeductionSummary.attribute_names.reject{ |attr| NON_VALIDATABLE_ATTRIBUTES.include?(attr)}
+
     def self.find_or_initialize_by_vat_form(form)
       self.find_or_initialize_by(
         cmpy_cd: "00025",
@@ -17,7 +20,7 @@ module Foodtax
     def self.import_general_form!(form)
       s = self.find_or_initialize_by_vat_form(form)
 
-      form.etc_summaries["covid19_deduction_summary"].collect{ |k, v| s[k] = v }
+      form.summaries["covid19_deduction_summary"].collect{ |k, v| s[k] = v }
 
       s.paytax_fix_amt = form.value_vat("100")
       s.gong_fix_amt = form.value_vat("20")

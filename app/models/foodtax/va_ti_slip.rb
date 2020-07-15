@@ -1,10 +1,13 @@
 module Foodtax
   class VaTiSlip < Foodtax::ApplicationRecord
-    include FoodtaxHelper
     self.primary_keys = :member_cd, :cmpy_cd, :term_cd, :declare_seq, :slip_seq
     after_initialize :default_values
 
     belongs_to :cm_member, foreign_key: :member_cd, primary_key: :member_cd
+
+    validates :member_cd, presence: true, uniqueness: { scope: %i(cmpy_cd term_cd declare_seq slip_seq) }
+    NON_VALIDATABLE_ATTRIBUTES = %w(slip_no deal_dt vend_cd person_jumin_no vend_trade_nm vend_trade_nm reg_date updt_date reg_user_id updp_user_id)
+    validates_presence_of Foodtax::VaTiSlip.attribute_names.reject{ |attr| NON_VALIDATABLE_ATTRIBUTES.include?(attr)}
 
     def self.import_vat_return!(vat_return)
       deemed_invoices = vat_return.deemed_purchases.invoices.index_by(&:vendeor_registration_number)

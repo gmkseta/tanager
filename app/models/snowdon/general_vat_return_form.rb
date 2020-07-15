@@ -22,7 +22,7 @@ class Snowdon::GeneralVatReturnForm < Snowdon::ApplicationRecord
   def converted_hash_by_order_number
     @converted_hash_by_order_number ||= begin
       converted_hash = {}
-      (attributes.keys - %w{id tax_payer etc_summaries created_at updated_at vat_return_id status}).each do |field|
+      (attributes.keys - %w{id tax_payer created_at updated_at vat_return_id status summaries}).each do |field|
         converted_hash.merge!(to_h(field))
       end
       converted_hash

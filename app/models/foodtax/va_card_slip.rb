@@ -5,7 +5,6 @@ module Foodtax
       hometax_card: 2,
       cash_receipt: 3,
     }
-    include FoodtaxHelper
     self.primary_keys = :member_cd, :cmpy_cd, :term_cd, :declare_seq, :slip_seq, :slip_type
     after_initialize :default_values
 

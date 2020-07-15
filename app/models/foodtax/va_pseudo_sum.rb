@@ -5,6 +5,9 @@ module Foodtax
 
     belongs_to :cm_member, foreign_key: :member_cd, primary_key: :member_cd
 
+    NON_VALIDATABLE_ATTRIBUTES = %w(deduct_biz_type REG_DATE UPDT_DATE REG_USER_ID UPDT_USER_ID)
+    validates_presence_of Foodtax::VaPseudoSum.attribute_names.reject{ |attr| NON_VALIDATABLE_ATTRIBUTES.include?(attr)}
+
     def self.find_or_initialize_by_vat_form(form)
       self.find_or_initialize_by(
         cmpy_cd: "00025",
@@ -16,7 +19,7 @@ module Foodtax
     def self.import_general_form!(form)
       s = self.find_or_initialize_by_vat_form(form)
 
-      form.etc_summaries["deemed_purchases_summary"].collect { |k, v| s[k] = v }
+      form.summaries["deemed_purchases_summary"].collect { |k, v| s[k] = v }
 
       s.C0010 = 0
       s.C0020 = form.value_price("32")
@@ -31,6 +34,7 @@ module Foodtax
       s.C0110 = 0
       s.C0120 = 0 
       s.C0130 = form.value_vat("43")
+      s.deduct_amt = form.value_vat("43")
 
       s.save!
     end
@@ -41,10 +45,8 @@ module Foodtax
       self.cmpy_cd ||= "00025"
       self.declare_seq ||= "1"
 
-      self.autocal_yn = "Y" if autocal_yn.blank?
+      self.autocal_yn = "N"
       self.deduct_biz_type = ""
-
-      
     end
 
     def default_dates

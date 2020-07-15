@@ -1,6 +1,7 @@
 :concurrency: 30
 :queues:
   - default
+  - create_vat_return_elec_file
   - [send_slack_message, 2]
   - calculate_income_tax
   - estimate_income_tax

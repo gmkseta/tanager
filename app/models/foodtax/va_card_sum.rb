@@ -16,7 +16,7 @@ module Foodtax
     def self.import_general_form!(form)
       c = self.find_or_initialize_by_vat_form(form)
 
-      form.etc_summaries["card_and_cash_summary"].collect { |k, v| c[k] = v }
+      form.summaries["card_and_cash_summary"].collect { |k, v| c[k] = v }
 
       c.deduct_target_amt = form.value_price("19")
       c.deduct_rate_nm = form.value_vat("19") > 0 ? "1.3" : ""
