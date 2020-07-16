@@ -91,6 +91,8 @@ module Foodtax
       self.biz_tel_no = form["tax_payer"]&.fetch("business_phone_number") || ""
       self.cp_no = form["tax_payer"]&.fetch("cellphone_number") || ""
       self.home_tel_no = form["tax_payer"]&.fetch("phone_number") || ""
+
+      self.smbiz_vat_gam_amt = form.summaries.dig("covid19_deduction_summary", "gamtax_amt").to_i
     end
 
     def default_values

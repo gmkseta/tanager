@@ -51,7 +51,7 @@ module Foodtax
           v.deduct_yn = custom_deductible ? "Y" : deductible ? "Y" : "N"
         end
         v.card_no = card_number || ""
-          v.vend_trade_nm = name || ""
+        v.vend_trade_nm = name || ""
         v.vend_biz_reg_no = registration_number
         v.slip_cnt = count
         v.supply_amt = price
