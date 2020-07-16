@@ -29,7 +29,7 @@ class RequestPaymentAccount < Service::Base
   QUERY
 
   def run
-    response = Cashnote::GraphqlRequest.http_query(token, GetIndividualIncomeTaxReturn)
+    response = Cashnote::GraphqlRequest.new(GetIndividualIncomeTaxReturn, token: token).http_query
     error_message = response.dig("errors")
     if error_message.present?
       Rails.logger.info("error_message : #{error_message}")
