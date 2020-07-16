@@ -29,12 +29,16 @@ class Snowdon::GeneralVatReturnForm < Snowdon::ApplicationRecord
     end
   end
 
+  def base_taxation_price(order_number)
+    converted_hash_by_order_number&.dig(order_number, "price").to_i
+  end
+
   def value_price(order_number)
-    converted_hash_by_order_number[order_number]&.dig("value", "price") || 0
+    converted_hash_by_order_number[order_number]&.dig("value", "price").to_i
   end
 
   def value_vat(order_number)
-    converted_hash_by_order_number[order_number]&.dig("value", "vat") || 0
+    converted_hash_by_order_number[order_number]&.dig("value", "vat").to_i
   end
 
   def period_start_date

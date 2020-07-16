@@ -22,8 +22,8 @@ module Foodtax
       form.summaries["deemed_purchases_summary"].collect { |k, v| s[k] = v }
 
       s.C0010 = 0
-      s.C0020 = form.value_price("32")
-      s.C0030 = form.value_price("32")
+      s.C0020 = form.base_taxation_price("32")
+      s.C0030 = form.base_taxation_price("32")
       s.C0061 = 0
       s.C0062 = form.value_vat("43")
       s.C0060 = form.value_vat("43")
