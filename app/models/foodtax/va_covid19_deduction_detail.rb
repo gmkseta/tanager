@@ -15,7 +15,7 @@ module Foodtax
         cmpy_cd: "00025",
         member_cd: form.vat_return.member_cd,
         term_cd: form.vat_return.term_cd,
-        seq_no: i
+        seq_no: i+1
       )
     end
 

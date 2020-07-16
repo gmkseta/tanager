@@ -18,8 +18,7 @@ module Foodtax
     end
 
     def self.import_general_form!(form)
-      no_deductions = form.vat_return.deductible_purchases.purchases_invoices.no_deductions
-      vendor_registration_numbers = no_deductions.index_by(&:vendor_registration_number)
+      vendor_registration_numbers = form.vat_return.deductible_purchases.purchases_invoices.no_deductions.index_by(&:vendor_registration_number)
       invoices = begin
         form.vat_return.business.hometax_purchases_invoices
           .joins(:deductible_purchase)
@@ -33,16 +32,16 @@ module Foodtax
             SUM(tax)
           QUERY
       end
-      no_deductible_purchases_details = []
-      invoices.each do |vendor_registration_number, count, price, vat|
+
+      no_deductible_purchases_details = invoices.map do |vendor_registration_number, count, price, vat|
         va_no_deduction_detail = Foodtax::VaNoDeductiblePurchaseDetail.find_or_initialize_by_vat_form(form)
         va_no_deduction_detail.nodeduct_type = vendor_registration_numbers[vendor_registration_number].nodeduct_reason_id - 1
         va_no_deduction_detail.C0010 = count
         va_no_deduction_detail.C0020 = price
         va_no_deduction_detail.C0030 = vat
-        no_deductible_purchases_details << va_no_deduction_detail
+        no_deductible_purchases_details
       end
-      Foodtax::VaNoDeductiblePurchaseDetail.import!(no_deductible_purchases_details)
+      self.import!(no_deductible_purchases_details)
     end
 
     private

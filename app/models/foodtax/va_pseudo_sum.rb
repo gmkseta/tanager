@@ -25,9 +25,9 @@ module Foodtax
       s.C0020 = form.base_taxation_price("32")
       s.C0030 = form.base_taxation_price("32")
       s.C0061 = 0
-      s.C0062 = form.value_vat("43")
-      s.C0060 = form.value_vat("43")
-      s.C0070 = form.value_vat("43")
+      s.C0062 = s.bill_supply_amt + s.card_supply_amt + s.direct_supply_amt
+      s.C0060 = s.bill_supply_amt + s.card_supply_amt + s.direct_supply_amt
+      s.C0070 = s.bill_supply_amt + s.card_supply_amt + s.direct_supply_amt
       s.C0080 = s.deduct_rate_nm[0]
       s.C0090 = form.value_vat("43")
       s.C0100 = 0
