@@ -8,8 +8,6 @@ gem 'rails', '~> 5.2.3'
 gem 'pg', '~> 1.0.0'
 # Use Puma as the app server
 gem 'puma', '~> 3.12'
-# Use Redis adapter to run Action Cable in production
-gem 'redis', '~> 4.0'
 # Use Active Model has_secure_password
 gem 'bcrypt', '~> 3.1.7'
 
@@ -30,12 +28,13 @@ gem 'friendly_id', '~> 5.2.4' # Note: You MUST use 5.0.0 or greater for Rails 4.
 gem 'graphql-client'
 gem 'httparty'
 gem 'knock'
-gem 'will_paginate', '>= 3.1.0'
-gem 'rails-i18n'
-gem 'sidekiq', '~> 6.0.7'
+gem 'redis'
 gem 'slack-notifier'
+gem 'sidekiq'
 gem 'sentry-raven'
 gem 'tiny_tds'
+gem 'rails-i18n'
+gem 'will_paginate', '>= 3.1.0'
 
 
 group :development, :test do
