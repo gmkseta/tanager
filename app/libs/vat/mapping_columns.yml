@@ -178,7 +178,7 @@ va_head:
     vat:
     desc: 합계
   "54":
-    vat: elec_ti_deduct_amt
+    vat: elec_declare_amt
     desc: 전자신고세액공제
   "55":
     vat: elec_ti_deduct_amt
