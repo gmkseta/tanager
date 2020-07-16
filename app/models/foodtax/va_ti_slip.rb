@@ -18,7 +18,7 @@ module Foodtax
       purchases_invoices = vat_return.grouped_hometax_purchases_invoices(vat_return.form.date_range) + vat_return.grouped_paper_invoices(is_sales: false)
       purchases = []
       index = 0
-      purchases_invoices.each do |registration_number, business_name, wrriten_at, amount, vat, price, count, deductible, paper_invoice|
+      purchases_invoices.each do |registration_number, card_number, business_name, wrriten_at, amount, vat, price, count, deductible, paper_invoice|
         ti_slip = self.new(
           member_cd: vat_return.member_cd,
           cmpy_cd: "00025",

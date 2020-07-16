@@ -17,6 +17,7 @@ class CreateVatElecFile < Service::Base
 
       Foodtax::VaIncome.import_general_form!(vat_return.form)
       Foodtax::VaCardSum.import_general_form!(vat_return.form)
+      Foodtax::VaCardSlip.import_vat_return!(vat_return)
 
       sales_bills_sum = Foodtax::VaOutBillSum.find_or_initialize_by_vat_form(vat_return.form)
       sales_bills_sum.import_general_form!(vat_return.form)

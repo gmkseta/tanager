@@ -40,12 +40,13 @@ class Snowdon::VatReturn < Snowdon::ApplicationRecord
     @grouped_hometax_card_purchases ||= begin
       business.hometax_card_purchases
         .where(purchased_at: date_range)
-        .group(:vendor_registration_number)      
-        .select(Arel.sql(<<~QUERY))
+        .group(:vendor_registration_number, :card_number)
+        .pluck(Arel.sql(<<~QUERY))
           vendor_registration_number,
           MAX(vendor_business_name),
-          MAX(purchased_at)
-          SUM(amount)
+          card_number,
+          MAX(purchased_at),
+          SUM(amount),
           SUM(vat),
           SUM(price),
           COUNT(*),
@@ -62,7 +63,8 @@ class Snowdon::VatReturn < Snowdon::ApplicationRecord
         .pluck(Arel.sql("
           vendor_registration_number,
           MAX(vendor_business_name),
-          MAX(purchased_at)
+          '' as card_number,
+          MAX(purchased_at),
           SUM(CASE WHEN receipt_type = 0 THEN amount ELSE -amount END),
           SUM(CASE WHEN receipt_type = 0 THEN vat ELSE -vat END),
           SUM(CASE WHEN receipt_type = 0 THEN price ELSE -price END),
@@ -80,6 +82,7 @@ class Snowdon::VatReturn < Snowdon::ApplicationRecord
         .pluck(Arel.sql(<<~QUERY))
           vendor_registration_number,
           MAX(vendor_business_name) as business_name,
+          '' as card_number,
           MAX(written_at),
           SUM(amount),
           SUM(tax),
@@ -96,12 +99,13 @@ class Snowdon::VatReturn < Snowdon::ApplicationRecord
       personal_card_purchases.group(:vendor_registration_number, :card_number)
         .pluck(Arel.sql(<<~QUERY))
           vendor_registration_number,
-          card_number
-          NULL as purchased_at,
+          '',
+          card_number,
+          '' as purchased_at,
           SUM(amount),
           SUM(vat),
           SUM(price),
-          COUNT(*)
+          COUNT(*),
           TRUE as deductible
         QUERY
     end
