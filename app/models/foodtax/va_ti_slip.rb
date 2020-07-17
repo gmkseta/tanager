@@ -41,9 +41,20 @@ module Foodtax
           ti_slip.deduct_yn = "Y"
           ti_slip.eti_yn = "N"
         else
-          ti_slip.nodeduct_type = deductible_purchases[registration_number]&.nodeduct_reason_id || 0
-          ti_slip.pseudo_buy_yn = deemed_invoices[registration_number]&.deductible ? "Y" : "N"
-          ti_slip.deduct_yn = ti_slip.nodeduct_type.present? ? "N" : deductible_purchases[registration_number]&.deductible ? "Y" : "N"
+          if deemed_invoices[registration_number]&.deductible
+            ti_slip.pseudo_buy_yn = "Y"
+            ti_slip.deduct_yn = "Y"
+          else
+            ti_slip.pseudo_buy_yn = "N"
+            ti_slip.deduct_yn = deductible ? "Y" : "N"
+          end
+          if deductible_purchases[registration_number]&.nodeduct_reason_id
+            ti_slip.nodeduct_type = deductible_purchases[registration_number].nodeduct_reason_id + 1
+            ti_slip.pseudo_buy_yn = "N"
+            ti_slip.deduct_yn = "N"
+          else
+            ti_slip.nodeduct_type = 0
+          end
           ti_slip.eti_yn = "Y"
         end
         ti_slip.approve_dt = wrriten_at.strftime("%Y%m%d")
