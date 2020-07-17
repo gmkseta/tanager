@@ -19,6 +19,8 @@ module Foodtax
 
     def self.import_general_form!(form)
       vendor_registration_numbers = form.vat_return.deductible_purchases.purchases_invoices.no_deductions.index_by(&:vendor_registration_number)
+      return if vendor_registration_numbers.blank?
+
       invoices = begin
         form.vat_return.business.hometax_purchases_invoices
           .joins(:deductible_purchase)

@@ -10,7 +10,7 @@ module Foodtax
     validates_presence_of Foodtax::VaTiSlip.attribute_names.reject{ |attr| NON_VALIDATABLE_ATTRIBUTES.include?(attr)}
 
     def self.import_vat_return!(vat_return)
-      deemed_invoices = vat_return.deemed_purchases.invoices.index_by(&:vendeor_registration_number)
+      deemed_invoices = vat_return.deemed_purchases.invoices.index_by(&:vendor_registration_number)
       deemed_paper_invoices = vat_return.deemed_purchases.paper_invoices.index_by(&:vendor_registration_number)
 
       deductible_purchases = vat_return.deductible_purchases.purchases_invoices.index_by(&:vendor_registration_number)

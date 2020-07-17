@@ -1,5 +1,7 @@
 class Snowdon::BusinessStatusForm < Snowdon::ApplicationRecord
-  enum declare_period: { first_half: "상반기", second_half: "하반기" }
+  validates :year, presence: true
+  validates :period, uniqueness: { scope: %i(business year) }, inclusion: { in: [1, 2] }
+  validates :self_rental, inclusion: { in: [true, false] }
   belongs_to :business
 
   def first_half?
