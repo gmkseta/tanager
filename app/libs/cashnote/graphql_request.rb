@@ -23,8 +23,8 @@ module Cashnote
       request = Net::HTTP::Post.new(uri.request_uri, header)
       request.body = { query: query }.to_json
       response = http.request(request)
-      json_body = JSON.parse(response.body)
-      json_body
+      raise Net::HTTPBadResponse unless response.code.eql?("200")
+      JSON.parse(response.body)
     end
   end
 end
