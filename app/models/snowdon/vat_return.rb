@@ -37,25 +37,31 @@ class Snowdon::VatReturn < Snowdon::ApplicationRecord
   end
 
   def grouped_hometax_card_purchases(date_range = form.date_range)
+    codes, _, _ = deemed_purchasable_info
+
     @grouped_hometax_card_purchases ||= begin
       business.hometax_card_purchases
         .where(purchased_at: date_range)
-        .group(:vendor_registration_number, :card_number)
+        .group(:vendor_registration_number)
         .pluck(Arel.sql(<<~QUERY))
           vendor_registration_number,
-          MAX(vendor_business_name),
-          card_number,
-          MAX(purchased_at),
+          MAX(vendor_business_name) as vendor_business_name,
+          MAX(card_number),
+          MAX(purchased_at) as purchased_at,
           SUM(amount),
           SUM(vat),
           SUM(price),
           COUNT(*),
-          MIN(deductible::integer)::boolean as deducible
+          MIN(deductible::integer)::boolean as deducible,
+          MAX(vendor_business_classification_code) ~* '(#{codes})' as deemed,
+          'HometaxCardPurchase' as type
         QUERY
     end
   end
 
   def grouped_purchases_cash_receipts(date_range = form.date_range)
+    codes, _, _ = deemed_purchasable_info
+
     @grouped_purchases_cash_receipts ||= begin
       business.hometax_purchases_cash_receipts
         .where(purchased_at: date_range)
@@ -69,28 +75,10 @@ class Snowdon::VatReturn < Snowdon::ApplicationRecord
           SUM(CASE WHEN receipt_type = 0 THEN vat ELSE -vat END),
           SUM(CASE WHEN receipt_type = 0 THEN price ELSE -price END),
           COUNT(*),
-          MIN(tax_deductible::integer)::boolean
+          MIN(tax_deductible::integer)::boolean,
+          MAX(vendor_business_code) ~* '(#{codes})' as deemed,
+          'HometaxPurchasesCashReceipt' as type
         "))
-    end
-  end
-
-  def grouped_hometax_purchases_invoices(date_range = form.date_range)
-    @grouped_hometax_purchases_invoices ||= begin
-      business.hometax_purchases_invoices
-        .where(written_at: date_range)
-        .group(:vendor_registration_number)
-        .pluck(Arel.sql(<<~QUERY))
-          vendor_registration_number,
-          MAX(vendor_business_name) as business_name,
-          '' as card_number,
-          MAX(written_at),
-          SUM(amount),
-          SUM(tax),
-          SUM(price),
-          COUNT(*),
-          TRUE as deducible,
-          FALSE as paper_invoice
-        QUERY
     end
   end
 
@@ -106,7 +94,31 @@ class Snowdon::VatReturn < Snowdon::ApplicationRecord
           SUM(vat),
           SUM(price),
           COUNT(*),
-          TRUE as deductible
+          TRUE as deductible,
+          TRUE as deemed,
+          'VatReturnPersonalCardPurchase' as type
+        QUERY
+    end
+  end
+
+  def grouped_hometax_purchases_invoices(date_range = form.date_range)
+    _, classifications, categories = deemed_purchasable_info
+
+    @grouped_hometax_purchases_invoices ||= begin
+      business.hometax_purchases_invoices
+        .where(written_at: date_range)
+        .group(:vendor_registration_number)
+        .pluck(Arel.sql(<<~QUERY))
+          vendor_registration_number,
+          MAX(vendor_business_name) as business_name,
+          MAX(written_at),
+          SUM(amount),
+          SUM(tax),
+          SUM(price),
+          COUNT(*),
+          TRUE as deducible,
+          MAX(vendor_business_classification) ~* '(#{classifications})' OR MAX(vendor_business_category) ~* '(#{categories})' as deemed,
+          'HometaxPurchasesInvoice' as type
         QUERY
     end
   end
@@ -124,30 +136,40 @@ class Snowdon::VatReturn < Snowdon::ApplicationRecord
           SUM(tax),
           SUM(price),
           COUNT(*),
-          FALSE as paper_invoice
+          TRUE as deducible,
+          TRUE as deemed,
+          'HometaxSalesInvoice' as type
         QUERY
     end
   end
 
-  def grouped_paper_invoices(is_sales: nil, is_tax_free: nil)
-    @grouped_paper_invoices ||= begin
-      invoices = paper_invoices.group(:trader_registration_number)
-      invoices = is_sales ? invoices.sales : invoices.purchases if is_sales.present?
-      invoices = is_tax_free ? invoices.tax_free : invoices.taxation if is_tax_free.present?
-      invoices.pluck(Arel.sql(<<~QUERY))
-        trader_registration_number,
-        MAX(trader_business_name) as business_name,
-        MAX(written_at),
-        SUM(amount),
-        SUM(vat),
-        SUM(price),
-        COUNT(*),
-        TRUE as deducible,
-        TRUE as paper_invoice
-      QUERY
+  def grouped_paper_invoices(is_sales: nil)
+    invoices = paper_invoices.group(:trader_registration_number)
+    invoices = is_sales ? invoices.sales : invoices.purchases if is_sales.present?
+    invoices.pluck(Arel.sql(<<~QUERY))
+      trader_registration_number,
+      MAX(trader_business_name) as business_name,
+      MAX(written_at),
+      SUM(amount),
+      SUM(vat),
+      SUM(price),
+      COUNT(*),
+      TRUE as deducible,
+      TRUE as deemed,
+      'VatReturnPaperInvoice' as type
+    QUERY
+  end
+
+  def deemed_purchasable_info
+    @deemed_purchasable_info ||= begin
+      codes = Snowdon::HometaxBusinessClassification.deemed_purchasable_codes.join("|")
+      classifications = Snowdon::HometaxPurchasesInvoice::DEEMED_PURCHASABLE_CLASSIFICATIONS.join("|")
+      categories = Snowdon::HometaxPurchasesInvoice::DEEMED_PURCHASABLE_CATEGORIES.join("|")
+
+      [codes, classifications, categories]  
     end
   end
-  
+
   def deemed_purchases_deductibles
     @deemed_purchases_deductibles ||= begin
       deemed_purchases.group_by do |purchase|

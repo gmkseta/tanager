@@ -1,7 +1,7 @@
 class Snowdon::HometaxPurchasesInvoice < Snowdon::ApplicationRecord
-  TAX_FREE_VENDOR_CLASSIFICATIONS = %w(농업 임업 수산 축산 김치 두부 소금 도매 소매 제조 도소매 식품 가공 곡물 과일 야채 농산 식자 유통 육류 음식 유제 유가공).freeze
-  TAX_FREE_VENDOR_CATEGORIES = %w(쌀 수산 참치 식품 생선).freeze
   REVISED_INVOICE_TYPES = %w(일반(수정) 수입(수정) 위수탁(수정) 영세율(수정) 영세율위수탁(수정)).freeze
+  DEEMED_PURCHASABLE_CLASSIFICATIONS = %w(농업 임업 수산 축산 김치 두부 소금 도매 소매 제조 도소매 식품 가공 곡물 과일 야채 농산 식자 유통 육류 음식 유제 유가공).freeze
+  DEEMED_PURCHASABLE_CATEGORIES = %w(쌀 수산 참치 식품 생선).freeze
 
   belongs_to :business
   belongs_to :hometax_business
@@ -44,13 +44,10 @@ class Snowdon::HometaxPurchasesInvoice < Snowdon::ApplicationRecord
     end
 
     def from_tax_free_vendors
-      classifications = TAX_FREE_VENDOR_CLASSIFICATIONS.map { |str| "'%#{str}%'" }.join(",")
-      categories = TAX_FREE_VENDOR_CATEGORIES.map { |str| "'%#{str}%'" }.join(",")
-
-      where(tax_invoice: false, tax: 0).where(<<-SQL.squish)
-        vendor_business_classification LIKE any (array[#{classifications}])
-        OR vendor_business_category LIKE any (array[#{categories}])
-      SQL
+      where(tax_invoice: false, tax: 0).where(Arel.sql("
+        vendor_business_classification ~* '(#{DEEMED_PURCHASABLE_CLASSIFICATIONS.join("|")})'
+        OR vendor_business_category ~* '(#{DEEMED_PURCHASABLE_CATEGORIES.join("|")})'
+      "))
     end
 
     def registration_number_attr_name

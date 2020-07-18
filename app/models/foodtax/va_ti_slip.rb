@@ -18,7 +18,7 @@ module Foodtax
       purchases_invoices = vat_return.grouped_hometax_purchases_invoices(vat_return.form.date_range) + vat_return.grouped_paper_invoices(is_sales: false)
       purchases = []
       index = 0
-      purchases_invoices.each do |registration_number, card_number, business_name, wrriten_at, amount, vat, price, count, deductible, paper_invoice|
+      purchases_invoices.each do |registration_number, business_name, wrriten_at, amount, vat, price, count, deductible, deemed, type|
         ti_slip = self.new(
           member_cd: vat_return.member_cd,
           cmpy_cd: "00025",
@@ -35,36 +35,29 @@ module Foodtax
         ti_slip.vat_amt = vat
         ti_slip.total_amt = amount
 
-        if paper_invoice
-          ti_slip.nodeduct_type = 0
-          ti_slip.pseudo_buy_yn = deemed_paper_invoices[registration_number].present? ? "Y" : "N"
-          ti_slip.deduct_yn = "Y"
-          ti_slip.eti_yn = "N"
-        else
-          if deemed_invoices[registration_number].present?
-            ti_slip.pseudo_buy_yn = "Y"
-            ti_slip.deduct_yn = "Y"
-          else
-            ti_slip.pseudo_buy_yn = "N"
-            ti_slip.deduct_yn = deductible ? "Y" : "N"
-          end
-          if deductible_purchases[registration_number]&.nodeduct_reason_id
-            ti_slip.nodeduct_type = deductible_purchases[registration_number].nodeduct_reason_id
-            ti_slip.pseudo_buy_yn = "N"
-            ti_slip.deduct_yn = "N"
-          else
-            ti_slip.nodeduct_type = 0
-          end
-          ti_slip.eti_yn = "Y"
-        end
+        no_deductible_id = deemed_paper_invoices[registration_number]&.nodeduct_reason_id
+        custom_deemed = deemed_paper_invoices[registration_number]&.deductible
+        custom_deductible = deductible_purchases[registration_number]&.deductible
+        ti_slip.eti_yn = type == "VatReturnPaperInvoice" ? "N" : "Y"
         ti_slip.approve_dt = wrriten_at.strftime("%Y%m%d")
         ti_slip.slip_each_yn = "N"
+
+        if no_deductible_id.present?
+          ti_slip.nodeduct_type = NoDeductReson.find(custom_no_deductible_id).code
+          ti_slip.pseudo_buy_yn = "N"
+          ti_slip.deduct_yn = "N"
+        else
+          ti_slip.pseudo_buy_yn = custom_deemed ? "Y" : (deemed && vat.zero?) ? "Y" : "N"
+          slip_deductible = custom_deductible.nil? ? deductible : custom_deductible
+          ti_slip.deduct_yn = ti_slip.pseudo_buy_yn == "Y" ? "Y" : slip_deductible ? "Y" : "N"
+          ti_slip.nodeduct_type = 0
+        end
         purchases << ti_slip
       end
       Foodtax::VaTiSlip.import! purchases
 
       sales_invoices = vat_return.grouped_hometax_sales_invoices + vat_return.grouped_paper_invoices(is_sales: true)
-      sales = sales_invoices.map do |registration_number, business_name, wrriten_at, amount, vat, price, count, paper_invoice|
+      sales = sales_invoices.map do |registration_number, business_name, wrriten_at, amount, vat, price, count, _, _, type|
         ti_slip = self.new(
           member_cd: vat_return.member_cd,
           cmpy_cd: "00025",
@@ -83,7 +76,7 @@ module Foodtax
         ti_slip.vat_amt = vat
         ti_slip.total_amt = amount
         ti_slip.nodeduct_type = 0
-        ti_slip.eti_yn = paper_invoice ? "N" : "Y"
+        ti_slip.eti_yn = type == "VatReturnPaperInvoice" ? "Y" : "N"
         ti_slip.approve_dt = wrriten_at.strftime("%Y%m%d")
         ti_slip.slip_each_yn = "N"
         ti_slip

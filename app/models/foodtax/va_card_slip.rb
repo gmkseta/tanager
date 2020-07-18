@@ -20,47 +20,56 @@ module Foodtax
     end
 
     def self.import_vat_return!(vat_return)
-      sales = self.convert_card_slips(vat_return, vat_return.grouped_personal_cards, :personal_card)
-      sales += self.convert_card_slips(vat_return, vat_return.grouped_hometax_card_purchases, :hometax_card)
-      sales += self.convert_card_slips(vat_return, vat_return.grouped_purchases_cash_receipts, :cash_receipt)
+      sales = self.convert_card_slips(vat_return, vat_return.grouped_personal_cards)
+      sales += self.convert_card_slips(vat_return, vat_return.grouped_hometax_card_purchases)
+      sales += self.convert_card_slips(vat_return, vat_return.grouped_purchases_cash_receipts)
 
       self.import! sales
     end
 
-    def self.convert_card_slips(vat_return, purchases, type)
+    def self.convert_card_slips(vat_return, purchases)
       index = 0      
-      purchases.map do |registration_number, name, card_number, purchased_at, amount, vat, price, count, deductible|
+      purchases.map do |registration_number, name, card_number, purchased_at, amount, vat, price, count, deductible, deemed, type|
         v = self.find_or_initialize_by_vat_form(vat_return.form)
         index = index + 1
         v.slip_seq = index
-        v.slip_type = type
         case type
-        when :personal_card
+        when 'VatReturnPersonalCardPurchase'
           v.card_type = 8
+          v.slip_type = :personal_card
           v.approve_dt = vat_return.form.period_start_date
           v.deduct_yn = "Y"
-        when :hometax_card
+          v.vend_trade_nm = "개인카드 매입분"
+        when 'HometaxCardPurchase'
           v.card_type = 9
+          v.slip_type = :hometax_card
           v.approve_dt = purchased_at&.strftime("%Y%m%d") || ""
           custom_deductible = vat_return.grouped_deductible_purchases.dig([registration_number, "사업용카드"], 0)&.deductible
           v.deduct_yn = custom_deductible ? "Y" : deductible ? "Y" : "N"
-        when :cash_receipt
+          v.vend_trade_nm = name || '홈택스 카드 매입분'
+        when 'HometaxPurchasesCashReceipt'
           v.card_type = ""
+          v.slip_type = :cash_receipt
           v.approve_dt = purchased_at.strftime("%Y%m%d")
           custom_deductible = vat_return.grouped_deductible_purchases.dig([registration_number, "현금영수증"], 0)&.deductible
           v.deduct_yn = custom_deductible ? "Y" : deductible ? "Y" : "N"
+          v.vend_trade_nm = name || '홈택스 현금영수증 매입분'
         end
         v.card_no = card_number || ""
-        v.vend_trade_nm = name || v.card_type == 8 ? "개인카드 매입" : ""
         v.vend_biz_reg_no = registration_number
         v.slip_cnt = count
         v.supply_amt = price
         v.vat_amt = vat
         v.total_amt = amount
+        v.deduct_yn = deductible ? "Y" : "N"
 
         custom_deemed = vat_return.deemed_purchases_deductibles.dig([registration_number, type], 0)&.deemed
-        pseudo_buy_yn = custom_deductible.nil? ? (deductible || false) : custom_deductible,
-        v.pseudo_buy_yn = pseudo_buy_yn ? "Y" : "N"
+        pseudo_buy_yn = custom_deductible.nil? ? (deemed || false) : custom_deductible
+
+        if pseudo_buy_yn
+          v.pseudo_buy_yn = pseudo_buy_yn ? "Y" : "N"
+          v.deduct_yn = "Y"
+        end
 
         v
       end
