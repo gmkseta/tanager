@@ -20,7 +20,7 @@ module Foodtax
 
       c.deduct_target_amt = form.value_price("19")
       c.deduct_rate_nm = form.value_vat("19") > 0 ? "1.3" : ""
-      c.deduct_target_amt = form.value_vat("19")
+      c.deduct_amt = form.value_vat("19")
 
       c.save!
     end
