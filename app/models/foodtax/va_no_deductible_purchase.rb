@@ -20,7 +20,7 @@ module Foodtax
     def self.import_general_form!(form)
       deductible_purchases = form.vat_return.deductible_purchases
       vendor_registration_numbers = deductible_purchases.purchases_invoices.no_deductions.index_by(&:vendor_registration_number)
-      return if vendor_registration_numbers.blank?
+      return create_empty_table(form) if vendor_registration_numbers.blank?
 
       invoices = begin
         form.vat_return.business.hometax_purchases_invoices
@@ -33,6 +33,14 @@ module Foodtax
       va_no_deduction.C0020 = invoices.sum(:price)
       va_no_deduction.C0030 = invoices.sum(:tax)
       va_no_deduction.save!
+    end
+
+    def self.create_empty_table(form)
+      no_deduct = self.find_or_initialize_by_vat_form(form)
+      no_deduct.C0010 = 0
+      no_deduct.C0020 = 0
+      no_deduct.C0030 = 0
+      no_deduct.save!
     end
 
     private
