@@ -54,7 +54,7 @@ module Foodtax
         self[k] = v
       end
 
-      self.yieldtax_amt = self.v_v010 - form.value_vat("19")
+      self.yieldtax_amt = self.v_v010 - form.value_vat("19") - self.elec_declare_amt
       self.real_paytax_amt = form.value_vat("27")
       self.paytax_amt = form.value_vat("27")
 
