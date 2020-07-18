@@ -37,7 +37,7 @@ module Foodtax
         case type
         when :personal_card
           v.card_type = 8
-          v.approve_dt = ""
+          v.approve_dt = vat_return.form.period_start_date
           v.deduct_yn = "Y"
         when :hometax_card
           v.card_type = 9
@@ -51,7 +51,7 @@ module Foodtax
           v.deduct_yn = custom_deductible ? "Y" : deductible ? "Y" : "N"
         end
         v.card_no = card_number || ""
-        v.vend_trade_nm = name || ""
+        v.vend_trade_nm = name || v.card_type == 8 ? "개인카드 매입" : ""
         v.vend_biz_reg_no = registration_number
         v.slip_cnt = count
         v.supply_amt = price

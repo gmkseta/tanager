@@ -37,11 +37,11 @@ module Foodtax
 
         if paper_invoice
           ti_slip.nodeduct_type = 0
-          ti_slip.pseudo_buy_yn = deemed_paper_invoices[registration_number]&.deductible ? "Y" : "N"
+          ti_slip.pseudo_buy_yn = deemed_paper_invoices[registration_number].present? ? "Y" : "N"
           ti_slip.deduct_yn = "Y"
           ti_slip.eti_yn = "N"
         else
-          if deemed_invoices[registration_number]&.deductible
+          if deemed_invoices[registration_number].present?
             ti_slip.pseudo_buy_yn = "Y"
             ti_slip.deduct_yn = "Y"
           else
@@ -49,7 +49,7 @@ module Foodtax
             ti_slip.deduct_yn = deductible ? "Y" : "N"
           end
           if deductible_purchases[registration_number]&.nodeduct_reason_id
-            ti_slip.nodeduct_type = deductible_purchases[registration_number].nodeduct_reason_id + 1
+            ti_slip.nodeduct_type = deductible_purchases[registration_number].nodeduct_reason_id
             ti_slip.pseudo_buy_yn = "N"
             ti_slip.deduct_yn = "N"
           else

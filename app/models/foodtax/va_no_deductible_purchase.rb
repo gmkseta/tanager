@@ -18,12 +18,15 @@ module Foodtax
     end
 
     def self.import_general_form!(form)
-      no_deductions = form.vat_return.deductible_purchases.purchases_invoices.no_deductions
-      vendor_registration_numbers = no_deductions.index_by(&:vendor_registration_number)
+      deductible_purchases = form.vat_return.deductible_purchases
+      vendor_registration_numbers = deductible_purchases.purchases_invoices.no_deductions.index_by(&:vendor_registration_number)
+      return if vendor_registration_numbers.blank?
+
       invoices = begin
         form.vat_return.business.hometax_purchases_invoices
-          .where(written_at: form.date_range)
           .where(vendor_registration_number: vendor_registration_numbers.keys)
+          .where(written_at: form.date_range)
+          .where.not(tax: 0)
       end
       va_no_deduction = Foodtax::VaNoDeductiblePurchase.find_or_initialize_by_vat_form(form)
       va_no_deduction.C0010 = invoices.count

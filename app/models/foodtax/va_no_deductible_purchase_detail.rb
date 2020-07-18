@@ -18,32 +18,43 @@ module Foodtax
     end
 
     def self.import_general_form!(form)
-      vendor_registration_numbers = form.vat_return.deductible_purchases.purchases_invoices.no_deductions.index_by(&:vendor_registration_number)
+      deductible_purchases = form.vat_return.deductible_purchases
+      vendor_registration_numbers = deductible_purchases.purchases_invoices.no_deductions.index_by(&:vendor_registration_number)
       return if vendor_registration_numbers.blank?
 
       invoices = begin
         form.vat_return.business.hometax_purchases_invoices
-          .joins(:deductible_purchase)
+          .where(vendor_registration_number: vendor_registration_numbers.keys)
           .where(written_at: form.date_range)
-          .where.not(vat_return_deductible_purchases: { nodeduct_reason_id: nil })
-          .group(:nodeduct_reason_id)
+          .where.not(tax: 0)
+          .group(:vendor_registration_number)
           .pluck(Arel.sql(<<~QUERY))
-            MAX(hometax_purchases_invoices.vendor_registration_number),
+            MAX(vendor_registration_number),
             COUNT(*),
             SUM(price),
             SUM(tax)
           QUERY
       end
 
-      no_deductible_purchases_details = invoices.map do |vendor_registration_number, count, price, vat|
-        va_no_deduction_detail = Foodtax::VaNoDeductiblePurchaseDetail.find_or_initialize_by_vat_form(form)
-        va_no_deduction_detail.nodeduct_type = vendor_registration_numbers[vendor_registration_number].nodeduct_reason_id - 1
-        va_no_deduction_detail.C0010 = count
-        va_no_deduction_detail.C0020 = price
-        va_no_deduction_detail.C0030 = vat
-        no_deductible_purchases_details
+      no_deductible_purchases = begin
+        index = 0
+        invoices.map do |vendor_registration_number, count, price, vat|
+          next if vendor_registration_numbers[vendor_registration_number].nil?
+          index = index + 1
+          va_no_deduction_detail = Foodtax::VaNoDeductiblePurchaseDetail.find_or_initialize_by_vat_form(form)
+          va_no_deduction_detail.declare_seq = index
+          va_no_deduction_detail.nodeduct_type = vendor_registration_numbers[vendor_registration_number].code
+          va_no_deduction_detail.C0010 = count
+          va_no_deduction_detail.C0020 = price
+          va_no_deduction_detail.C0030 = vat
+
+          va_no_deduction_detail
+        end
       end
-      self.import!(no_deductible_purchases_details)
+
+      return if no_deductible_purchases.compact.blank?
+
+      self.import!(no_deductible_purchases.compact)
     end
 
     private
