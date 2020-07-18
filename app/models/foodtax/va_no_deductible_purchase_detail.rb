@@ -41,9 +41,12 @@ module Foodtax
         invoices.map do |vendor_registration_number, count, price, vat|
           next if vendor_registration_numbers[vendor_registration_number].nil?
           index = index + 1
+
+          no_deduct_reason = Snowdon::NodeductReason.find(vendor_registration_numbers[vendor_registration_number].nodeduct_reason_id)
+
           va_no_deduction_detail = Foodtax::VaNoDeductiblePurchaseDetail.find_or_initialize_by_vat_form(form)
           va_no_deduction_detail.declare_seq = index
-          va_no_deduction_detail.nodeduct_type = vendor_registration_numbers[vendor_registration_number].code
+          va_no_deduction_detail.nodeduct_type = no_deduct_reason.code
           va_no_deduction_detail.C0010 = count
           va_no_deduction_detail.C0020 = price
           va_no_deduction_detail.C0030 = vat
@@ -54,7 +57,7 @@ module Foodtax
 
       return if no_deductible_purchases.compact.blank?
 
-      self.import!(no_deductible_purchases.compact)
+      self.import!(no_deductible_purchases)
     end
 
     private
