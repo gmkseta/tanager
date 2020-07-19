@@ -73,7 +73,7 @@ module Foodtax
         self["biz_addr#{index + 1}"] = address
       end
 
-      self.return_bank = form["tax_payer"]&.fetch("refund_bank_name") || ""
+      self.return_bank = form.return_bank_code
       self.return_acct_no = form["tax_payer"]&.fetch("refund_bank_account") || ""
 
       h = form.vat_return.business.hometax_business

@@ -53,6 +53,11 @@ class Snowdon::GeneralVatReturnForm < Snowdon::ApplicationRecord
     converted_hash_by_order_number["28"]
   end
 
+  def bank_code
+    name = tax_payer["refund_bank_name"]    
+    Classification.banks.find_by(name: name)&.slug || ""
+  end
+
   def date_range
     vat_return_period_datetime_range(
       taxation_type: vat_return.business.taxation_type,
