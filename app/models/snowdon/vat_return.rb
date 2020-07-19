@@ -143,21 +143,40 @@ class Snowdon::VatReturn < Snowdon::ApplicationRecord
     end
   end
 
-  def grouped_paper_invoices(is_sales: nil)
-    invoices = paper_invoices.group(:trader_registration_number)
-    invoices = is_sales ? invoices.sales : invoices.purchases if is_sales.present?
-    invoices.pluck(Arel.sql(<<~QUERY))
-      trader_registration_number,
-      MAX(trader_business_name) as business_name,
-      MAX(written_at),
-      SUM(amount),
-      SUM(vat),
-      SUM(price),
-      COUNT(*),
-      TRUE as deducible,
-      TRUE as deemed,
-      'VatReturnPaperInvoice' as type
-    QUERY
+  def grouped_sales_paper_invoices
+    @grouped_sales_paper_invoices ||= begin
+      paper_invoices.sales.group(:trader_registration_number)
+        .pluck(Arel.sql(<<~QUERY))
+          trader_registration_number,
+          MAX(trader_business_name) as business_name,
+          MAX(written_at),
+          SUM(amount),
+          SUM(vat),
+          SUM(price),
+          COUNT(*),
+          TRUE as deducible,
+          TRUE as deemed,
+          'VatReturnPaperInvoice' as type
+        QUERY
+    end
+  end
+
+  def grouped_purchases_paper_invoices
+    @grouped_purchases_paper_invoices ||= begin
+      paper_invoices.purchases.group(:trader_registration_number)
+        .pluck(Arel.sql(<<~QUERY))
+          trader_registration_number,
+          MAX(trader_business_name) as business_name,
+          MAX(written_at),
+          SUM(amount),
+          SUM(vat),
+          SUM(price),
+          COUNT(*),
+          TRUE as deducible,
+          TRUE as deemed,
+          'VatReturnPaperInvoice' as type
+        QUERY
+    end
   end
 
   def deemed_purchasable_info

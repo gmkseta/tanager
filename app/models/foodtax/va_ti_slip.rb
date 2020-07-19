@@ -15,7 +15,7 @@ module Foodtax
 
       deductible_purchases = vat_return.deductible_purchases.purchases_invoices.index_by(&:vendor_registration_number)
 
-      purchases_invoices = vat_return.grouped_hometax_purchases_invoices(vat_return.form.date_range) + vat_return.grouped_paper_invoices(is_sales: false)
+      purchases_invoices = vat_return.grouped_hometax_purchases_invoices(vat_return.form.date_range) + vat_return.grouped_purchases_paper_invoices
       purchases = []
       index = 0
       purchases_invoices.each do |registration_number, business_name, wrriten_at, amount, vat, price, count, deductible, deemed, type|
@@ -34,11 +34,12 @@ module Foodtax
         ti_slip.supply_amt = price
         ti_slip.vat_amt = vat
         ti_slip.total_amt = amount
+        ti_slip.eti_yn = type == "VatReturnPaperInvoice" ? "N" : "Y"
 
         no_deductible_id = deemed_paper_invoices[registration_number]&.nodeduct_reason_id
         custom_deemed = deemed_paper_invoices[registration_number]&.deductible
         custom_deductible = deductible_purchases[registration_number]&.deductible
-        ti_slip.eti_yn = type == "VatReturnPaperInvoice" ? "N" : "Y"
+        
         ti_slip.approve_dt = wrriten_at.strftime("%Y%m%d")
         ti_slip.slip_each_yn = "N"
 
@@ -56,7 +57,7 @@ module Foodtax
       end
       Foodtax::VaTiSlip.import! purchases
 
-      sales_invoices = vat_return.grouped_hometax_sales_invoices + vat_return.grouped_paper_invoices(is_sales: true)
+      sales_invoices = vat_return.grouped_hometax_sales_invoices + vat_return.grouped_sales_paper_invoices
       sales = sales_invoices.map do |registration_number, business_name, wrriten_at, amount, vat, price, count, _, _, type|
         ti_slip = self.new(
           member_cd: vat_return.member_cd,
@@ -76,7 +77,7 @@ module Foodtax
         ti_slip.vat_amt = vat
         ti_slip.total_amt = amount
         ti_slip.nodeduct_type = 0
-        ti_slip.eti_yn = type == "VatReturnPaperInvoice" ? "Y" : "N"
+        ti_slip.eti_yn = type == "VatReturnPaperInvoice" ? "N" : "Y"
         ti_slip.approve_dt = wrriten_at.strftime("%Y%m%d")
         ti_slip.slip_each_yn = "N"
         ti_slip
