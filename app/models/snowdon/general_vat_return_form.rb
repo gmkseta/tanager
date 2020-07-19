@@ -53,8 +53,8 @@ class Snowdon::GeneralVatReturnForm < Snowdon::ApplicationRecord
     converted_hash_by_order_number["28"]
   end
 
-  def bank_code
-    name = tax_payer["refund_bank_name"]    
+  def return_bank_code
+    name = tax_payer["refund_bank_name"]
     Classification.banks.find_by(name: name)&.slug || ""
   end
 
