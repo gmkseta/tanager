@@ -36,6 +36,10 @@ class Snowdon::VatReturn < Snowdon::ApplicationRecord
    "#{year}#{period}"
   end
 
+  def exclude_covid19_deduction?
+    pre_form&.covid19_deduction_excluded == true
+  end
+
   def grouped_hometax_card_purchases(date_range = form.date_range)
     codes, _, _ = deemed_purchasable_info
 

@@ -19,7 +19,9 @@ module Foodtax
       )
     end
 
-    def self.import_general_form!(form)      
+    def self.import_general_form!(form)
+      return if form.vat_return.exclude_covid19_deduction?
+
       form.summaries["covid19_deduction_details"].each_with_index do |s, i|
         d = self.find_or_initialize_by_vat_form(form, i)
         s.collect { |k, v| d[k] = v }
