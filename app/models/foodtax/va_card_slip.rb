@@ -44,14 +44,14 @@ module Foodtax
           v.card_type = 9
           v.slip_type = :hometax_card
           v.approve_dt = purchased_at&.strftime("%Y%m%d") || ""
-          custom_deductible = vat_return.grouped_deductible_purchases.dig([registration_number, "사업용카드"], 0)&.deductible
+          custom_deductible = vat_return.grouped_deductible_purchases.dig([registration_number, type], 0)&.deductible
           v.deduct_yn = custom_deductible ? "Y" : deductible ? "Y" : "N"
           v.vend_trade_nm = name || '홈택스 카드 매입분'
         when 'HometaxPurchasesCashReceipt'
           v.card_type = ""
           v.slip_type = :cash_receipt
           v.approve_dt = purchased_at.strftime("%Y%m%d")
-          custom_deductible = vat_return.grouped_deductible_purchases.dig([registration_number, "현금영수증"], 0)&.deductible
+          custom_deductible = vat_return.grouped_deductible_purchases.dig([registration_number, type], 0)&.deductible
           v.deduct_yn = custom_deductible ? "Y" : deductible ? "Y" : "N"
           v.vend_trade_nm = name || '홈택스 현금영수증 매입분'
         end
@@ -61,10 +61,9 @@ module Foodtax
         v.supply_amt = price
         v.vat_amt = vat
         v.total_amt = amount
-        v.deduct_yn = deductible ? "Y" : "N"
 
-        custom_deemed = vat_return.deemed_purchases_deductibles.dig([registration_number, type], 0)&.deemed
-        pseudo_buy_yn = custom_deductible.nil? ? (deemed || false) : custom_deductible
+        custom_deemed = vat_return.deemed_purchases_deductibles.dig([registration_number, convert_deemed_type(type)], 0)&.deemed
+        pseudo_buy_yn = custom_deemed.nil? ? (deemed || false) : custom_deemed
 
         if pseudo_buy_yn
           v.pseudo_buy_yn = pseudo_buy_yn ? "Y" : "N"
@@ -72,6 +71,17 @@ module Foodtax
         end
 
         v
+      end
+    end
+
+    def self.convert_deemed_type(type)
+      case type
+      when "HometaxPurchasesCashReceipt"
+        "cash_receipts"
+      when "VatReturnPersonalCardPurchase"
+        "personal_cards"
+      when "HometaxCardPurchase"
+        "business_cards"
       end
     end
     
