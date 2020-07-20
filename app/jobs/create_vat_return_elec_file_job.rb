@@ -1,6 +1,6 @@
 class CreateVatReturnElecFileJob < ApplicationJob
   sidekiq_options retry: false
-  queue_as :create_vat_return_elec_file 
+  queue_as :create_vat_return_elec_file
 
   def perform(vat_return_id)
     vat_return = Snowdon::VatReturn.find(vat_return_id)
@@ -29,14 +29,14 @@ class CreateVatReturnElecFileJob < ApplicationJob
       QUERY
       response = Cashnote::GraphqlRequest.new(uploadVatReturnFile, token: nil).http_query
       results = response.dig("data", "uploadVatReturnFile")
-      
+
       return report_to_slack(
         "⚠️*부가세* 전자파일 업로드 오류!\n```#{results.dig("result", "message")}```",
         { vat_return_id: vat_return_id, member_cd: vat_return.member_cd },
-      ) if results.dig("result", "message").present?      
+      ) if results.dig("result", "message").present?
       return false
     end
-    
+
 
   rescue ActiveRecord::RecordNotFound => e
     report_to_slack(
@@ -45,7 +45,7 @@ class CreateVatReturnElecFileJob < ApplicationJob
     )
   rescue ActiveRecord::RecordInvalid => e
     report_to_slack(
-      "⚠️*부가세* 전자파일 데이터 내용검증 오류\n```Invalid : #{e.record.errors}```",
+      "⚠️*부가세* 전자파일 데이터 내용검증 오류\n```Invalid : #{e.record.errors.full_messages}```",
       { vat_return_id: vat_return_id },
     )
   rescue Net::HTTPBadResponse
