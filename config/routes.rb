@@ -1,3 +1,5 @@
+require "sidekiq/web"
+
 Rails.application.routes.draw do
   get "/", to: proc { [200, {}, ['']] }
   get "auth/status", to: "auth#status"
@@ -42,4 +44,16 @@ Rails.application.routes.draw do
   post "hometax/scraped_callback", to: "hometax#scraped_callback"
   get "estimated_income_taxes", to: "estimated_income_taxes#index"
   resources :vat_return_files, only: [:create]
+
+  Sidekiq::Web.use Rack::Auth::Basic do |username, password|
+    # Protect against timing attacks:
+    # - See https://codahale.com/a-lesson-in-timing-attacks/
+    # - See https://thisdata.com/blog/timing-attacks-against-string-comparison/
+    # - Use & (do not use &&) so that it doesn't short circuit.
+    # - Use digests to stop length information leaking (see also ActiveSupport::SecurityUtils.variable_size_secure_compare)
+    ActiveSupport::SecurityUtils.secure_compare(::Digest::SHA256.hexdigest(username), ::Digest::SHA256.hexdigest(Rails.application.credentials[Rails.env.to_sym].dig(:sidekiq, :username))) &
+      ActiveSupport::SecurityUtils.secure_compare(::Digest::SHA256.hexdigest(password), ::Digest::SHA256.hexdigest(Rails.application.credentials[Rails.env.to_sym].dig(:sidekiq, :password)))
+  end
+
+  mount Sidekiq::Web => "/sidekiq"
 end
