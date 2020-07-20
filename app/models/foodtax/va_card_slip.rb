@@ -34,25 +34,31 @@ module Foodtax
         index = index + 1
         v.slip_seq = index
         case type
-        when 'VatReturnPersonalCardPurchase'
+        when "VatReturnPersonalCardPurchase"
           v.card_type = 8
           v.slip_type = :personal_card
           v.approve_dt = vat_return.form.period_start_date
           v.deduct_yn = "Y"
           v.vend_trade_nm = "개인카드 매입분"
-        when 'HometaxCardPurchase'
+        when "HometaxCardPurchase"
           v.card_type = 9
           v.slip_type = :hometax_card
           v.approve_dt = purchased_at&.strftime("%Y%m%d") || ""
+
           custom_deductible = vat_return.grouped_deductible_purchases.dig([registration_number, type], 0)&.deductible
-          v.deduct_yn = custom_deductible ? "Y" : deductible ? "Y" : "N"
+          deduct = custom_deductible.nil? ? deductible : custom_deductible
+          v.deduct_yn = deduct ? "Y" : "N"
+
           v.vend_trade_nm = name || "홈택스 카드 매입분"
-        when 'HometaxPurchasesCashReceipt'
+        when "HometaxPurchasesCashReceipt"
           v.card_type = ""
           v.slip_type = :cash_receipt
           v.approve_dt = purchased_at.strftime("%Y%m%d")
+
           custom_deductible = vat_return.grouped_deductible_purchases.dig([registration_number, type], 0)&.deductible
-          v.deduct_yn = custom_deductible ? "Y" : deductible ? "Y" : "N"
+          deduct = custom_deductible.nil? ? deductible : custom_deductible
+          v.deduct_yn = deduct ? "Y" : "N"
+
           v.vend_trade_nm = name || "홈택스 현금영수증 매입분"
         end
         v.card_no = card_number || ""

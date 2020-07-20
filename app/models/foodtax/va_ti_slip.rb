@@ -39,7 +39,7 @@ module Foodtax
         no_deductible_id = deemed_paper_invoices[registration_number]&.nodeduct_reason_id
         custom_deemed = deemed_paper_invoices[registration_number]&.deductible
         custom_deductible = deductible_purchases[registration_number]&.deductible
-        
+
         ti_slip.approve_dt = wrriten_at.strftime("%Y%m%d")
         ti_slip.slip_each_yn = "N"
 
@@ -48,9 +48,12 @@ module Foodtax
           ti_slip.pseudo_buy_yn = "N"
           ti_slip.deduct_yn = "N"
         else
-          ti_slip.pseudo_buy_yn = custom_deemed ? "Y" : (deemed && vat.zero?) ? "Y" : "N"
+          pseudo_buy = custom_deemed.nil? ? (deemed && vat.zero?) : custom_deemed
+          ti_slip.pseudo_buy_yn = pseudo_buy ? "Y" : "N"
+
           slip_deductible = custom_deductible.nil? ? deductible : custom_deductible
-          ti_slip.deduct_yn = ti_slip.pseudo_buy_yn == "Y" ? "Y" : slip_deductible ? "Y" : "N"
+          ti_slip.deduct_yn = pseudo_buy ? "Y" : slip_deductible ? "Y" : "N"
+
           ti_slip.nodeduct_type = 0
         end
         purchases << ti_slip
