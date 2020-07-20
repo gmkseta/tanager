@@ -6,7 +6,7 @@ module Foodtax
 
     belongs_to :cm_member, foreign_key: :member_cd, primary_key: :member_cd
 
-    DEFAULT_EMPTY_STRING = %w(return_bank return_branch return_acct_no biz_addr2 biz_addr3 biz_addr4 biz_tel_no cp_no home_tel_no in_vat_autocal_yn closure_dt closure_reason_type closure_reason_type_nm)
+    DEFAULT_EMPTY_STRING = %w(return_bank return_branch return_acct_no biz_addr2 biz_addr3 biz_addr4 biz_tel_no cp_no home_tel_no in_vat_autocal_yn closure_dt closure_reason_type closure_reason_type_nm tax_office_acct_cd)
     NON_VALIDATABLE_ATTRIBUTES = %w(reg_date updt_date reg_user_id updt_user_id) + DEFAULT_EMPTY_STRING
     validates_presence_of Foodtax::VaHead.attribute_names.reject{ |attr| NON_VALIDATABLE_ATTRIBUTES.include?(attr) }
 
