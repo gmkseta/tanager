@@ -63,11 +63,11 @@ module Foodtax
         v.total_amt = amount
 
         custom_deemed = vat_return.deemed_purchases_deductibles.dig([registration_number, convert_deemed_type(type)], 0)&.deemed
-        pseudo_buy_yn = custom_deemed.nil? ? (deemed || false) : custom_deemed
 
-        if pseudo_buy_yn
-          v.pseudo_buy_yn = pseudo_buy_yn ? "Y" : "N"
-          v.deduct_yn = "Y"
+        if vat.zero?
+          pseudo_buy = custom_deemed.nil? ? (deemed || false) : custom_deemed
+          v.pseudo_buy_yn = pseudo_buy ? "Y" : "N"
+          v.deduct_yn = "Y" if v.pseudo_buy_yn == "Y"
         end
 
         v
