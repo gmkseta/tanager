@@ -24,7 +24,7 @@ module Foodtax
         va_income = self.find_or_initialize_by_vat_form(form, index)
 
         value = form.converted_hash_by_order_number[k]
-        next if value.blank? || value["price"].blank?
+        next if value.blank? || value["price"].blank? || value["item"].blank? || value["name"].blank? || value["code"].blank?
 
         va_income.seq_no = index
         va_income.uptae = value["name"]

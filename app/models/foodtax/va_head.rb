@@ -83,7 +83,7 @@ module Foodtax
       self.self_hometax_id = h.login
       self.upjong_cd = form.primary_classification["code"]
 
-      self.closure_dt = form["tax_payer"]&.fetch("business_closed_at")&.strftime("%Y%m%d") || ""
+      self.closure_dt = form["tax_payer"]&.fetch("business_closed_at")&.to_date&.strftime("%Y%m%d") || ""
       self.closure_yn = self.closure_dt.blank? ? "N" : "Y"
       self.closure_reason_type = ""
       self.closure_reason_type_nm = ""

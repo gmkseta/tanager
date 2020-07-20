@@ -46,14 +46,14 @@ module Foodtax
           v.approve_dt = purchased_at&.strftime("%Y%m%d") || ""
           custom_deductible = vat_return.grouped_deductible_purchases.dig([registration_number, type], 0)&.deductible
           v.deduct_yn = custom_deductible ? "Y" : deductible ? "Y" : "N"
-          v.vend_trade_nm = name || '홈택스 카드 매입분'
+          v.vend_trade_nm = name || "홈택스 카드 매입분"
         when 'HometaxPurchasesCashReceipt'
           v.card_type = ""
           v.slip_type = :cash_receipt
           v.approve_dt = purchased_at.strftime("%Y%m%d")
           custom_deductible = vat_return.grouped_deductible_purchases.dig([registration_number, type], 0)&.deductible
           v.deduct_yn = custom_deductible ? "Y" : deductible ? "Y" : "N"
-          v.vend_trade_nm = name || '홈택스 현금영수증 매입분'
+          v.vend_trade_nm = name || "홈택스 현금영수증 매입분"
         end
         v.card_no = card_number || ""
         v.vend_biz_reg_no = registration_number
