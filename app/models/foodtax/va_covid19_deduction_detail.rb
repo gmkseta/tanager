@@ -22,10 +22,23 @@ module Foodtax
     def self.import_general_form!(form)
       return if form.vat_return.exclude_covid19_deduction?
 
-      form.summaries["covid19_deduction_details"].each_with_index do |s, i|
-        d = self.find_or_initialize_by_vat_form(form, i)
-        s.collect { |k, v| d[k] = v }
-        d.save!
+      summary = Foodtax::VaCovid19DeductionSummary.find_or_initialize_by(
+        cmpy_cd: "00025",
+        member_cd: form.vat_return.member_cd,
+        term_cd: form.vat_return.term_cd,
+      )
+
+      form.summaries["covid19_deduction_details"].each_with_index do |summary, index|
+        detail = self.find_or_initialize_by_vat_form(form, index)
+        summary.collect { |k, v| detail[k] = v }        
+        detail.save!
+      end
+
+      easyvat_sum = form.summaries["covid19_deduction_details"].sum { |s| s["easyvat_amt"] }
+      if easyvat_sum != summary.difftax_amt
+        detail = self.find_or_initialize_by_vat_form(form, 0)
+        detail.easyvat_amt = detail.easyvat_amt + summary.difftax_amt - easyvat_sum
+        detail.save!
       end
     end
 

@@ -18,7 +18,7 @@ module Foodtax
     end
 
     def self.import_general_form!(form)
-      return create_empty_table(form) if form.vat_return.exclude_covid19_deduction?
+      return self.create_empty_table(form) if form.vat_return.exclude_covid19_deduction?
       s = self.find_or_initialize_by_vat_form(form)
 
       form.summaries["covid19_deduction_summary"].collect{ |k, v| s[k] = v }
@@ -27,11 +27,15 @@ module Foodtax
       s.gong_fix_amt = form.value_vat("20")
       s.gam_target_amt = [s.paytax_fix_amt - s.gong_fix_amt, 0].max
       s.paytax_amt = s.gam_target_amt
+      
+      diff_tax = s.paytax_amt - s.gamtax_amt
+      s.difftax_amt = diff_tax if s.difftax_amt != diff_tax
+     
       s.use_yn = "Y"
       s.save!
     end
 
-    def create_empty_table(form)
+    def self.create_empty_table(form)
       s = self.find_or_initialize_by_vat_form(form)
       form.summaries["covid19_deduction_summary"].collect{ |k, v| s[k] = 0 }
       s.paytax_fix_amt = 0
