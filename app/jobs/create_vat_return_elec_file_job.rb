@@ -1,4 +1,5 @@
 class CreateVatReturnElecFileJob < ApplicationJob
+  sidekiq_options retry: false
   queue_as :create_vat_return_elec_file 
 
   def perform(vat_return_id)
