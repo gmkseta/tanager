@@ -37,7 +37,8 @@ class Snowdon::VatReturn < Snowdon::ApplicationRecord
   end
 
   def exclude_covid19_deduction?
-    pre_form&.covid19_deduction_excluded == true
+    covid19_deduction = form.value_vat("20-1")
+    pre_form&.covid19_deduction_excluded == true || covid19_deduction.zero?
   end
 
   def grouped_hometax_card_purchases(date_range = form.date_range)
