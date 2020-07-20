@@ -27,6 +27,7 @@ module Foodtax
       s.gong_fix_amt = form.value_vat("20")
       s.gam_target_amt = [s.paytax_fix_amt - s.gong_fix_amt, 0].max
       s.paytax_amt = s.gam_target_amt
+      s.use_yn = "Y"
       s.save!
     end
 
@@ -37,6 +38,7 @@ module Foodtax
       s.gong_fix_amt = 0
       s.gam_target_amt = 0
       s.paytax_amt = 0
+      s.use_yn = "N"
       s.save!
     end
 
