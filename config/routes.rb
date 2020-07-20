@@ -51,8 +51,8 @@ Rails.application.routes.draw do
     # - See https://thisdata.com/blog/timing-attacks-against-string-comparison/
     # - Use & (do not use &&) so that it doesn't short circuit.
     # - Use digests to stop length information leaking (see also ActiveSupport::SecurityUtils.variable_size_secure_compare)
-    ActiveSupport::SecurityUtils.secure_compare(::Digest::SHA256.hexdigest(username), ::Digest::SHA256.hexdigest("kcd")) &
-      ActiveSupport::SecurityUtils.secure_compare(::Digest::SHA256.hexdigest(password), ::Digest::SHA256.hexdigest("123abc!@#"))
+    ActiveSupport::SecurityUtils.secure_compare(::Digest::SHA256.hexdigest(username), ::Digest::SHA256.hexdigest(Rails.application.credentials[Rails.env.to_sym].dig(:sidekiq, :username))) &
+      ActiveSupport::SecurityUtils.secure_compare(::Digest::SHA256.hexdigest(password), ::Digest::SHA256.hexdigest(Rails.application.credentials[Rails.env.to_sym].dig(:sidekiq, :password)))
   end
 
   mount Sidekiq::Web => "/sidekiq"
