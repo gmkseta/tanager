@@ -79,7 +79,7 @@ module Foodtax
       h = form.vat_return.business.hometax_business
       tax_office = Foodtax::CmTaxOffice.find_by(tax_office_cd: h.official_code)
       self.tax_office_cd = h.official_code
-      self.tax_office_acct_cd = tax_office.acct_cd
+      self.tax_office_acct_cd = tax_office.acct_cd if tax_office.present?
       self.self_hometax_id = h.login
       self.upjong_cd = form.primary_classification["code"]
 

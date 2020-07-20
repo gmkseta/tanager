@@ -1,14 +1,15 @@
 default: &default
   adapter: sqlserver
   encoding: utf8
-  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  pool: 30
 
 development:
   <<: *default
-  database: <%= Rails.application.credentials[Rails.env.to_sym].dig(:foodtax_database, :database) %>
+  database: <%= Rails.application.credentials[Rails.env.to_sym].dig(:foodtax_database, :database) %>  
   username: <%= Rails.application.credentials[Rails.env.to_sym].dig(:foodtax_database, :username) %>
   password: <%= Rails.application.credentials[Rails.env.to_sym].dig(:foodtax_database, :password) %>
   host: <%= Rails.application.credentials[Rails.env.to_sym].dig(:foodtax_database, :host) %>
+    
   timeout: 60
 
 production:
@@ -16,5 +17,6 @@ production:
   database: <%= Rails.application.credentials[Rails.env.to_sym].dig(:foodtax_database, :database) %>
   username: <%= Rails.application.credentials[Rails.env.to_sym].dig(:foodtax_database, :username) %>
   password: <%= Rails.application.credentials[Rails.env.to_sym].dig(:foodtax_database, :password) %>
-  host: <%= Rails.application.credentials[Rails.env.to_sym].dig(:foodtax_database, :host) %>
+  host : foodtax-production.csyi7cpegnru.ap-northeast-2.rds.amazonaws.com
   timeout: 60
+  

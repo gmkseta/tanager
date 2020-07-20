@@ -41,16 +41,15 @@ module Foodtax
 
       h = form.vat_return.business.hometax_business
       self.corp_yn = (h.taxation_type == "법인사업자") ? "Y" : "N"
-      tax_office = Foodtax::CmTaxOffice.find_by(tax_office_cd: h.official_code)
       self.alloc_tax_office_cd = h.official_code
-      self.alloc_tax_office_nm = tax_office.tax_office_nm
+      self.alloc_tax_office_nm = h.official_name
 
       self.uptae = form.primary_classification["name"]
       self.jongmok = form.primary_classification["item"]
       self.upjong_cd = form.primary_classification["code"]
 
       self.open_dt = form.vat_return.business.opened_at&.strftime("%Y%m%d") || form.vat_return.business.card_merchant_signed_up_at&.strftime("%Y%m%d") || ""
-      self.closure_dt = form["tax_payer"]&.fetch("business_closed_at")&.strftime("%Y%m%d") || ""
+      self.closure_dt = form["tax_payer"]&.fetch("business_closed_at")&.to_date&.strftime("%Y%m%d") || ""
 
       cellphone_number = form["tax_payer"]&.fetch("cellphone_number")
       if cellphone_number

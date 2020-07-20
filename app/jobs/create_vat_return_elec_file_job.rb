@@ -33,12 +33,7 @@ class CreateVatReturnElecFileJob < ApplicationJob
       return report_to_slack(
         "⚠️*부가세* 전자파일 업로드 오류!\n```#{results.dig("result", "message")}```",
         { vat_return_id: vat_return_id, member_cd: vat_return.member_cd },
-      ) if results.dig("result", "message").present?
-
-      report_to_slack(
-        "🎉*부가세* 전자파일 업로드완료!\n```납부세액: #{vat_return.form.value_vat("27")}```",
-        { vat_return_id: vat_return_id, member_cd: vat_return.member_cd },
-      )
+      ) if results.dig("result", "message").present?      
       return false
     end
     
