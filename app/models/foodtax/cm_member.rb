@@ -30,6 +30,7 @@ module Foodtax
       self.boss_nm = form["tax_payer"]&.fetch("owner_name")
       date = form["tax_payer"]&.fetch("owner_birthday").to_date
       self.boss_jumin_no = "#{date.strftime("%y%m%d")}0000001"
+      self.email = form["tax_payer"]&.fetch("email") || ""
 
       business_address = form["tax_payer"]&.fetch("business_address")
       self.biz_addr4 = business_address.split[3..]&.join(" ")
@@ -47,7 +48,6 @@ module Foodtax
       self.uptae = form.primary_classification["name"]
       self.jongmok = form.primary_classification["item"]
       self.upjong_cd = form.primary_classification["code"]
-      self.email = form["tax_payer"]&.fetch("email")
 
       self.open_dt = form.vat_return.business.opened_at&.strftime("%Y%m%d") || form.vat_return.business.card_merchant_signed_up_at&.strftime("%Y%m%d") || ""
       self.closure_dt = form["tax_payer"]&.fetch("business_closed_at")&.strftime("%Y%m%d") || ""
