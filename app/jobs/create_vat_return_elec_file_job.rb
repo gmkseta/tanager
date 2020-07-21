@@ -5,9 +5,10 @@ class CreateVatReturnElecFileJob < ApplicationJob
   def perform(vat_return_id)
     vat_return = Snowdon::VatReturn.find(vat_return_id)
 
-    file = CreateVatElecFile.call(vat_return_id)
-
     va_head = Foodtax::VaHead.find_or_initialize_by_vat_return(vat_return)
+    DeleteFoodtaxVatForm.call(vat_return_id) if va_head.present?
+
+    file = CreateVatElecFile.call(vat_return_id)
 
     if validate_eql_fields(vat_return.form, va_head, file)
       uploadVatReturnFile = <<~QUERY
