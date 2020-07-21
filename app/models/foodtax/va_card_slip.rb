@@ -20,11 +20,11 @@ module Foodtax
     end
 
     def self.import_vat_return!(vat_return)
-      sales = self.convert_card_slips(vat_return, vat_return.grouped_personal_cards)
-      sales += self.convert_card_slips(vat_return, vat_return.grouped_hometax_card_purchases)
-      sales += self.convert_card_slips(vat_return, vat_return.grouped_purchases_cash_receipts)
+      purchases = self.convert_card_slips(vat_return, vat_return.grouped_personal_cards)
+      purchases += self.convert_card_slips(vat_return, vat_return.grouped_hometax_card_purchases)
+      purchases += self.convert_card_slips(vat_return, vat_return.grouped_purchases_cash_receipts)
 
-      self.import! sales
+      self.import! purchases
     end
 
     def self.convert_card_slips(vat_return, purchases)
