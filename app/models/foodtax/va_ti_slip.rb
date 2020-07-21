@@ -35,19 +35,19 @@ module Foodtax
         ti_slip.vat_amt = vat
         ti_slip.total_amt = amount
         ti_slip.eti_yn = type == "VatReturnPaperInvoice" ? "N" : "Y"
-
-        no_deductible_id = deemed_paper_invoices[registration_number]&.nodeduct_reason_id
-        custom_deemed = deemed_paper_invoices[registration_number]&.deductible
-        custom_deductible = deductible_purchases[registration_number]&.deductible
-
+        
         ti_slip.approve_dt = wrriten_at.strftime("%Y%m%d")
         ti_slip.slip_each_yn = "N"
 
+        no_deductible_id = deductible_purchases[registration_number]&.nodeduct_reason_id
         if no_deductible_id.present?
           ti_slip.nodeduct_type = NoDeductReson.find(custom_no_deductible_id).code
           ti_slip.pseudo_buy_yn = "N"
           ti_slip.deduct_yn = "N"
         else
+          custom_deemed = deemed_paper_invoices[registration_number]&.deemed
+          custom_deductible = deductible_purchases[registration_number]&.deductible
+        
           pseudo_buy = custom_deemed.nil? ? (deemed && vat.zero?) : custom_deemed
           ti_slip.pseudo_buy_yn = pseudo_buy ? "Y" : "N"
 

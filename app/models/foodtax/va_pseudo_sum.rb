@@ -27,12 +27,12 @@ module Foodtax
       s.C0061 = 0
       s.C0062 = s.bill_supply_amt + s.card_supply_amt + s.direct_supply_amt
       s.C0060 = s.bill_supply_amt + s.card_supply_amt + s.direct_supply_amt
-      s.C0070 = s.bill_supply_amt + s.card_supply_amt + s.direct_supply_amt
+      s.C0070 = [s.C0050, s.C0060].min
       s.C0080 = s.deduct_rate_nm[0]
       s.C0090 = form.value_vat("43")
       s.C0100 = 0
       s.C0110 = 0
-      s.C0120 = 0 
+      s.C0120 = 0
       s.C0130 = form.value_vat("43")
       s.deduct_amt = form.value_vat("43")
 
