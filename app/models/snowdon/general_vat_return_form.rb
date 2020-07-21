@@ -19,6 +19,10 @@ class Snowdon::GeneralVatReturnForm < Snowdon::ApplicationRecord
     status.eql?(:declarable)
   end
 
+  def deemed_purchase?
+    value_vat("43").nonzero?
+  end
+
   def converted_hash_by_order_number
     @converted_hash_by_order_number ||= begin
       converted_hash = {}

@@ -36,7 +36,7 @@ class CreateVatElecFile < Service::Base
     Foodtax::VaNoDeductiblePurchase.import_general_form!(vat_return.form)
     Foodtax::VaNoDeductiblePurchaseDetail.import_general_form!(vat_return.form)
 
-    Foodtax::VaPseudoSum.import_general_form!(vat_return.form)
+    Foodtax::VaPseudoSum.import_general_form!(vat_return.form) if vat_return.form.deemed_purchase?
 
     Foodtax::VaCovid19DeductionSummary.import_general_form!(vat_return.form)
     Foodtax::VaCovid19DeductionDetail.import_general_form!(vat_return.form)
