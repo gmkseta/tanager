@@ -28,7 +28,7 @@ module Foodtax
     end
 
     def self.convert_card_slips(vat_return, purchases)
-      index = 0      
+      index = 0
       purchases.map do |registration_number, name, card_number, purchased_at, amount, vat, price, count, deductible, deemed, type|
         v = self.find_or_initialize_by_vat_form(vat_return.form)
         index = index + 1
@@ -49,7 +49,7 @@ module Foodtax
           deduct = custom_deductible.nil? ? deductible : custom_deductible
           v.deduct_yn = deduct ? "Y" : "N"
 
-          v.vend_trade_nm = name || "홈택스 카드 매입분"
+          v.vend_trade_nm = name&.squish&.truncate(50) || "홈택스 카드 매입분"
         when "HometaxPurchasesCashReceipt"
           v.card_type = ""
           v.slip_type = :cash_receipt
@@ -59,7 +59,7 @@ module Foodtax
           deduct = custom_deductible.nil? ? deductible : custom_deductible
           v.deduct_yn = deduct ? "Y" : "N"
 
-          v.vend_trade_nm = name || "홈택스 현금영수증 매입분"
+          v.vend_trade_nm = name&.squish&.truncate(50) || "홈택스 현금영수증 매입분"
         end
         v.card_no = card_number || ""
         v.vend_biz_reg_no = registration_number

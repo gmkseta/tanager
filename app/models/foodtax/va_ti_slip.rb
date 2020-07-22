@@ -84,7 +84,7 @@ module Foodtax
         ti_slip.deduct_yn = "Y"
         ti_slip.slip_cnt = count
         ti_slip.vend_biz_reg_no = registration_number
-        ti_slip.vend_trade_nm = business_name&.truncate(50) || ""
+        ti_slip.vend_trade_nm = business_name&.squish&.truncate(50) || ""
         ti_slip.supply_amt = price
         ti_slip.vat_amt = vat
         ti_slip.total_amt = amount
