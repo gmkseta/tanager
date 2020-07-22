@@ -11,6 +11,7 @@ module Foodtax
 
     def self.import_vat_return!(vat_return)
       deemed_invoices = vat_return.deemed_purchases.invoices.index_by(&:vendor_registration_number)
+
       deemed_paper_invoices = vat_return.deemed_purchases.paper_invoices.index_by(&:vendor_registration_number)
 
       deductible_purchases = vat_return.deductible_purchases.purchases_invoices.index_by(&:vendor_registration_number)
@@ -45,9 +46,17 @@ module Foodtax
           ti_slip.pseudo_buy_yn = "N"
           ti_slip.deduct_yn = "N"
         else
-          custom_deemed = deemed_paper_invoices[registration_number]&.deemed
+          custom_deemed = begin
+            case type
+            when "VatReturnPaperInvoice"
+              deemed_paper_invoices[registration_number]&.deemed
+            when "HometaxPurchasesInvoice"
+              deemed_invoices[registration_number]&.deemed
+            end
+          end
+
           custom_deductible = deductible_purchases[registration_number]&.deductible
-        
+
           pseudo_buy = custom_deemed.nil? ? (deemed && vat.zero?) : custom_deemed
           ti_slip.pseudo_buy_yn = pseudo_buy ? "Y" : "N"
 
