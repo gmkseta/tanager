@@ -36,6 +36,8 @@ module Foodtax
       s.C0130 = form.value_vat("43")
       s.deduct_amt = form.value_vat("43")
 
+      s.autocal_yn = "X" unless form.deemed_purchase?
+
       s.save!
     end
 
