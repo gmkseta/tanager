@@ -52,6 +52,7 @@ class Snowdon::VatReturn < Snowdon::ApplicationRecord
       business.hometax_card_purchases
         .where(purchased_at: date_range)
         .where(vat: 0)
+        .where.not(price: 0)
         .group(:vendor_registration_number)
         .pluck(Arel.sql(<<~QUERY))
           vendor_registration_number,
@@ -102,6 +103,7 @@ class Snowdon::VatReturn < Snowdon::ApplicationRecord
       business.hometax_purchases_cash_receipts
         .where(purchased_at: date_range)
         .where(vat: 0)
+        .where.not(price: 0)
         .group(:vendor_registration_number)
         .pluck(Arel.sql("
           vendor_registration_number,
@@ -196,6 +198,7 @@ class Snowdon::VatReturn < Snowdon::ApplicationRecord
       business.hometax_purchases_invoices
         .where(written_at: date_range)
         .where(tax: 0)
+        .where.not(price: 0)
         .group(:vendor_registration_number)
         .pluck(Arel.sql(<<~QUERY))
           vendor_registration_number,
