@@ -42,7 +42,7 @@ module Foodtax
 
         no_deductible_id = deductible_purchases[registration_number]&.nodeduct_reason_id
         if no_deductible_id.present?
-          ti_slip.nodeduct_type = NoDeductReson.find(custom_no_deductible_id).code
+          ti_slip.nodeduct_type = Snowdon::NodeductReason.find(no_deductible_id).code
           ti_slip.pseudo_buy_yn = "N"
           ti_slip.deduct_yn = "N"
         else
