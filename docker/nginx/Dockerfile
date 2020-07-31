@@ -1,4 +1,4 @@
-FROM nginx:1.11.3
+FROM nginx:1.18
 RUN rm -f /etc/nginx/conf.d/*
 
 ENV TZ Asia/Seoul
