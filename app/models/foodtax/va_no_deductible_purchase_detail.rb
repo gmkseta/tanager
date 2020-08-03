@@ -24,12 +24,13 @@ module Foodtax
 
       invoices = begin
         form.vat_return.business.hometax_purchases_invoices
+          .joins(:deductible_purchase)
           .where(vendor_registration_number: vendor_registration_numbers.keys)
           .where(written_at: form.date_range)
           .where.not(tax: 0)
-          .group(:vendor_registration_number)
+          .group(:nodeduct_reason_id)
           .pluck(Arel.sql(<<~QUERY))
-            MAX(vendor_registration_number),
+            nodeduct_reason_id,
             COUNT(*),
             SUM(price),
             SUM(tax)
@@ -38,11 +39,9 @@ module Foodtax
 
       no_deductible_purchases = begin
         index = 0
-        invoices.map do |vendor_registration_number, count, price, vat|
-          next if vendor_registration_numbers[vendor_registration_number].nil?
+        invoices.map do |nodeduct_reason_id, count, price, vat|
           index = index + 1
-
-          no_deduct_reason = Snowdon::NodeductReason.find(vendor_registration_numbers[vendor_registration_number].nodeduct_reason_id)
+          no_deduct_reason = Snowdon::NodeductReason.find(nodeduct_reason_id)
 
           va_no_deduction_detail = Foodtax::VaNoDeductiblePurchaseDetail.find_or_initialize_by_vat_form(form)
           va_no_deduction_detail.declare_seq = index
