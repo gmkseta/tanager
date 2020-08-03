@@ -1,9 +1,9 @@
 module Foodtax
   class VaCardSlip < Foodtax::ApplicationRecord
     enum slip_type: {
-      personal_card: 1,
-      hometax_card: 2,
-      cash_receipt: 3,
+      personal_card: "1",
+      hometax_card: "2",
+      cash_receipt: "3",
     }
     self.primary_keys = :member_cd, :cmpy_cd, :term_cd, :declare_seq, :slip_seq, :slip_type
     after_initialize :default_values

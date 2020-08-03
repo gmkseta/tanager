@@ -16,12 +16,8 @@ class DeleteFoodtaxVatForm < Service::Base
     va_head = Foodtax::VaHead.find_or_initialize_by_vat_return(vat_return)
     va_head&.delete
 
-    va_incomes = Foodtax::VaIncome.where(
-      cmpy_cd: "00025",
-      member_cd: vat_return.member_cd,
-      term_cd: vat_return.term_cd
-    )
-    va_incomes&.delete_all
+    va_incomes = Foodtax::VaIncome.where(cmpy_cd: "00025", member_cd: vat_return.member_cd, term_cd: vat_return.term_cd)
+    va_incomes&.destroy_all
 
     va_card_sum = Foodtax::VaCardSum.find_or_initialize_by(
       cmpy_cd: "00025",
@@ -35,7 +31,7 @@ class DeleteFoodtaxVatForm < Service::Base
       member_cd: vat_return.member_cd,
       term_cd: vat_return.term_cd
     )
-    va_card_slips&.delete_all
+    va_card_slips&.destroy_all
 
     sales_bills_sum = Foodtax::VaOutBillSum.find_or_initialize_by_vat_form(vat_return.form)
     sales_bills_sum&.delete
@@ -54,7 +50,7 @@ class DeleteFoodtaxVatForm < Service::Base
       member_cd: vat_return.member_cd,
       term_cd: vat_return.term_cd
     )
-    va_ti_slips&.delete_all
+    va_ti_slips&.destroy_all
 
     va_penalty = Foodtax::VaPenalty.find_or_initialize_by_vat_form(vat_return.form)
     va_penalty&.delete
@@ -62,8 +58,12 @@ class DeleteFoodtaxVatForm < Service::Base
     va_nodeductible_purchase = Foodtax::VaNoDeductiblePurchase.find_or_initialize_by_vat_form(vat_return.form)
     va_nodeductible_purchase&.delete
 
-    va_nodeductible_purchase_detail = Foodtax::VaNoDeductiblePurchaseDetail.find_or_initialize_by_vat_form(vat_return.form)
-    va_nodeductible_purchase_detail&.delete
+    va_nodeductible_purchase_detail = Foodtax::VaNoDeductiblePurchaseDetail.where(
+      cmpy_cd: "00025",
+      member_cd: vat_return.member_cd,
+      term_cd: vat_return.term_cd
+    )
+    va_nodeductible_purchase_detail&.destroy_all
 
     va_pseudo_sum = Foodtax::VaPseudoSum.find_or_initialize_by_vat_form(vat_return.form)
     va_pseudo_sum&.delete
@@ -78,7 +78,7 @@ class DeleteFoodtaxVatForm < Service::Base
       cmpy_cd: "00025",
       member_cd: vat_return.member_cd
     )
-    covid19_summary_details&.delete_all
+    covid19_summary_details&.destroy_all
     
     business_status_form = Foodtax::VaBusinessStatusForm.find_or_initialize_by_vat_form(vat_return.form)
     business_status_form&.delete
